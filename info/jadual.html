@@ -75,6 +75,7 @@
       justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
+      margin-bottom: 25px;
     }
 
     .time-box {
@@ -102,6 +103,107 @@
       text-align: center;
       font-size: 18px;
       color: #7f8c8d;
+    }
+
+    /* Countdown Section */
+    .countdown-section {
+      text-align: center;
+      padding: 15px;
+      margin: 20px auto;
+      max-width: 500px;
+      background-color: #2c3e50;
+      border-radius: 15px;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .countdown-label {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .countdown-timer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .countdown-unit {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      min-width: 60px;
+    }
+    
+    .countdown-value {
+      font-size: 24px;
+      font-weight: 600;
+    }
+    
+    .countdown-unit-label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .countdown-progress {
+      width: 100%;
+      height: 10px;
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 5px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    
+    .countdown-progress-bar {
+      height: 100%;
+      background-color: #e74c3c;
+      border-radius: 5px;
+      transition: width 1s linear;
+    }
+
+    /* Infaq & Wakaf Button */
+    .infaq-section {
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      margin: 20px auto;
+      max-width: 600px;
+    }
+    
+    .infaq-description {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    
+    .infaq-button {
+      display: inline-block;
+      padding: 12px 25px;
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      color: white;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    .infaq-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+    
+    .infaq-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
     }
 
     table {
@@ -239,6 +341,24 @@
       .time-value {
         font-size: 16px;
       }
+      
+      .countdown-timer {
+        gap: 10px;
+      }
+      
+      .countdown-unit {
+        min-width: 50px;
+        padding: 8px;
+      }
+      
+      .countdown-value {
+        font-size: 20px;
+      }
+      
+      .infaq-button {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
 
       /* Simplified mobile table styles */
       table {
@@ -283,6 +403,38 @@
   <div id="today-data-section">
     <!-- Will be populated with JS -->
   </div>
+  
+  <!-- Countdown Section -->
+  <div id="countdown-section" class="countdown-section" style="display: none;">
+    <div id="countdown-label" class="countdown-label">Countdown</div>
+    <div class="countdown-timer">
+      <div class="countdown-unit">
+        <div id="countdown-hours" class="countdown-value">00</div>
+        <div class="countdown-unit-label">Jam</div>
+      </div>
+      <div class="countdown-unit">
+        <div id="countdown-minutes" class="countdown-value">00</div>
+        <div class="countdown-unit-label">Minit</div>
+      </div>
+      <div class="countdown-unit">
+        <div id="countdown-seconds" class="countdown-value">00</div>
+        <div class="countdown-unit-label">Saat</div>
+      </div>
+    </div>
+    <div class="countdown-progress">
+      <div id="countdown-progress-bar" class="countdown-progress-bar" style="width: 0%;"></div>
+    </div>
+  </div>
+  
+  <!-- Infaq & Wakaf Section -->
+  <div class="infaq-section">
+    <div class="infaq-description">
+      Sumbangkan Infaq & Wakaf anda untuk membantu kami meneruskan kerja-kerja dakwah dan program-program yang bermanfaat kepada masyarakat.
+    </div>
+    <a href="https://www.mamtj6.com/infaq-wakaf" class="infaq-button">
+      Infaq & Wakaf MAMTJ6
+    </a>
+  </div>
 
   <!-- Desktop Table View -->
   <table id="desktop-schedule-table">
@@ -307,10 +459,17 @@
   </div>
 
   <footer>
-    <p>&copy; 2025 Jadual Waktu. <a href="#">Privacy Policy</a> | <a href="#">Contact Us</a></p>
+    <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> menggunakan <a href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
+    <p>&copy; 2025 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="https://wa.me/601156828198">Hubungi Kami</a></p>
   </footer>
 
   <script>
+    // Global variables to store prayer times for countdown
+    let globalPrayerTimes = {
+      today: null,
+      tomorrow: null
+    };
+    
     // Function to format a timestamp to Malaysia time (12-hour format)
     function formatTime(timestamp) {
       const date = new Date(timestamp * 1000); // Convert from seconds to milliseconds
@@ -354,6 +513,15 @@
       return today.getDate() === day && today.getMonth() === 2 && today.getFullYear() === 2025;
     }
     
+    // Check if a given date is tomorrow
+    function isTomorrow(day) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      
+      return tomorrow.getDate() === day && tomorrow.getMonth() === 2 && tomorrow.getFullYear() === 2025;
+    }
+    
     // Function to process Hijri dates for Ramadan
     function formatHijriForRamadan(hijri) {
       const [year, month, day] = hijri.split('-');
@@ -364,6 +532,118 @@
       } else {
         // For Sha'ban (month 8)
         return `${parseInt(day)} Shaaban`;
+      }
+    }
+    
+    // Function to handle countdown timer
+    function startCountdown(targetTime, startTime, label, totalDuration) {
+      const countdownSection = document.getElementById('countdown-section');
+      const countdownLabel = document.getElementById('countdown-label');
+      const hoursElement = document.getElementById('countdown-hours');
+      const minutesElement = document.getElementById('countdown-minutes');
+      const secondsElement = document.getElementById('countdown-seconds');
+      const progressBar = document.getElementById('countdown-progress-bar');
+      
+      // Set the countdown label
+      countdownLabel.textContent = label;
+      countdownSection.style.display = 'block';
+      
+      // Calculate total duration in seconds if not provided
+      if (!totalDuration) {
+        totalDuration = targetTime - startTime;
+      }
+      
+      // Update the countdown every second
+      const countdownTimer = setInterval(() => {
+        // Get current time in Malaysia (MYT)
+        const now = Math.floor(Date.now() / 1000);
+        
+        // Calculate remaining time
+        const remainingTime = targetTime - now;
+        
+        if (remainingTime <= 0) {
+          // Time's up!
+          clearInterval(countdownTimer);
+          hoursElement.textContent = '00';
+          minutesElement.textContent = '00';
+          secondsElement.textContent = '00';
+          progressBar.style.width = '100%';
+          
+          // Refresh data to update countdown target
+          fetchData();
+          return;
+        }
+        
+        // Calculate hours, minutes, seconds
+        const hours = Math.floor(remainingTime / 3600);
+        const minutes = Math.floor((remainingTime % 3600) / 60);
+        const seconds = remainingTime % 60;
+        
+        // Update countdown display
+        hoursElement.textContent = hours.toString().padStart(2, '0');
+        minutesElement.textContent = minutes.toString().padStart(2, '0');
+        secondsElement.textContent = seconds.toString().padStart(2, '0');
+        
+        // Calculate progress (as percentage of elapsed time)
+        const elapsedTime = now - startTime;
+        const progress = Math.min(100, (elapsedTime / totalDuration) * 100);
+        progressBar.style.width = `${progress}%`;
+        
+      }, 1000);
+      
+      // Return the timer ID for potential cleanup
+      return countdownTimer;
+    }
+    
+    // Function to determine the appropriate countdown target
+    function setupCountdown() {
+      if (!globalPrayerTimes.today) {
+        return; // No data available yet
+      }
+      
+      // Get current time (Unix timestamp in seconds)
+      const now = Math.floor(Date.now() / 1000);
+      
+      // If Subuh time has passed but Maghrib hasn't yet, countdown to Berbuka
+      if (now > globalPrayerTimes.today.fajr && now < globalPrayerTimes.today.maghrib) {
+        // Countdown to Berbuka
+        const startTime = globalPrayerTimes.today.fajr;
+        const targetTime = globalPrayerTimes.today.maghrib;
+        const totalDuration = targetTime - startTime;
+        startCountdown(
+          targetTime, 
+          startTime, 
+          "Countdown untuk berbuka puasa", 
+          totalDuration
+        );
+      } 
+      // If Maghrib has passed, countdown to next day's Subuh
+      else if (now > globalPrayerTimes.today.maghrib && globalPrayerTimes.tomorrow) {
+        // Countdown to tomorrow's Subuh
+        const startTime = globalPrayerTimes.today.maghrib;
+        const targetTime = globalPrayerTimes.tomorrow.fajr;
+        const totalDuration = targetTime - startTime;
+        startCountdown(
+          targetTime, 
+          startTime, 
+          "Countdown untuk mula berpuasa semula", 
+          totalDuration
+        );
+      }
+      // If before Subuh, countdown to today's Subuh
+      else if (now < globalPrayerTimes.today.fajr) {
+        // We don't have yesterday's maghrib time, so use midnight as a fallback starting point
+        const midnightToday = new Date();
+        midnightToday.setHours(0, 0, 0, 0);
+        const startTime = Math.floor(midnightToday.getTime() / 1000);
+        const targetTime = globalPrayerTimes.today.fajr;
+        const totalDuration = targetTime - startTime;
+        startCountdown(
+          targetTime, 
+          startTime, 
+          "Countdown untuk mula berpuasa", 
+          totalDuration
+        );
       }
     }
     
@@ -394,6 +674,7 @@
         
         // Variables to store today's data
         let todayData = null;
+        let tomorrowData = null;
         
         // Get current date
         const today = new Date();
@@ -441,7 +722,30 @@
               day: dayOfWeek,
               imsak: imsakFormatted,
               subuh: fajrFormatted,
-              berbuka: maghribFormatted
+              berbuka: maghribFormatted,
+              fajr: fajrTimestamp,    // Store actual timestamp for countdown
+              maghrib: maghribTimestamp  // Store actual timestamp for countdown
+            };
+            
+            // Store the data in global variable
+            globalPrayerTimes.today = {
+              fajr: fajrTimestamp,
+              maghrib: maghribTimestamp
+            };
+          }
+          
+          // Check if this prayer time is for tomorrow
+          const isTomorrowDay = isTomorrow(prayer.day);
+          if (isTomorrowDay) {
+            tomorrowData = {
+              fajr: fajrTimestamp,
+              maghrib: maghribTimestamp
+            };
+            
+            // Store tomorrow's data in global variable
+            globalPrayerTimes.tomorrow = {
+              fajr: fajrTimestamp,
+              maghrib: maghribTimestamp
             };
           }
           
@@ -513,6 +817,9 @@
               </div>
             </div>
           `;
+          
+          // Setup countdown based on current time
+          setupCountdown();
         } else {
           todaySection.innerHTML = `
             <div class="no-data-message">
@@ -538,9 +845,25 @@
       }
     }
     
-    // Fetch data on page load and every 5 minutes
+    // Fetch data on page load
     document.addEventListener('DOMContentLoaded', fetchData);
-    setInterval(fetchData, 300000); // 300000 ms = 5 minutes
+    
+    // Only refresh the countdown timer and values that need updating
+    // (Not refreshing the entire table every 5 minutes as before)
+    setInterval(() => {
+      // Only refetch if there's no data or when the countdown needs to change target
+      const now = Math.floor(Date.now() / 1000);
+      
+      if (!globalPrayerTimes.today) {
+        fetchData();
+        return;
+      }
+      
+      // Check if we need to transition between countdown targets
+      if (globalPrayerTimes.today.fajr === now || globalPrayerTimes.today.maghrib === now) {
+        fetchData();
+      }
+    }, 60000); // Check every minute for transitions
   </script>
 </body>
 </html>
