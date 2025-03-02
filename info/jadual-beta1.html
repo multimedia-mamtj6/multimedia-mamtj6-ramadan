@@ -75,7 +75,7 @@ h3 {
     /* Today's Data Section */
     .today-data {
       text-align: center;
-      padding: 20px;
+      padding: 15px;
       background-color: #fff;
       border-bottom: 1px solid #eee;
     }
@@ -107,7 +107,7 @@ h3 {
 .time-box {
   flex: 1; /* Allow boxes to grow equally */
   min-width: 100px; /* Minimum width for each box */
-  max-width: 120px; /* Maximum width to prevent excessive stretching */
+  max-width: 115px; /* Maximum width to prevent excessive stretching */
   padding: 10px; /* Adjusted padding for mobile */
   text-align: center;
   background-color: #f0f7ff;
@@ -277,7 +277,7 @@ h3 {
 
     tr.today {
       background-color: #e8f5e9 !important;
-      font-weight: 600;
+      font-weight: 700;
       border: 2px solid #2ecc71 !important;
     }
 
@@ -309,23 +309,27 @@ h3 {
     }
 
     .mobile-day-header {
-      padding: 10px;
-      background-color: #f8f8f8;
-      border-bottom: 1px solid #eee;
-    }
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
 
     .mobile-day-today {
       background-color: #e8f5e9;
     }
 
     .mobile-day-date {
-      font-weight: 500;
-    }
+  font-weight: 700;
+  font-size: 16px; /* Adjust font size as needed */
+  color: #2c3e50; /* Dark color for better readability */
+}
 
-    .mobile-day-hijri {
-      font-size: 0.85em;
-      color: #777;
-    }
+    .mobile-day-gregorian {
+  font-size: 14px; /* Slightly smaller than the Hijri date */
+  color: #777; /* Lighter color for the Gregorian date */
+  margin-top: 3px; /* Add some spacing between the two lines */
+}
 
     .mobile-day-times {
       display: flex;
@@ -831,31 +835,31 @@ h3 {
           desktopTbody.appendChild(tr);
 
           // Create mobile view entry
-          const mobileDay = document.createElement("div");
-          mobileDay.className = "mobile-day-entry";
+const mobileDay = document.createElement("div");
+mobileDay.className = "mobile-day-entry";
 
-          mobileDay.innerHTML = `
-            <div class="mobile-day-header ${isCurrentDay ? 'mobile-day-today' : ''}">
-              <div class="mobile-day-date">${dayOfWeek}, ${gregorianDate}</div>
-              <div class="mobile-day-hijri">${hijriFormatted}</div>
-            </div>
-            <div class="mobile-day-times">
-              <div class="mobile-time-item">
-                <div class="mobile-time-label">Imsak</div>
-                <div class="mobile-time-value">${imsakFormatted}</div>
-              </div>
-              <div class="mobile-time-item">
-                <div class="mobile-time-label">Subuh</div>
-                <div class="mobile-time-value">${fajrFormatted}</div>
-              </div>
-              <div class="mobile-time-item">
-                <div class="mobile-time-label">Berbuka</div>
-                <div class="mobile-time-value">${maghribFormatted}</div>
-              </div>
-            </div>
-          `;
+mobileDay.innerHTML = `
+  <div class="mobile-day-header ${isCurrentDay ? 'mobile-day-today' : ''}">
+    <div class="mobile-day-date">${dayOfWeek}, ${hijriFormatted}</div>
+    <div class="mobile-day-gregorian">${gregorianDate}</div>
+  </div>
+  <div class="mobile-day-times">
+    <div class="mobile-time-item">
+      <div class="mobile-time-label">Imsak</div>
+      <div class="mobile-time-value">${imsakFormatted}</div>
+    </div>
+    <div class="mobile-time-item">
+      <div class="mobile-time-label">Subuh</div>
+      <div class="mobile-time-value">${fajrFormatted}</div>
+    </div>
+    <div class="mobile-time-item">
+      <div class="mobile-time-label">Berbuka</div>
+      <div class="mobile-time-value">${maghribFormatted}</div>
+    </div>
+  </div>
+`;
 
-          mobileContainer.appendChild(mobileDay);
+mobileContainer.appendChild(mobileDay);
         });
 
         // Update today's data section
