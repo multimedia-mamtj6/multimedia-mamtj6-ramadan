@@ -12,7 +12,7 @@
   <meta property="og:image" content="https://ramadan.mamtj6.com/media/linkpreview-ramadan.jpg" />
   <meta property="og:url" content="https://ramadan.mamtj6.com/info/jadual" />
   <meta property="og:type" content="website" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600:700;800&display=swap" rel="stylesheet">
   <style>
     /* Custom CSS */
     body {
@@ -37,16 +37,30 @@
     }
 
     h1 {
-      font-size: 24px;
-      margin: 0;
-      color: #2c3e50;
-    }
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700; /* Poppins Bold */
+  font-size: 32px; /* Biggest size for desktop */
+  margin: 0;
+  padding: 0 20px; /* Add padding for mobile */
+}
 
-    h2 {
-      font-size: 18px;
-      margin: 5px 0 0;
-      color: #7f8c8d;
-    }
+h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* Poppins SemiBold */
+  font-size: 24px; /* 2nd biggest size for desktop */
+  margin: 0;
+  padding: 20px 0px 0px 0px; /* Add padding for mobile */
+}
+
+h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Poppins Regular */
+  font-style: italic; /* Italic */
+  font-size: 18px; /* Small size for desktop */
+  margin: 0;
+  padding: 0 20px; /* Add padding for mobile */
+}
+
 
     /* New container for today info and countdown */
     .today-container {
@@ -66,37 +80,41 @@
       border-bottom: 1px solid #eee;
     }
 
-    .today-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
+.today-title {
+  font-size: 24px; /* Bigger font size */
+  font-weight: 800; /* Bold */
+  margin: 0px 0px 0px 0px;
+  color: #2c3e50;
+  text-transform: uppercase; /* Optional: Makes the text uppercase */
+}
 
     .today-date {
       font-size: 20px;
       font-weight: 700;
-      margin-bottom: 15px;
+      margin: 0px 0px 15px 0px;
       color: #2c3e50;
     }
 
     .time-boxes {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-bottom: 25px;
-    }
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Reduced gap for mobile */
+  flex-wrap: nowrap; /* Prevent wrapping */
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+  padding-bottom: 10px; /* Add some padding for scrollbar */
+}
 
-    .time-box {
-      background-color: #f0f7ff;
-      border: 1px solid #cce6ff;
-      border-radius: 10px;
-      padding: 15px;
-      min-width: 100px;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
+.time-box {
+  flex: 1; /* Allow boxes to grow equally */
+  min-width: 100px; /* Minimum width for each box */
+  max-width: 120px; /* Maximum width to prevent excessive stretching */
+  padding: 10px; /* Adjusted padding for mobile */
+  text-align: center;
+  background-color: #f0f7ff;
+  border: 1px solid #cce6ff;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
 
     .time-label {
       font-weight: 600;
@@ -343,16 +361,28 @@
     }
 
     @media (max-width: 600px) {
-      h1 {
-        font-size: 20px;
-      }
+     h1 {
+    font-size: 28px; /* Slightly smaller for mobile */
+    padding: 0 15px; /* Adjust padding for mobile */
+  }
 
-      h2 {
-        font-size: 16px;
-      }
+  h2 {
+    font-size: 20px; /* Slightly smaller for mobile */
+    padding: 20px 0px 0px 0px; /* Adjust padding for mobile */
+  }
 
-      .today-title,
+  h3 {
+    font-size: 16px; /* Slightly smaller for mobile */
+    padding: 0 15px; /* Adjust padding for mobile */
+  }
+
+      .today-title{
+        font-size: 25px;
+      }
+      
+      
       .today-date {
+        padding: 0px 0px 0px 0px;
         font-size: 16px;
       }
 
@@ -418,8 +448,8 @@
     <!-- Logo -->
     <img src="https://multimedia.mamtj6.com/media/logo/mamtj6-black.webp" alt="Logo" class="logo">
     <h1>Jadual waktu Imsak, Subuh dan Berbuka</h1>
-    <h2>Bagi Negeri Pahang Zon 3</h2>
-    <h2>Daerah Jerantut, Temerloh, Maran, Bera, Chenor, Jengka & Kawasan sekitarnya</h2>
+    <h2>Negeri Pahang (Zon 3)</h2>
+    <h3>Daerah Jerantut, Temerloh, Maran, Bera, Chenor, Jengka & Kawasan sekitarnya</h3>
   </header>
 
   <!-- New container for today info and countdown -->
