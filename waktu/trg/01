@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jadual Waktu Ramadan 2025-1446h</title>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="https://multimedia.mamtj6.com/media/logo/mamtj6_single.svg" />
+  <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content=" Waktu Imsak, Subuh dan Berbuka" />
+  <meta property="og:description" content="Bagi Negeri Terengganu (Zon 1)" />
+  <meta property="og:image" content="https://ramadan.mamtj6.com/media/linkpreview-ramadan.jpg" />
+  <meta property="og:url" content="https://ramadan.mamtj6.com/info/jadual" />
+  <meta property="og:type" content="website" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600:700;800&display=swap" rel="stylesheet">
+  <style>
+    /* Custom CSS */
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      width: 150px;
+      height: auto;
+      margin: 0 auto 10px;
+    }
+
+    h1 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700; /* Poppins Bold */
+  font-size: 32px; /* Biggest size for desktop */
+  margin: 0;
+  padding: 0 20px; /* Add padding for mobile */
+}
+
+h2 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* Poppins SemiBold */
+  font-size: 24px; /* 2nd biggest size for desktop */
+  margin: 0;
+  padding: 20px 0px 0px 0px; /* Add padding for mobile */
+}
+
+h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400; /* Poppins Regular */
+  font-style: italic; /* Italic */
+  font-size: 18px; /* Small size for desktop */
+  margin: 0;
+  padding: 0 20px; /* Add padding for mobile */
+}
+
+
+    /* New container for today info and countdown */
+    .today-container {
+      background: #fff;
+      margin: 20px auto;
+      max-width: 1200px;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    /* Today's Data Section */
+    .today-data {
+      text-align: center;
+      padding: 15px;
+      background-color: #fff;
+      border-bottom: 1px solid #eee;
+    }
+
+.today-title {
+  font-size: 24px; /* Bigger font size */
+  font-weight: 800; /* Bold */
+  margin: 0px 0px 0px 0px;
+  color: #2c3e50;
+  text-transform: uppercase; /* Optional: Makes the text uppercase */
+}
+
+    .today-date {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0px 0px 15px 0px;
+      color: #2c3e50;
+    }
+
+    .time-boxes {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Reduced gap for mobile */
+  flex-wrap: nowrap; /* Prevent wrapping */
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+  padding-bottom: 10px; /* Add some padding for scrollbar */
+}
+
+.time-box {
+  flex: 1; /* Allow boxes to grow equally */
+  min-width: 100px; /* Minimum width for each box */
+  max-width: 115px; /* Maximum width to prevent excessive stretching */
+  padding: 10px; /* Adjusted padding for mobile */
+  text-align: center;
+  background-color: #f0f7ff;
+  border: 1px solid #cce6ff;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+    .time-label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #2c3e50;
+    }
+
+    .time-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .no-data-message {
+      padding: 20px;
+      text-align: center;
+      font-size: 18px;
+      color: #7f8c8d;
+    }
+
+    /* Countdown Section */
+    .countdown-section {
+      text-align: center;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 500px;
+      background-color: #2c3e50;
+      border-radius: 15px;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .countdown-label {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .countdown-timer {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .countdown-unit {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+      min-width: 60px;
+    }
+
+    .countdown-value {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .countdown-unit-label {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .countdown-progress {
+      width: 100%;
+      height: 15px; /* Increased height */
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      margin-top: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .countdown-progress-bar {
+      height: 100%;
+      background-color: #bad643;
+      border-radius: 8px;
+      transition: width 1s linear;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .countdown-progress-percentage {
+      font-size: 12px;
+      color: #fff;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+    }
+
+    /* Infaq & Wakaf Button */
+    .infaq-section {
+      text-align: center;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      max-width: 600px;
+    }
+
+    .infaq-description {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .infaq-button {
+      display: inline-block;
+      padding: 12px 25px;
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      color: white;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .infaq-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+
+    .infaq-button:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
+    }
+
+    table {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #2c3e50;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr.today {
+      background-color: #e8f5e9 !important;
+      font-weight: 700;
+      border: 2px solid #2ecc71 !important;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background-color: #2c3e50;
+      color: #fff;
+      margin-top: 40px;
+    }
+
+    footer a {
+      color: #bad643;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Mobile Schedule Entry */
+    .mobile-day-entry {
+      background-color: #fff;
+      margin: 10px auto;
+      width: 90%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-day-header {
+  padding: 10px;
+  background-color: #e0e6db;
+  border-bottom: 1px solid #eee;
+  text-align: center;
+}
+
+    .mobile-day-today {
+      background-color: #bad643;
+    }
+
+    .mobile-day-date {
+  font-weight: 700;
+  font-size: 16px; /* Adjust font size as needed */
+  color: #2c3e50; /* Dark color for better readability */
+}
+
+    .mobile-day-gregorian {
+  font-size: 14px; /* Slightly smaller than the Hijri date */
+  color: #777; /* Lighter color for the Gregorian date */
+  margin-top: 3px; /* Add some spacing between the two lines */
+}
+
+    .mobile-day-times {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+    }
+
+    .mobile-time-item {
+      text-align: center;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 8px;
+      flex: 1;
+      margin: 0 4px;
+    }
+
+    .mobile-time-label {
+      font-size: 0.85em;
+      color: #555;
+      margin-bottom: 3px;
+    }
+
+    .mobile-time-value {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    #loading-indicator {
+      text-align: center;
+      padding: 20px;
+      font-size: 16px;
+      color: #555;
+    }
+
+    @media (max-width: 600px) {
+     h1 {
+    font-size: 28px; /* Slightly smaller for mobile */
+    padding: 0 15px; /* Adjust padding for mobile */
+  }
+
+  h2 {
+    font-size: 20px; /* Slightly smaller for mobile */
+    padding: 20px 0px 0px 0px; /* Adjust padding for mobile */
+  }
+
+  h3 {
+    font-size: 16px; /* Slightly smaller for mobile */
+    padding: 0 15px; /* Adjust padding for mobile */
+  }
+
+      .today-title{
+        font-size: 25px;
+      }
+      
+      
+      .today-date {
+        padding: 0px 0px 0px 0px;
+        font-size: 16px;
+      }
+
+      .time-box {
+        padding: 10px;
+        min-width: 80px;
+      }
+
+      .time-label {
+        font-size: 14px;
+      }
+
+      .time-value {
+        font-size: 16px;
+      }
+
+      .countdown-section {
+        padding: 15px;
+      }
+
+      .countdown-timer {
+        gap: 10px;
+      }
+
+      .countdown-unit {
+        min-width: 50px;
+        padding: 8px;
+      }
+
+      .countdown-value {
+        font-size: 20px;
+      }
+
+      .infaq-button {
+        padding: 10px 20px;
+        font-size: 15px;
+      }
+
+      table {
+        width: 90%;
+        margin: 20px auto;
+      }
+
+      th, td {
+        padding: 8px 5px;
+        font-size: 14px;
+      }
+
+      #desktop-schedule-table {
+        display: none;
+      }
+    }
+
+    @media (min-width: 601px) {
+      #mobile-schedule-table {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Logo -->
+    <img src="https://multimedia.mamtj6.com/media/logo/mamtj6-black.webp" alt="Logo" class="logo">
+    <h1>Jadual waktu Imsak, Subuh dan Berbuka</h1>
+    <h2>Negeri Terengganu (Zon 1)</h2>
+    <h3>Daerah Kuala Terengganu, Marang, Kuala Nerus & Kawasan sekitarnya</h3>
+  </header>
+
+  <!-- New container for today info and countdown -->
+  <div class="today-container">
+    <!-- Loading Indicator -->
+    <div id="loading-indicator">
+      Memuat data...
+    </div>
+
+    <!-- Today's Data Section -->
+    <div id="today-data-section">
+      <!-- Will be populated with JS -->
+    </div>
+
+    <!-- Countdown Section -->
+    <div id="countdown-section" class="countdown-section" style="display: none;">
+      <div id="countdown-label" class="countdown-label">Countdown</div>
+      <div class="countdown-timer">
+        <div class="countdown-unit">
+          <div id="countdown-hours" class="countdown-value">00</div>
+          <div class="countdown-unit-label">Jam</div>
+        </div>
+        <div class="countdown-unit">
+          <div id="countdown-minutes" class="countdown-value">00</div>
+          <div class="countdown-unit-label">Minit</div>
+        </div>
+        <div class="countdown-unit">
+          <div id="countdown-seconds" class="countdown-value">00</div>
+          <div class="countdown-unit-label">Saat</div>
+        </div>
+      </div>
+      <div class="countdown-progress">
+        <div id="countdown-progress-bar" class="countdown-progress-bar" style="width: 0%;"></div>
+        <div id="countdown-progress-percentage" class="countdown-progress-percentage">0%</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Infaq & Wakaf Section -->
+  <div class="infaq-section">
+    <div class="infaq-description">
+      Jom berinfaq untuk Program Ihya’ Ramadan anjuran Masjid Al-Mukhlisin, Taman Jaya 6 (MAMTJ6), Temerloh, Pahang Darul Makmur.
+    </div>
+    <a href="https://www.mamtj6.com/infaq-wakaf" class="infaq-button">
+      Jom Berinfaq
+    </a>
+  </div>
+
+  <!-- Desktop Table View -->
+  <table id="desktop-schedule-table">
+    <thead>
+      <tr>
+        <th>Tarikh Hijri</th>
+        <th>Tarikh Miladi</th>
+        <th>Hari</th>
+        <th>Imsak</th>
+        <th>Subuh</th>
+        <th>Berbuka</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be populated here dynamically -->
+    </tbody>
+  </table>
+
+  <!-- Mobile View -->
+  <div id="mobile-schedule-table">
+    <!-- Mobile data will be populated here -->
+  </div>
+
+  <footer>
+    <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> menggunakan <a href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
+    <p>&copy; 2025 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="https://wa.me/601156828198">Hubungi Kami</a></p>
+  </footer>
+
+  <script>
+    // Global variables to store prayer times for countdown
+    let globalPrayerTimes = {
+      today: null,
+      tomorrow: null
+    };
+
+    // Function to format a timestamp to Malaysia time (12-hour format)
+    function formatTime(timestamp) {
+      const date = new Date(timestamp * 1000); // Convert from seconds to milliseconds
+
+      let hours = date.getHours();
+      const minutes = date.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+
+      // Convert to 12-hour format
+      hours = hours % 12;
+      hours = hours ? hours : 12; // the hour '0' should be '12'
+
+      // Format minutes with leading zero if needed
+      const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+
+      return `${hours}:${minutesStr} ${ampm}`;
+    }
+
+    // Calculate Imsak time (10 minutes before Fajr)
+    function calculateImsak(fajrTimestamp) {
+      return fajrTimestamp - 600; // Subtract 10 minutes (600 seconds)
+    }
+
+    // Get the day of the week from a timestamp
+    function getDayOfWeek(timestamp) {
+      const date = new Date(timestamp * 1000);
+      const days = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+      return days[date.getDay()];
+    }
+
+    // Format a Gregorian date in Malay format (e.g., "1 Mac")
+    function formatMalayDate(day) {
+      // Since we're only dealing with March 2025, we can just use "Mac"
+      return `${day} Mac`;
+    }
+
+    // Check if a given date is today
+    function isToday(day) {
+      const today = new Date();
+      // March is month 2 (0-indexed)
+      return today.getDate() === day && today.getMonth() === 2 && today.getFullYear() === 2025;
+    }
+
+    // Check if a given date is tomorrow
+    function isTomorrow(day) {
+      const today = new Date();
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+
+      return tomorrow.getDate() === day && tomorrow.getMonth() === 2 && tomorrow.getFullYear() === 2025;
+    }
+
+    // Function to process Hijri dates for Ramadan
+    function formatHijriForRamadan(hijri) {
+      const [year, month, day] = hijri.split('-');
+
+      // Check if it's Ramadan (month 9)
+      if (parseInt(month) === 9) {
+        return `${parseInt(day)} Ramadan`;
+      } else {
+        // For Sha'ban (month 8)
+        return `${parseInt(day)} Shaaban`;
+      }
+    }
+
+    // Function to handle countdown timer
+    function startCountdown(targetTime, startTime, label, totalDuration) {
+      const countdownSection = document.getElementById('countdown-section');
+      const countdownLabel = document.getElementById('countdown-label');
+      const hoursElement = document.getElementById('countdown-hours');
+      const minutesElement = document.getElementById('countdown-minutes');
+      const secondsElement = document.getElementById('countdown-seconds');
+      const progressBar = document.getElementById('countdown-progress-bar');
+      const percentageElement = document.getElementById('countdown-progress-percentage');
+
+      // Set the countdown label
+      countdownLabel.textContent = label;
+      countdownSection.style.display = 'block';
+
+      // Calculate total duration in seconds if not provided
+      if (!totalDuration) {
+        totalDuration = targetTime - startTime;
+      }
+
+      // Update the countdown every second
+      const countdownTimer = setInterval(() => {
+        // Get current time in Malaysia (MYT)
+        const now = Math.floor(Date.now() / 1000);
+
+        // Calculate remaining time
+        const remainingTime = targetTime - now;
+
+        if (remainingTime <= 0) {
+          // Time's up!
+          clearInterval(countdownTimer);
+          hoursElement.textContent = '00';
+          minutesElement.textContent = '00';
+          secondsElement.textContent = '00';
+          progressBar.style.width = '100%';
+          percentageElement.textContent = '100%';
+
+          // Refresh data to update countdown target
+          fetchData();
+          return;
+        }
+
+        // Calculate hours, minutes, seconds
+        const hours = Math.floor(remainingTime / 3600);
+        const minutes = Math.floor((remainingTime % 3600) / 60);
+        const seconds = remainingTime % 60;
+
+        // Update countdown display
+        hoursElement.textContent = hours.toString().padStart(2, '0');
+        minutesElement.textContent = minutes.toString().padStart(2, '0');
+        secondsElement.textContent = seconds.toString().padStart(2, '0');
+
+        // Calculate progress (as percentage of elapsed time)
+        const elapsedTime = now - startTime;
+        const progress = Math.min(100, (elapsedTime / totalDuration) * 100);
+        progressBar.style.width = `${progress}%`;
+        percentageElement.textContent = `${Math.round(progress)}%`;
+
+      }, 1000);
+
+      // Return the timer ID for potential cleanup
+      return countdownTimer;
+    }
+
+    // Function to determine the appropriate countdown target
+    function setupCountdown() {
+      if (!globalPrayerTimes.today) {
+        return; // No data available yet
+      }
+
+      // Get current time (Unix timestamp in seconds)
+      const now = Math.floor(Date.now() / 1000);
+
+      // If Subuh time has passed but Maghrib hasn't yet, countdown to Berbuka
+      if (now > globalPrayerTimes.today.fajr && now < globalPrayerTimes.today.maghrib) {
+        // Countdown to Berbuka
+        const startTime = globalPrayerTimes.today.fajr;
+        const targetTime = globalPrayerTimes.today.maghrib;
+        const totalDuration = targetTime - startTime;
+        startCountdown(
+          targetTime,
+          startTime,
+          "Countdown untuk berbuka puasa",
+          totalDuration
+        );
+      }
+      // If Maghrib has passed, countdown to next day's Subuh
+      else if (now > globalPrayerTimes.today.maghrib && globalPrayerTimes.tomorrow) {
+        // Countdown to tomorrow's Subuh
+        const startTime = globalPrayerTimes.today.maghrib;
+        const targetTime = globalPrayerTimes.tomorrow.fajr;
+        const totalDuration = targetTime - startTime;
+        startCountdown(
+          targetTime,
+          startTime,
+          "Countdown untuk mula berpuasa semula",
+          totalDuration
+        );
+      }
+      // If before Subuh, countdown to today's Subuh
+      else if (now < globalPrayerTimes.today.fajr) {
+        // We don't have yesterday's maghrib time, so use midnight as a fallback starting point
+        const midnightToday = new Date();
+        midnightToday.setHours(0, 0, 0, 0);
+        const startTime = Math.floor(midnightToday.getTime() / 1000);
+        const targetTime = globalPrayerTimes.today.fajr;
+        const totalDuration = targetTime - startTime;
+        startCountdown(
+          targetTime,
+          startTime,
+          "Countdown untuk mula berpuasa",
+          totalDuration
+        );
+      }
+    }
+
+    // Fetch data from API and populate the table
+    async function fetchData() {
+      const url = "https://api.waktusolat.app/v2/solat/TRG01";
+      const loadingIndicator = document.getElementById("loading-indicator");
+
+      try {
+        loadingIndicator.style.display = "block";
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+
+        // Get prayers for March 2-30 (Ramadan only)
+        const marchPrayers = data.prayers.filter(prayer => {
+          // Find prayers from March 2nd (day 2) to March 30 (day 30)
+          return prayer.day >= 2 && prayer.day <= 30;
+        });
+
+        if (marchPrayers.length === 0) {
+          throw new Error("Prayer data for Ramadan not found");
+        }
+
+        // Variables to store today's data
+        let todayData = null;
+        let tomorrowData = null;
+
+        // Get current date
+        const today = new Date();
+        const currentDay = today.getDate();
+
+        // Populate desktop table
+        const desktopTbody = document.querySelector("#desktop-schedule-table tbody");
+        desktopTbody.innerHTML = ""; // Clear existing rows
+
+        // Prepare mobile container
+        const mobileContainer = document.getElementById("mobile-schedule-table");
+        mobileContainer.innerHTML = ""; // Clear existing content
+
+        marchPrayers.forEach(prayer => {
+          // Format the Hijri date
+          const hijriFormatted = formatHijriForRamadan(prayer.hijri);
+
+          // Skip if it's not Ramadan (should be filtered out already, but double check)
+          if (!hijriFormatted.includes("Ramadan")) {
+            return;
+          }
+
+          // Calculate necessary timestamps
+          const fajrTimestamp = prayer.fajr;
+          const imsakTimestamp = calculateImsak(fajrTimestamp);
+          const maghribTimestamp = prayer.maghrib;
+
+          // Format times
+          const fajrFormatted = formatTime(fajrTimestamp);
+          const imsakFormatted = formatTime(imsakTimestamp);
+          const maghribFormatted = formatTime(maghribTimestamp);
+
+          // Get day of week
+          const dayOfWeek = getDayOfWeek(fajrTimestamp);
+
+          // Format Gregorian date in Malay
+          const gregorianDate = formatMalayDate(prayer.day);
+
+          // Check if this prayer time is for today
+          const isCurrentDay = isToday(prayer.day);
+          if (isCurrentDay) {
+            todayData = {
+              hijri: hijriFormatted,
+              gregorian: gregorianDate,
+              day: dayOfWeek,
+              imsak: imsakFormatted,
+              subuh: fajrFormatted,
+              berbuka: maghribFormatted,
+              fajr: fajrTimestamp,    // Store actual timestamp for countdown
+              maghrib: maghribTimestamp  // Store actual timestamp for countdown
+            };
+
+            // Store the data in global variable
+            globalPrayerTimes.today = {
+              fajr: fajrTimestamp,
+              maghrib: maghribTimestamp
+            };
+          }
+
+          // Check if this prayer time is for tomorrow
+          const isTomorrowDay = isTomorrow(prayer.day);
+          if (isTomorrowDay) {
+            tomorrowData = {
+              fajr: fajrTimestamp,
+              maghrib: maghribTimestamp
+            };
+
+            // Store tomorrow's data in global variable
+            globalPrayerTimes.tomorrow = {
+              fajr: fajrTimestamp,
+              maghrib: maghribTimestamp
+            };
+          }
+
+          // Create desktop table row
+          const tr = document.createElement("tr");
+          if (isCurrentDay) {
+            tr.classList.add("today");
+          }
+
+          tr.innerHTML = `
+            <td>${hijriFormatted}</td>
+            <td>${gregorianDate}</td>
+            <td>${dayOfWeek}</td>
+            <td>${imsakFormatted}</td>
+            <td>${fajrFormatted}</td>
+            <td>${maghribFormatted}</td>
+          `;
+          desktopTbody.appendChild(tr);
+
+          // Create mobile view entry
+const mobileDay = document.createElement("div");
+mobileDay.className = "mobile-day-entry";
+
+mobileDay.innerHTML = `
+  <div class="mobile-day-header ${isCurrentDay ? 'mobile-day-today' : ''}">
+    <div class="mobile-day-date">${dayOfWeek}, ${hijriFormatted}</div>
+    <div class="mobile-day-gregorian">${gregorianDate}</div>
+  </div>
+  <div class="mobile-day-times">
+    <div class="mobile-time-item">
+      <div class="mobile-time-label">Imsak</div>
+      <div class="mobile-time-value">${imsakFormatted}</div>
+    </div>
+    <div class="mobile-time-item">
+      <div class="mobile-time-label">Subuh</div>
+      <div class="mobile-time-value">${fajrFormatted}</div>
+    </div>
+    <div class="mobile-time-item">
+      <div class="mobile-time-label">Berbuka</div>
+      <div class="mobile-time-value">${maghribFormatted}</div>
+    </div>
+  </div>
+`;
+
+mobileContainer.appendChild(mobileDay);
+        });
+
+        // Update today's data section
+        const todaySection = document.getElementById("today-data-section");
+
+        if (todayData) {
+          todaySection.innerHTML = `
+            <div class="today-data">
+              <div class="today-title">INFO HARI INI</div>
+              <div class="today-date"><strong>${todayData.day}, ${todayData.hijri} (${todayData.gregorian})</strong></div>
+              <div class="time-boxes">
+                <div class="time-box">
+                  <div class="time-label">Imsak</div>
+                  <div class="time-value">${todayData.imsak}</div>
+                </div>
+                <div class="time-box">
+                  <div class="time-label">Subuh</div>
+                  <div class="time-value">${todayData.subuh}</div>
+                </div>
+                <div class="time-box">
+                  <div class="time-label">Berbuka</div>
+                  <div class="time-value">${todayData.berbuka}</div>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Setup countdown based on current time
+          setupCountdown();
+        } else {
+          todaySection.innerHTML = `
+            <div class="no-data-message">
+              Tiada data untuk hari ini
+            </div>
+          `;
+        }
+
+        loadingIndicator.style.display = "none";
+
+      } catch (error) {
+        console.error("Error fetching data:", error);
+
+        // Show error message if data can't be loaded
+        const todaySection = document.getElementById("today-data-section");
+        todaySection.innerHTML = `
+          <div class="no-data-message">
+            Tiada data untuk hari ini. Ralat: ${error.message}
+          </div>
+        `;
+
+        loadingIndicator.style.display = "none";
+      }
+    }
+
+    // Fetch data on page load
+    document.addEventListener('DOMContentLoaded', fetchData);
+
+    // Only refresh the countdown timer and values that need updating
+    setInterval(() => {
+      // Only refetch if there's no data or when the countdown needs to change target
+      const now = Math.floor(Date.now() / 1000);
+
+      if (!globalPrayerTimes.today) {
+        fetchData();
+        return;
+      }
+
+      // Check if we need to transition between countdown targets
+      if (globalPrayerTimes.today.fajr === now || globalPrayerTimes.today.maghrib === now) {
+        fetchData();
+      }
+    }, 60000); // Check every minute for transitions
+  </script>
+</body>
+</html>
