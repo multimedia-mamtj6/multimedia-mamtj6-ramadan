@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JADUAL IMAM & BILAL TERAWIH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --tertiary-color: #9b59b6;
+            --background-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --accent-color: #f39c12;
+            --highlight-color: rgba(52, 152, 219, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--text-color);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .today-date {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--tertiary-color);
+        }
+
+        .today-info {
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .today-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .duty-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .duty-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            transition: transform 0.3s ease;
+        }
+
+        .duty-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .duty-card h3 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .duty-card.imam {
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .duty-card.bilal {
+            border-top: 5px solid var(--secondary-color);
+        }
+
+        .duty-card.pembimbing {
+            border-top: 5px solid var(--tertiary-color);
+        }
+
+        .duty-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .duty-card .name {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .table-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        tr.highlight {
+            background-color: var(--highlight-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .card-view {
+            display: none;
+        }
+
+        .day-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .day-card.highlight {
+            border-left: 5px solid var(--primary-color);
+            background-color: var(--highlight-color);
+        }
+
+        .day-card .date {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .day-card .day {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .day-card .detail {
+            margin-bottom: 8px;
+        }
+
+        .day-card .label {
+            font-weight: 600;
+            color: var(--tertiary-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        .footer-text {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .copyright {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .contact {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .contact i {
+            color: var(--primary-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .table-view {
+                display: none;
+            }
+
+            .card-view {
+                display: block;
+            }
+
+            .duty-cards {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .duty-card {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JADUAL IMAM & BILAL TERAWIH</h1>
+            <h2>MAMTJ6</h2>
+        </header>
+
+        <section class="today-info">
+            <h2 class="today-title">IMAM & BILAL BERTUGAS HARI INI</h2>
+            <div class="today-date" id="today-date"></div>
+            <div class="duty-cards" id="duty-cards">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <section class="table-container">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Cari nama atau tarikh...">
+            </div>
+            
+            <div class="table-view">
+                <table id="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>Tarikh Miladi</th>
+                            <th>Tarikh Hijri</th>
+                            <th>Hari</th>
+                            <th>Imam Terawih</th>
+                            <th>Bilal Terawih</th>
+                            <th>Pembimbing Qiamullail</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="card-view" id="card-view">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-text">
+                Dibangunkan oleh biro multimedia & disusun oleh biro dakwah
+            </div>
+            <div class="copyright">
+                Copyright 2025 MAMTJ6
+            </div>
+            <div class="contact">
+                <i class="fas fa-phone"></i>
+                <span>Sebarang pembeltulan, hubungi 0148387320</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSm2cQfgZt43eEckcd0aj6v11UR1bFdwBNLXl0fWq3_RJ-FiI-A8H2Q1C83J-KXDvQ3pm9_faLKo-07/pub?output=csv';
+        let scheduleData = [];
+        const monthsMs = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
+        const daysMs = ['Ahad', 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu'];
+
+        // Function to parse CSV data
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const result = [];
+            const headers = lines[0].split(',');
+            
+            for(let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                const obj = {};
+                const currentLine = lines[i].split(',');
+                
+                for(let j = 0; j < headers.length; j++) {
+                    obj[headers[j].trim()] = currentLine[j] ? currentLine[j].trim() : '';
+                }
+                result.push(obj);
+            }
+            return result;
+        }
+
+        // Improved function to parse date string in DD/MM/YYYY format
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            
+            // Handle DD/MM/YYYY format first (common in Malaysia)
+            const ddmmyyyy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
+            const match = dateStr.match(ddmmyyyy);
+            
+            if (match) {
+                const day = parseInt(match[1], 10);
+                const month = parseInt(match[2], 10) - 1; // JS months are 0-indexed
+                const year = parseInt(match[3], 10);
+                
+                const date = new Date(year, month, day);
+                
+                // Verify the date is valid
+                if (!isNaN(date.getTime())) {
+                    return date;
+                }
+            }
+            
+            // Try direct parsing (works for YYYY-MM-DD)
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+            
+            console.error(`Could not parse date: ${dateStr}`);
+            return null;
+        }
+
+        // Function to format date to Malay format
+        function formatDateMalay(dateStr, hijriDate, day) {
+            if (!dateStr) return '';
+            
+            const date = parseDate(dateStr);
+            if (!date) return '';
+            
+            const dayName = daysMs[date.getDay()];
+            const day2 = date.getDate();
+            const month = monthsMs[date.getMonth()];
+            const year = date.getFullYear();
+            
+            // Format: AHAD, 1 RAMADAN 1446h / 2 MAC 2025
+            return `${dayName.toUpperCase()}, ${hijriDate} / ${day2} ${month.toUpperCase()} ${year}`;
+        }
+
+        // Improved function to format short date
+        function formatShortDate(dateStr) {
+            if (!dateStr) return '';
+            
+            const date = parseDate(dateStr);
+            if (!date) {
+                console.warn(`Failed to format date: ${dateStr}`);
+                return dateStr; // Return original string if parsing fails
+            }
+            
+            const day = date.getDate();
+            const month = monthsMs[date.getMonth()];
+            
+            return `${day} ${month}`;
+        }
+
+        // Function to format short hijri date
+        function formatShortHijri(hijriStr) {
+            if (!hijriStr) return '';
+            
+            const parts = hijriStr.split(' ');
+            if (parts.length >= 2) {
+                return `${parts[0]} ${parts[1]}`;
+            }
+            return hijriStr;
+        }
+
+        // Function to check if today is within Qiamullail period (March 21-29, 2025)
+        function isQiamullailPeriod(date) {
+            const startDate = parseDate('21/03/2025');
+            const endDate = parseDate('29/03/2025');
+            
+            return date >= startDate && date <= endDate;
+        }
+
+        // Function to find today's schedule based on date
+        function findTodaySchedule(data) {
+            // Get today's date
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Set time to midnight for date comparison
+            
+            // For testing/demo purposes, hardcode to March 4, 2025
+            const demoToday = parseDate('04/03/2025');
+            if (demoToday) demoToday.setHours(0, 0, 0, 0);
+            
+            // Use either actual today or demo date
+            const compareDate = demoToday || today;
+            
+            // Look for the entry with today's date
+            for (let i = 0; i < data.length; i++) {
+                const dateStr = data[i]['Tarikh Miladi'];
+                if (!dateStr) continue;
+                
+                const entryDate = parseDate(dateStr);
+                if (!entryDate) {
+                    console.warn(`Failed to parse date from: ${dateStr}`);
+                    continue;
+                }
+                
+                entryDate.setHours(0, 0, 0, 0);
+                
+                // Check if the date matches today's date (or demo date)
+                if (entryDate.getTime() === compareDate.getTime()) {
+                    return { schedule: data[i], index: i };
+                }
+            }
+            
+            console.warn("No matching date found in the data");
+            return null; // No match found
+        }
+
+        // Function to update today's info
+        function updateTodayInfo(data) {
+            const todayData = findTodaySchedule(data);
+            
+            if (todayData && todayData.schedule) {
+                const todaySchedule = todayData.schedule;
+                
+                // Format the date for display
+                const dateStr = todaySchedule['Tarikh Miladi'];
+                const hijriStr = todaySchedule['Tarikh Hijri'];
+                const dayStr = todaySchedule['Hari'];
+                
+                // Parse the date
+                const date = parseDate(dateStr);
+                
+                // Format: AHAD, 1 RAMADAN 1446h / 2 MAC 2025
+                document.getElementById('today-date').textContent = formatDateMalay(
+                    dateStr,
+                    hijriStr,
+                    dayStr
+                );
+                
+                const dutyCardsContainer = document.getElementById('duty-cards');
+                dutyCardsContainer.innerHTML = '';
+                
+                // Imam Card
+                const imamCard = document.createElement('div');
+                imamCard.className = 'duty-card imam';
+                imamCard.innerHTML = `
+                    <h3>IMAM TERAWIH</h3>
+                    <img src="${todaySchedule['Gambar Imam'] || '/api/placeholder/300/200'}" alt="Imam">
+                    <div class="name">${todaySchedule['Imam Terawih'] || 'Tidak ditetapkan'}</div>
+                `;
+                dutyCardsContainer.appendChild(imamCard);
+                
+                // Bilal Card
+                const bilalCard = document.createElement('div');
+                bilalCard.className = 'duty-card bilal';
+                bilalCard.innerHTML = `
+                    <h3>BILAL TERAWIH</h3>
+                    <img src="${todaySchedule['Gambar Bilal'] || '/api/placeholder/300/200'}" alt="Bilal">
+                    <div class="name">${todaySchedule['Bilal Terawih'] || 'Tidak ditetapkan'}</div>
+                `;
+                dutyCardsContainer.appendChild(bilalCard);
+                
+                // Check if it's Qiamullail period
+                if (isQiamullailPeriod(date)) {
+                    const pembimbingCard = document.createElement('div');
+                    pembimbingCard.className = 'duty-card pembimbing';
+                    pembimbingCard.innerHTML = `
+                        <h3>PEMBIMBING QIAMULLAIL</h3>
+                        <img src="${todaySchedule['Gambar Pembimbing'] || '/api/placeholder/300/200'}" alt="Pembimbing">
+                        <div class="name">${todaySchedule['Pembimbing Qiamullail'] || 'Tidak ditetapkan'}</div>
+                    `;
+                    dutyCardsContainer.appendChild(pembimbingCard);
+                }
+                
+                return todayData.index; // Return the index of today's schedule
+            } else {
+                document.getElementById('today-date').textContent = 'Tiada maklumat untuk hari ini';
+                const dutyCardsContainer = document.getElementById('duty-cards');
+                dutyCardsContainer.innerHTML = '<p style="text-align: center; width: 100%;">Tiada maklumat untuk hari ini</p>';
+                
+                return -1; // No match found
+            }
+        }
+
+        // Function to sort data by date
+        function sortDataByDate(data) {
+            return data.sort((a, b) => {
+                const dateA = parseDate(a['Tarikh Miladi']);
+                const dateB = parseDate(b['Tarikh Miladi']);
+                
+                if (!dateA && !dateB) return 0;
+                if (!dateA) return 1;
+                if (!dateB) return -1;
+                
+                return dateA - dateB;
+            });
+        }
+
+        // Function to populate the table
+        function populateTable(data, todayIndex) {
+            const tableBody = document.getElementById('table-body');
+            const cardView = document.getElementById('card-view');
+            
+            tableBody.innerHTML = '';
+            cardView.innerHTML = '';
+            
+            // Sort data by date first
+            const sortedData = sortDataByDate([...data]);
+            
+            sortedData.forEach((item, index) => {
+                // Check if this is today's entry in the sorted data
+                const isToday = (todayIndex !== -1) && (item === data[todayIndex]);
+                
+                // Table row
+                const row = document.createElement('tr');
+                if (isToday) {
+                    row.className = 'highlight';
+                }
+                
+                row.innerHTML = `
+                    <td>${formatShortDate(item['Tarikh Miladi'])}</td>
+                    <td>${formatShortHijri(item['Tarikh Hijri'])}</td>
+                    <td>${item['Hari']}</td>
+                    <td>${item['Imam Terawih'] || '-'}</td>
+                    <td>${item['Bilal Terawih'] || '-'}</td>
+                    <td>${item['Pembimbing Qiamullail'] || '-'}</td>
+                `;
+                tableBody.appendChild(row);
+                
+                // Card for mobile view
+                const card = document.createElement('div');
+                card.className = `day-card ${isToday ? 'highlight' : ''}`;
+                
+                card.innerHTML = `
+                    <div class="date">${formatShortDate(item['Tarikh Miladi'])} | ${formatShortHijri(item['Tarikh Hijri'])}</div>
+                    <div class="day">${item['Hari']}</div>
+                    <div class="detail"><span class="label">Imam Terawih:</span> ${item['Imam Terawih'] || '-'}</div>
+                    <div class="detail"><span class="label">Bilal Terawih:</span> ${item['Bilal Terawih'] || '-'}</div>
+                    <div class="detail"><span class="label">Pembimbing Qiamullail:</span> ${item['Pembimbing Qiamullail'] || '-'}</div>
+                `;
+                cardView.appendChild(card);
+            });
+        }
+
+        // Function to handle search
+        function handleSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('keyup', () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                
+                const filteredData = scheduleData.filter(item => {
+                    return Object.values(item).some(value => 
+                        value.toString().toLowerCase().includes(searchTerm)
+                    );
+                });
+                
+                populateTable(filteredData, -1); // -1 means no highlighting in search results
+            });
+        }
+
+        // Function to sanitize the CSV data and fix any date format issues
+        function sanitizeData(data) {
+            return data.map(item => {
+                // Check if Tarikh Miladi is in the correct format
+                const dateStr = item['Tarikh Miladi'];
+                if (dateStr) {
+                    // If date is already in DD/MM/YYYY format, keep it
+                    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(dateStr)) {
+                        // It's already in the right format
+                    } 
+                    // If the date is just a day number (e.g., "3"), fix it
+                    else if (/^\d{1,2}$/.test(dateStr)) {
+                        // Assume it's for March 2025 (adjust as needed)
+                        item['Tarikh Miladi'] = `${dateStr}/03/2025`;
+                        console.log(`Fixed date format: ${dateStr} -> ${item['Tarikh Miladi']}`);
+                    }
+                    // Try to handle other potential date formats
+                    else {
+                        console.warn(`Unusual date format: ${dateStr}`);
+                    }
+                }
+                return item;
+            });
+        }
+
+        // Function to fetch data and initialize
+        async function initialize() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvData = await response.text();
+                
+                // Parse the CSV
+                let rawData = parseCSV(csvData);
+                
+                // Sanitize and fix date formats
+                scheduleData = sanitizeData(rawData);
+                
+                const todayIndex = updateTodayInfo(scheduleData);
+                populateTable(scheduleData, todayIndex);
+                handleSearch();
+                
+                // Set up auto-refresh at midnight
+                function scheduleRefresh() {
+                    const now = new Date();
+                    const midnight = new Date();
+                    midnight.setHours(0, 0, 0, 0);
+                    midnight.setDate(midnight.getDate() + 1);
+                    
+                    const timeUntilMidnight = midnight - now;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, timeUntilMidnight);
+                }
+                
+                scheduleRefresh();
+                
+            } catch (error) {
+                console.error('Error fetching or parsing data:', error);
+                document.body.innerHTML += `<div style="color: red; text-align: center; margin-top: 20px;">Ralat semasa memuat data. Sila muat semula halaman.</div>`;
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            initialize();
+            // Removed the call to debugShowRawData() here
+        });
+    </script>
+</body>
+</html>
