@@ -1,102 +1,142 @@
-# Dokumentasi Projek: Bot Kiraan Detik Telegram dengan Imej Dinamik
+# Panduan Implementasi Projek Bot Kiraan Detik untuk Acara Baharu
 
-Dokumen ini menerangkan secara terperinci mengenai projek automasi yang menghantar imej kiraan detik harian ke saluran Telegram menggunakan Google Apps Script dan Google Slides.
+Dokumen ini menyediakan arahan langkah demi langkah untuk menyalin projek bot kiraan detik sedia ada dan mengkonfigurasikannya untuk acara, reka bentuk, dan mesej yang baharu.
 
-## 1. Pengenalan
+## Pengenalan
 
-Projek ini adalah sistem automasi yang direka untuk meningkatkan penglibatan dalam saluran Telegram dengan menyediakan kandungan visual yang relevan setiap hari. Ia mengira baki hari ke satu tarikh acara yang ditetapkan (contohnya, 1 Ramadan), menjana imej yang menarik dengan nombor kiraan detik, dan menyiarkannya secara automatik ke saluran.
+Pendekatan yang disyorkan adalah dengan mencipta satu projek Google Apps Script yang **berasingan** untuk setiap kiraan detik. Ini memastikan kestabilan, pengasingan, dan kesederhanaan kod untuk setiap automasi.
 
-Ia juga menyertakan ciri perkongsian ke WhatsApp yang membolehkan pengguna menyebarkan siaran tersebut dengan mudah.
+## Bahagian 1: Penyediaan Aset Baharu
 
-## 2. Komponen Utama
+Sebelum menyentuh kod, sediakan semua aset digital yang diperlukan untuk kiraan detik baharu anda.
 
-Projek ini dibina menggunakan beberapa perkhidmatan Google dan Telegram yang saling berhubung:
+### 1.1. Templat Google Slides Baharu (Wajib)
 
-*   **Google Apps Script:** Bertindak sebagai "otak" projek. Ia menjadi hos kepada semua kod logik, menguruskan automasi, dan berkomunikasi dengan perkhidmatan lain.
-*   **Google Slides:** Digunakan sebagai "enjin templat imej". Satu fail Google Slides direka bentuk untuk menjadi templat, dan skrip akan mengubah suai teks di dalamnya secara dinamik.
-*   **Google Slides API (Advanced Service):** Perkhidmatan yang membolehkan skrip mengeksport slaid yang telah dikemas kini sebagai fail imej PNG melalui URL.
-*   **Pencetus Google Apps Script (Triggers):** Mekanisme penjadualan yang menjalankan skrip secara automatik setiap hari.
-*   **Bot Telegram:** Entiti yang digunakan untuk menghantar mesej ke saluran bagi pihak skrip.
-*   **API Telegram:** Antara muka yang membolehkan skrip berkomunikasi dengan pelayan Telegram untuk menghantar dan mengedit mesej.
+Setiap kiraan detik memerlukan templat imejnya sendiri.
 
-## 3. Aliran Kerja Automasi
+1.  Pergi ke Google Drive anda.
+2.  Cari fail templat Google Slides yang asal (cth., `Templat Countdown Telegram`).
+3.  Klik kanan pada fail tersebut dan pilih **"Buat salinan" (Make a copy)**.
+4.  Namakan semula fail salinan itu dengan nama yang relevan (cth., `Templat Countdown Tahun Baru`).
+5.  **Buka templat baharu ini:**
+    *   Tukar reka bentuk seperti imej latar belakang atau teks statik mengikut tema acara baharu anda.
+    *   **PENTING:** Pastikan kotak teks yang mengandungi pemegang teks `{{countdown_number}}` tidak dipadam. Anda boleh mengubah gayanya (fon, saiz, warna, bayang-bayang).
+6.  Salin **ID Persembahan (Presentation ID)** daripada URL templat baharu ini.
+    *   Contoh URL: `https://docs.google.com/presentation/d/INI_ADALAH_ID_BAHARU_ANDA/edit`
 
-Aliran kerja harian projek ini adalah seperti berikut:
+### 1.2. Saluran Telegram Baharu (Pilihan)
 
-1.  **Pencetus Aktif:** Setiap hari pada jam 9:05 pagi (waktu yang ditetapkan), pencetus masa akan mengaktifkan fungsi utama `sendCountdownMessages`.
-2.  **Pengiraan Hari:** Skrip mengambil tarikh acara sasaran dan mengira baki hari dari tarikh semasa.
-3.  **Penjanaan Imej (`generateCountdownImage`):**
-    *   Skrip membuka fail Google Slides templat menggunakan ID Persembahan (`PRESENTATION_ID`).
-    *   Ia mencari teks pemegang (`{{countdown_number}}`) pada slaid pertama dan menggantikannya dengan nombor baki hari.
-    *   Ia kemudian memanggil Google Slides API untuk mendapatkan URL imej PNG bagi slaid yang baru dikemas kini.
-    *   Akhir sekali, ia menukar semula nombor pada slaid kepada teks pemegang asal (`{{countdown_number}}`) untuk menyediakannya bagi larian hari berikutnya.
-4.  **Penghantaran Mesej (`sendTelegramPhotoWithButton` - Langkah 1):**
-    *   Skrip membuat panggilan pertama ke API Telegram untuk menghantar imej (menggunakan URL yang dijana) bersama kapsyen yang telah diformat. Mesej ini dihantar **tanpa** sebarang butang.
-5.  **Penambahan Butang (`sendTelegramPhotoWithButton` - Langkah 2):**
-    *   Telegram membalas panggilan pertama dengan maklumat siaran, termasuk `message_id` yang unik.
-    *   Skrip mengambil `message_id` ini.
-    *   Ia mencipta satu versi mesej yang "bersih" khusus untuk WhatsApp, membuang semua pemformatan dan menambah pautan terus ke siaran (`https://t.me/username/message_id`).
-    *   Skrip membuat panggilan kedua ke API Telegram untuk **mengedit mesej asal**, menambah butang "Share on WhatsApp" yang mengandungi pautan mesej bersih tadi.
+Jika anda mahu menyiarkan kiraan detik ini ke lokasi yang berbeza:
 
-## 4. Panduan Penyediaan Lengkap
+1.  Cipta satu Saluran Telegram awam (Public Channel) yang baharu.
+2.  Berikan nama pengguna (username) yang unik (cth., `@TahunBaruCountdown`). Ini akan menjadi `CHAT_ID` baharu anda.
+3.  Tambah bot anda yang sedia ada (cth., `@autosent_robot`) ke dalam saluran baharu ini sebagai **Administrator** dengan kebenaran untuk menghantar mesej.
 
-Untuk menyediakan projek ini dari awal, ikuti langkah-langkah di bawah:
+Jika anda mahu menggunakan saluran yang sama, anda boleh langkau langkah ini.
 
-### Langkah 1: Cipta Bot Telegram
-1.  Buka Telegram dan cari `@BotFather`.
-2.  Hantar arahan `/newbot`.
-3.  Ikut arahan untuk menamakan bot anda.
-4.  BotFather akan memberikan anda satu **Token API**. Salin dan simpan token ini. Ini ialah `BOT_TOKEN` anda.
+## Bahagian 2: Penyediaan Projek Google Apps Script Baharu
 
-### Langkah 2: Sediakan Saluran Telegram
-1.  Cipta saluran Telegram baharu (Public Channel).
-2.  Tetapkan nama pengguna (username) yang unik untuk saluran anda (cth., `@islamic_countdown`). Ini ialah `CHAT_ID` anda.
-3.  Tambah bot yang anda cipta tadi ke dalam saluran sebagai **Administrator** dengan kebenaran untuk menghantar mesej.
+Sekarang, kita akan mencipta "otak" baharu untuk automasi ini.
 
-### Langkah 3: Reka Bentuk Templat Google Slides
-1.  Cipta satu fail Google Slides baharu.
-2.  **Tetapkan Saiz:** Pergi ke `Fail > Persediaan Halaman > Tersuai`. Tetapkan saiz kepada **11.25 x 11.25 inci** (ini akan menghasilkan imej 1080x1080 piksel).
-3.  **Reka Bentuk:** Tambah imej latar belakang, logo, dan teks statik anda.
-4.  **Tambah Pemegang Teks:** Masukkan satu Kotak Teks di mana nombor akan muncul. Taip teks pemegang unik di dalamnya, iaitu `{{countdown_number}}`. Gayakan teks ini (fon, saiz, warna, bayang-bayang) mengikut kehendak anda.
-5.  **Dapatkan ID:** Salin ID unik dari URL fail Slides anda (`https://docs.google.com/presentation/d/ID_ANDA_DI_SINI/edit`). Ini ialah `PRESENTATION_ID` anda.
+1.  Pergi ke [script.google.com](https://script.google.com) dan klik **"Projek baharu" (New project)**.
+2.  Berikan nama yang jelas pada projek ini (cth., `Bot Countdown Tahun Baru`).
+3.  Buka projek Apps Script yang asal, pilih semua kod (`Ctrl+A` atau `Cmd+A`), dan salin (`Ctrl+C` atau `Cmd+C`).
+4.  Tampal (`Ctrl+V` atau `Cmd+V`) kod tersebut ke dalam fail `Code.gs` projek baharu anda.
 
-### Langkah 4: Sediakan Projek Google Apps Script
-1.  Pergi ke [script.google.com](https://script.google.com) dan cipta projek baharu.
-2.  Padamkan kod sedia ada dan tampal keseluruhan kod projek ini.
-3.  **Isi Maklumat Anda:** Kemas kini pembolehubah di bahagian atas skrip (`BOT_TOKEN`, `CHAT_ID`, `PRESENTATION_ID`).
-4.  **Aktifkan Perkhidmatan Lanjutan:**
-    *   Di sebelah kiri, klik `+` pada "Perkhidmatan".
-    *   Cari `Google Slides API`, pilih, dan klik `Tambah`.
-    *   Pastikan pengecamnya ialah `Slides`.
-5.  **Konfigurasi Fail Manifest (`appsscript.json`):**
-    *   Klik ikon Tetapan Projek ⚙️ dan tandakan "Tunjukkan fail manifest 'appsscript.json' dalam editor".
-    *   Kembali ke editor dan buka fail `appsscript.json`.
-    *   Gantikan kandungannya dengan kod di bawah:
-    ```json
-    {
-      "timeZone": "Asia/Kuala_Lumpur",
-      "exceptionLogging": "STACKDRIVER",
-      "runtimeVersion": "V8",
-      "oauthScopes": [
-        "https://www.googleapis.com/auth/presentations",
-        "https://www.googleapis.com/auth/script.external_request",
-        "https://www.googleapis.com/auth/script.scriptapp"
-      ]
-    }
-    ```
-6.  Simpan projek anda.
+## Bahagian 3: Pengubahsuaian Kod
 
-### Langkah 5: Jalankan & Beri Kebenaran
-1.  Pilih fungsi `setupAndCreateTrigger` dari menu lungsur turun.
-2.  Klik **▶️ Jalankan**.
-3.  Ikut arahan untuk memberi kebenaran kepada skrip. Anda perlu melalui skrin amaran "tidak selamat" kerana ini adalah skrip peribadi anda. Benarkan semua akses yang diminta.
-4.  Selepas selesai, pencetus harian anda telah dicipta. Anda boleh menguji larian penuh dengan menjalankan fungsi `sendCountdownMessages` secara manual.
+Ini adalah bahagian paling penting di mana kita akan menyesuaikan skrip untuk acara baharu.
 
-## 5. Penyelenggaraan
+### 3.1. Kemas Kini Pembolehubah Utama
 
-*   **Untuk Menukar Acara:** Buka skrip, ubah `name` dan `date` dalam fungsi `setupAndCreateTrigger`, kemudian jalankan fungsi `setupAndCreateTrigger` sekali lagi.
-*   **Untuk Menukar Reka Bentuk:** Hanya buka fail Google Slides anda dan edit reka bentuknya. Tidak perlu mengubah kod selagi anda tidak memadamkan teks pemegang `{{countdown_number}}`.
-*   **Melihat Log:** Untuk menyemak jika skrip berjalan dengan jayanya setiap hari, anda boleh pergi ke halaman "Pelaksanaan" (Executions) dalam editor Apps Script.
+Di bahagian paling atas skrip, kemas kini pembolehubah berikut dengan maklumat daripada **Bahagian 1**:
 
+```javascript
+// ✅ ISIKAN MAKLUMAT BAHARU ANDA DI SINI
+const BOT_TOKEN = "TOKEN_BOT_ANDA"; // Boleh kekal sama jika guna bot yang sama
+const CHAT_ID = "@NamaSaluranBaharu"; // ID Saluran baharu anda
+const PRESENTATION_ID = "ID_GOOGLE_SLIDES_BAHARU_ANDA"; // ID dari templat baharu
+```
 
-➡️ **[Panduan Cara Guna Untuk Projek Lain (howto.md)](./howto.md)**
+### 3.2. Tukar Butiran Acara
+
+Cari fungsi `setupAndCreateTrigger` dan ubah butiran acara di dalamnya.
+
+*   **Tujuan:** Menetapkan nama, tarikh, dan masa sasaran untuk kiraan detik.
+*   **Contoh:**
+    *   **Sebelum:**
+        ```javascript
+        const events = [
+          { name: "1 RAMADAN 1447H / 2026", date: "2026-02-19T08:00:00+08:00" },
+        ];
+        ```
+    *   **Selepas (untuk Tahun Baru):**
+        ```javascript
+        const events = [
+          { name: "SAMBUTAN TAHUN BARU 2026", date: "2026-01-01T00:00:00+08:00" },
+        ];
+        ```
+
+### 3.3. Tukar Kapsyen Imej Harian
+
+Cari fungsi `getCountdownCaption` dan ubah suai mesej yang dihantar bersama imej.
+
+*   **Tujuan:** Mengawal teks utama yang dilihat oleh pengguna setiap hari di Telegram.
+*   **Contoh:**
+    *   **Sebelum:**
+        ```javascript
+        return `*${daysRemaining} hari lagi!* countdown to *${eventName}* ⌛️\n\n📆 ${formattedDate}\n\nInfo lanjut dan peringatan harian:\n\n#ramadancountdown`;
+        ```
+    *   **Selepas (untuk Tahun Baru):**
+        ```javascript
+        return `*Tinggal ${daysRemaining} hari lagi* menuju kemeriahan *${eventName}*! 🎉\n\n🗓️ Tarikh: ${formattedDate}\n\nJom raikan bersama!\n\n#TahunBaru2026 #CountdownMY`;
+        ```
+
+### 3.4. Tukar Mesej Sambutan
+
+Cari fungsi `sendCountdownMessages` dan ubah suai mesej yang dihantar apabila kiraan detik tamat.
+
+*   **Tujuan:** Menghantar mesej khas pada hari acara.
+*   **Contoh:**
+    *   **Sebelum:**
+        ```javascript
+        const celebrationMessage = `🎉 *Alhamdulillah, ${event.name} telah tiba!* 🎉`;
+        ```
+    *   **Selepas (untuk Tahun Baru):**
+        ```javascript
+        const celebrationMessage = `🎆 *SELAMAT TAHUN BARU 2026!* 🎆 Semoga tahun ini membawa kebahagiaan untuk anda semua! ✨`;
+        ```
+
+### 3.5. Tukar Mesej Perkongsian WhatsApp (Pilihan)
+
+Jika anda mahu mesej yang dikongsi ke WhatsApp berbeza daripada kapsyen utama, anda boleh mengubahnya dalam fungsi `sendTelegramPhotoWithButton`. Jika tidak, kod sedia ada akan membersihkan kapsyen dari `getCountdownCaption` secara automatik.
+
+*   **Tujuan:** Mengawal teks yang muncul apabila pengguna menekan butang "Share on WhatsApp".
+*   **Contoh:**
+    *   Cari blok kod ini dalam `sendTelegramPhotoWithButton`:
+        ```javascript
+        let whatsappMessage = caption
+          .replace(/[*_]/g, "")
+          // ... dan seterusnya ...
+        ```
+    *   Jika anda mahu mesej yang berbeza sepenuhnya, gantikan blok itu dengan:
+        ```javascript
+        // Cipta mesej WhatsApp yang lebih ringkas dan spesifik
+        let whatsappMessage = `Jom sertai kiraan detik untuk ${eventName}! Tinggal ${daysRemaining} hari lagi. Dapatkan peringatan harian di sini:`;
+        ```
+
+## Bahagian 4: Konfigurasi dan Pengaktifan
+
+Setiap projek baharu memerlukan konfigurasi dan kebenarannya sendiri.
+
+1.  **Aktifkan Perkhidmatan Lanjutan:**
+    *   Dalam projek baharu anda, klik `+` pada "Perkhidmatan".
+    *   Cari dan tambah `Google Slides API`. Pastikan pengecamnya ialah `Slides`.
+2.  **Konfigurasi Fail Manifest (`appsscript.json`):**
+    *   Pastikan fail `appsscript.json` wujud dan kandungannya adalah betul (anda boleh salin dari projek lama).
+3.  **Jalankan dan Beri Kebenaran (Langkah Terakhir):**
+    *   Dari menu lungsur turun, pilih fungsi **`setupAndCreateTrigger`**.
+    *   Klik butang **▶️ Jalankan**.
+    *   Google akan meminta anda untuk **memberi kebenaran** untuk projek baharu ini. Luluskan semua permintaan kebenaran.
+
+## Selesai!
