@@ -97,3 +97,6 @@ Untuk menyediakan projek ini dari awal, ikuti langkah-langkah di bawah:
 *   **Untuk Menukar Acara:** Buka skrip, ubah `name` dan `date` dalam fungsi `setupAndCreateTrigger`, kemudian jalankan fungsi `setupAndCreateTrigger` sekali lagi.
 *   **Untuk Menukar Reka Bentuk:** Hanya buka fail Google Slides anda dan edit reka bentuknya. Tidak perlu mengubah kod selagi anda tidak memadamkan teks pemegang `{{countdown_number}}`.
 *   **Melihat Log:** Untuk menyemak jika skrip berjalan dengan jayanya setiap hari, anda boleh pergi ke halaman "Pelaksanaan" (Executions) dalam editor Apps Script.
+
+
+➡️ **[Panduan Cara Guna Untuk Projek Lain (howto.md)](./howto.md)**
