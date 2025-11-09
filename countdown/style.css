@@ -9,7 +9,7 @@
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background-color: var(--background-color);
-  background-image: url('/media/pattern.svg');
+  background-image: url('media/background/pattern.svg');
   background-repeat: repeat;
   color: var(--text-color);
   margin: 0;
