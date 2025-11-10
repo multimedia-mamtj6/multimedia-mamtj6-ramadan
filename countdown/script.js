@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeChoicePopup();
         const days = masihiDaysDisplay.textContent;
         const options = {
-            templateSrc: '/media/template/template-masihi.png',
+            templateSrc: 'media/template/template-masihi.png',
             texts: [{ 
                 text: days, 
                 font: '700 300px Merriweather', 
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         closeChoicePopup();
         const days = hijriElements.days.textContent;
         const options = {
-            templateSrc: '/media/template/template-hijri.png',
+            templateSrc: 'media/template/template-hijri.png',
             texts: [{ 
                 text: days, 
                 font: '700 300px Merriweather', 
@@ -318,4 +318,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         calculateAndDisplayMasihiDays();
         initializeHijriCountdown();
     })();
+
 });
