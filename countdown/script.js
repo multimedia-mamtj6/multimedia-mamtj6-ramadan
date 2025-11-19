@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Global Variables ---
     const masihiTargetDate = new Date('2026-02-19T00:00:00');
-    const hijriTargetDate = new Date('2026-02-18T19:28:00');
+    const hijriTargetDate = new Date('2026-02-18T19:29:00');
     let hijriInterval;
     let timeOffset = 0;
     let activeExportButton = null;
@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const masihiInfo = document.getElementById('masihi-info-display');
     const hijriCountdownContainer = hijriPanel.querySelector('.countdown-container');
     const hijriInfo = document.getElementById('hijri-info-display');
-    const fadeElements = [masihiCountdownContainer, masihiInfo, hijriCountdownContainer, hijriInfo];
     // =============================
 
     // --- Time Synchronization ---
@@ -61,11 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const days = Math.ceil(timeRemaining / (1000 * 60 * 60 * 24));
         masihiDaysDisplay.textContent = days;
         
-        // Cetuskan fade-in selepas pengiraan selesai
-        setTimeout(() => {
-            masihiCountdownContainer.classList.add('fade-in');
-            masihiInfo.classList.add('fade-in');
-        }, 50); // Kelewatan kecil untuk memastikan elemen sedia
     }
 
      // --- Helper Functions ---
@@ -130,81 +124,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function initializeHijriCountdown() {
-        hijriInfoDisplay.innerHTML = `Kiraan detik ke waktu Maghrib bagi wilayah Kuala Lumpur <strong>(${formatTimeForDisplay(hijriTargetDate)})</strong> pada 18 Feb 2026.`;
+        hijriInfoDisplay.innerHTML = `Kiraan detik ke waktu Maghrib bagi wilayah Kuala Lumpur <strong>(${formatTimeForDisplay(hijriTargetDate)})</strong> pada 18 Februari 2026.`;
         startHijriCountdown();
     }
     
-    // --- Tab Switching Logic (dengan logik Fade In/Out) ---
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            const targetTab = tab.dataset.tab;
-            if (tabContainer.dataset.activeTab === targetTab) return;
+    // --- Tab Switching Logic (Lebih Licin & Ringkas) ---
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        const targetTab = tab.dataset.tab;
+        if (tabContainer.dataset.activeTab === targetTab) return;
 
-            // 1. Sembunyikan semua elemen (remove fade-in)
-            fadeElements.forEach(el => el.classList.remove('fade-in'));
-
-            // Tunggu seketika untuk efek fade-out selesai
-            setTimeout(() => {
-                tabContainer.querySelector('.active').classList.remove('active');
-                tab.classList.add('active');
-                tabContainer.dataset.activeTab = targetTab;
-                
-                if (targetTab === 'masihi') {
-                    clearInterval(hijriInterval);
-                    hijriPanel.classList.remove('active-panel');
-                    masihiPanel.classList.add('active-panel');
-                    
-                    // 2. Paparkan elemen di tab baharu (add fade-in)
-                    masihiCountdownContainer.classList.add('fade-in');
-                    masihiInfo.classList.add('fade-in');
-                } else {
-                    masihiPanel.classList.remove('active-panel');
-                    hijriPanel.classList.add('active-panel');
-                    startHijriCountdown();
-
-                    // 2. Paparkan elemen di tab baharu (add fade-in)
-                    hijriCountdownContainer.classList.add('fade-in');
-                    hijriInfo.classList.add('fade-in');
-                }
-            }, 250); // Masa ini patut separuh dari masa transisi dalam CSS
-        });
+        // Tukar tab yang aktif
+        tabContainer.querySelector('.active').classList.remove('active');
+        tab.classList.add('active');
+        tabContainer.dataset.activeTab = targetTab;
+        
+        if (targetTab === 'masihi') {
+            // Hentikan kiraan Hijri & tukar panel
+            clearInterval(hijriInterval);
+            hijriPanel.classList.remove('active-panel');
+            masihiPanel.classList.add('active-panel');
+        } else {
+            // Tukar panel & mulakan kiraan Hijri
+            masihiPanel.classList.remove('active-panel');
+            hijriPanel.classList.add('active-panel');
+            startHijriCountdown();
+        }
+        // CSS akan menguruskan transisi fade secara automatik
     });
+});
     
-    // --- FUNGSI LUKISAN DIKEMAS KINI DENGAN yOffset ---
-    function drawCenteredTextWithSpacing(textInfo) {
-        ctx.font = textInfo.font;
-        ctx.fillStyle = textInfo.color;
-        
-        let totalWidth = 0;
-        for (let i = 0; i < textInfo.text.length; i++) {
-            totalWidth += ctx.measureText(textInfo.text[i]).width;
-        }
-        totalWidth += (textInfo.text.length - 1) * (textInfo.spacing || 0);
-
-        let currentX = (canvas.width - totalWidth) / 2;
-        
-        const metrics = ctx.measureText(textInfo.text);
-        const textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-        
-        // === PERUBAHAN DI SINI: Guna yOffset ===
-        const yOffset = textInfo.yOffset || 0; // Guna 0 jika tiada
-        const currentY = ((canvas.height - textHeight) / 2) + yOffset;
-        // ====================================
-
-        ctx.shadowColor = textInfo.shadowColor || 'transparent';
-        ctx.shadowBlur = textInfo.shadowBlur || 0;
-        ctx.shadowOffsetX = textInfo.shadowOffsetX || 0;
-        ctx.shadowOffsetY = textInfo.shadowOffsetY || 0;
-
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-
-        for (let i = 0; i < textInfo.text.length; i++) {
-            const char = textInfo.text[i];
-            ctx.fillText(char, currentX, currentY);
-            currentX += ctx.measureText(char).width + (textInfo.spacing || 0);
-        }
+    // --- FUNGSI LUKISAN DIKEMAS KINI DENGAN PENDEKATAN YANG LEBIH STABIL ---
+function drawCenteredTextWithSpacing(textInfo) {
+    ctx.font = textInfo.font;
+    ctx.fillStyle = textInfo.color;
+    
+    // Logik untuk mengira lebar dan posisi-X (mendatar) tidak berubah
+    let totalWidth = 0;
+    for (let i = 0; i < textInfo.text.length; i++) {
+        totalWidth += ctx.measureText(textInfo.text[i]).width;
     }
+    totalWidth += (textInfo.text.length - 1) * (textInfo.spacing || 0);
+    let currentX = (canvas.width - totalWidth) / 2;
+    
+    // === PERUBAHAN DI SINI: PENGIRAAN POSISI-Y YANG BAHARU ===
+    // 1. Ambil yOffset terus dari textInfo.
+    const yOffset = textInfo.yOffset || 0;
+    
+    // 2. Kira posisi-Y terus dari titik tengah kanvas. 
+    //    Ini mengelakkan kebergantungan pada measureText() yang tidak konsisten untuk ketinggian.
+    const currentY = (canvas.height / 2) + yOffset;
+
+    // Logik bayang-bayang tidak berubah
+    ctx.shadowColor = textInfo.shadowColor || 'transparent';
+    ctx.shadowBlur = textInfo.shadowBlur || 0;
+    ctx.shadowOffsetX = textInfo.shadowOffsetX || 0;
+    ctx.shadowOffsetY = textInfo.shadowOffsetY || 0;
+
+    // Logik textAlign tidak berubah
+    ctx.textAlign = 'left';
+
+    // === PERUBAHAN DI SINI: TUKAR TEXTBASELINE ===
+    // 3. Gunakan 'middle' sebagai titik rujukan menegak yang lebih konsisten merentas pelayar.
+    ctx.textBaseline = 'middle'; 
+
+    // Logik untuk melukis setiap aksara tidak berubah
+    for (let i = 0; i < textInfo.text.length; i++) {
+        const char = textInfo.text[i];
+        ctx.fillText(char, currentX, currentY);
+        currentX += ctx.measureText(char).width + (textInfo.spacing || 0);
+    }
+}
 
     async function generateImage(options) {
         const { templateSrc, texts, filename, button } = options;
@@ -277,7 +267,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 color: '#FFFFFF', 
                 spacing: 15,
                 // === PERUBAHAN DI SINI: Tambah yOffset ===
-                yOffset: -30, // Nombor negatif untuk gerak ke atas
+                yOffset: -5, // Nombor negatif untuk gerak ke atas
                 // =======================================
                 shadowColor: 'rgba(0,0,0,0.3)', 
                 shadowBlur: 15, 
@@ -300,7 +290,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 color: '#FFFFFF', 
                 spacing: 15,
                 // === PERUBAHAN DI SINI: Tambah yOffset ===
-                yOffset: -30, // Nombor negatif untuk gerak ke atas
+                yOffset: -5, // Nombor negatif untuk gerak ke atas
                 // =======================================
                 shadowColor: 'rgba(0,0,0,0.3)', 
                 shadowBlur: 15, 
@@ -318,5 +308,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         calculateAndDisplayMasihiDays();
         initializeHijriCountdown();
     })();
-
 });
