@@ -129,72 +129,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     // --- Tab Switching Logic (Lebih Licin & Ringkas) ---
-tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-        const targetTab = tab.dataset.tab;
-        if (tabContainer.dataset.activeTab === targetTab) return;
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            if (tabContainer.dataset.activeTab === targetTab) return;
 
-        // Tukar tab yang aktif
-        tabContainer.querySelector('.active').classList.remove('active');
-        tab.classList.add('active');
-        tabContainer.dataset.activeTab = targetTab;
-        
-        if (targetTab === 'masihi') {
-            // Hentikan kiraan Hijri & tukar panel
-            clearInterval(hijriInterval);
-            hijriPanel.classList.remove('active-panel');
-            masihiPanel.classList.add('active-panel');
-        } else {
-            // Tukar panel & mulakan kiraan Hijri
-            masihiPanel.classList.remove('active-panel');
-            hijriPanel.classList.add('active-panel');
-            startHijriCountdown();
-        }
-        // CSS akan menguruskan transisi fade secara automatik
+            // Tukar tab yang aktif
+            tabContainer.querySelector('.active').classList.remove('active');
+            tab.classList.add('active');
+            tabContainer.dataset.activeTab = targetTab;
+            
+            if (targetTab === 'masihi') {
+                // Hentikan kiraan Hijri & tukar panel
+                clearInterval(hijriInterval);
+                hijriPanel.classList.remove('active-panel');
+                masihiPanel.classList.add('active-panel');
+            } else {
+                // Tukar panel & mulakan kiraan Hijri
+                masihiPanel.classList.remove('active-panel');
+                hijriPanel.classList.add('active-panel');
+                startHijriCountdown();
+            }
+            // CSS akan menguruskan transisi fade secara automatik
+        });
     });
-});
     
     // --- FUNGSI LUKISAN DIKEMAS KINI DENGAN PENDEKATAN YANG LEBIH STABIL ---
-function drawCenteredTextWithSpacing(textInfo) {
-    ctx.font = textInfo.font;
-    ctx.fillStyle = textInfo.color;
-    
-    // Logik untuk mengira lebar dan posisi-X (mendatar) tidak berubah
-    let totalWidth = 0;
-    for (let i = 0; i < textInfo.text.length; i++) {
-        totalWidth += ctx.measureText(textInfo.text[i]).width;
+    function drawCenteredTextWithSpacing(textInfo) {
+        ctx.font = textInfo.font;
+        ctx.fillStyle = textInfo.color;
+        
+        // Logik untuk mengira lebar dan posisi-X (mendatar) tidak berubah
+        let totalWidth = 0;
+        for (let i = 0; i < textInfo.text.length; i++) {
+            totalWidth += ctx.measureText(textInfo.text[i]).width;
+        }
+        totalWidth += (textInfo.text.length - 1) * (textInfo.spacing || 0);
+        let currentX = (canvas.width - totalWidth) / 2;
+        
+        // === PERUBAHAN DI SINI: PENGIRAAN POSISI-Y YANG BAHARU ===
+        const yOffset = textInfo.yOffset || 0;
+        const currentY = (canvas.height / 2) + yOffset;
+
+        // Logik bayang-bayang tidak berubah
+        ctx.shadowColor = textInfo.shadowColor || 'transparent';
+        ctx.shadowBlur = textInfo.shadowBlur || 0;
+        ctx.shadowOffsetX = textInfo.shadowOffsetX || 0;
+        ctx.shadowOffsetY = textInfo.shadowOffsetY || 0;
+
+        // Logik textAlign tidak berubah
+        ctx.textAlign = 'left';
+
+        // === PERUBAHAN DI SINI: TUKAR TEXTBASELINE ===
+        ctx.textBaseline = 'middle'; 
+
+        // Logik untuk melukis setiap aksara tidak berubah
+        for (let i = 0; i < textInfo.text.length; i++) {
+            const char = textInfo.text[i];
+            ctx.fillText(char, currentX, currentY);
+            currentX += ctx.measureText(char).width + (textInfo.spacing || 0);
+        }
     }
-    totalWidth += (textInfo.text.length - 1) * (textInfo.spacing || 0);
-    let currentX = (canvas.width - totalWidth) / 2;
-    
-    // === PERUBAHAN DI SINI: PENGIRAAN POSISI-Y YANG BAHARU ===
-    // 1. Ambil yOffset terus dari textInfo.
-    const yOffset = textInfo.yOffset || 0;
-    
-    // 2. Kira posisi-Y terus dari titik tengah kanvas. 
-    //    Ini mengelakkan kebergantungan pada measureText() yang tidak konsisten untuk ketinggian.
-    const currentY = (canvas.height / 2) + yOffset;
-
-    // Logik bayang-bayang tidak berubah
-    ctx.shadowColor = textInfo.shadowColor || 'transparent';
-    ctx.shadowBlur = textInfo.shadowBlur || 0;
-    ctx.shadowOffsetX = textInfo.shadowOffsetX || 0;
-    ctx.shadowOffsetY = textInfo.shadowOffsetY || 0;
-
-    // Logik textAlign tidak berubah
-    ctx.textAlign = 'left';
-
-    // === PERUBAHAN DI SINI: TUKAR TEXTBASELINE ===
-    // 3. Gunakan 'middle' sebagai titik rujukan menegak yang lebih konsisten merentas pelayar.
-    ctx.textBaseline = 'middle'; 
-
-    // Logik untuk melukis setiap aksara tidak berubah
-    for (let i = 0; i < textInfo.text.length; i++) {
-        const char = textInfo.text[i];
-        ctx.fillText(char, currentX, currentY);
-        currentX += ctx.measureText(char).width + (textInfo.spacing || 0);
-    }
-}
 
     async function generateImage(options) {
         const { templateSrc, texts, filename, button } = options;
@@ -223,41 +218,60 @@ function drawCenteredTextWithSpacing(textInfo) {
 
         template.onerror = () => {
             alert('Gagal memuatkan imej templat.');
-            closePreviewPopup();
+            // Jika templat gagal dimuat, pastikan pengguna boleh cuba lagi
+            exportChoicePopup.classList.add('hidden');
+            if (activeExportButton) {
+                activeExportButton.disabled = false;
+                activeExportButton = null;
+            }
         };
     }
 
-    // --- Popup Logic ---
-    function closePreviewPopup() {
+    // --- Popup Logic (DIKEMAS KINI) ---
+
+    // Butang batal pada popup PRATONTON
+    popupCancelBtn.addEventListener('click', () => {
+        // Hanya sembunyikan popup pratonton, kembali ke popup pilihan
         previewPopup.classList.add('hidden');
-        if (activeExportButton) {
-            activeExportButton.disabled = false;
-            activeExportButton = null;
-        }
-    }
+    });
 
-    function closeChoicePopup() {
-        exportChoicePopup.classList.add('hidden');
-    }
-
-    popupCancelBtn.addEventListener('click', closePreviewPopup);
+    // Butang muat turun pada popup PRATONTON
     popupDownloadBtn.addEventListener('click', () => {
         const url = previewImage.src;
         const filename = popupDownloadBtn.dataset.filename;
         downloadLink.href = url;
         downloadLink.download = filename;
         downloadLink.click();
-        closePreviewPopup();
+        
+        // Tutup SEMUA popup dan aktifkan semula butang utama
+        previewPopup.classList.add('hidden');
+        exportChoicePopup.classList.add('hidden');
+        if (activeExportButton) {
+            activeExportButton.disabled = false;
+            activeExportButton = null;
+        }
     });
 
-    // --- Unified Export Button Logic ---
+    // --- Unified Export Button Logic (DIKEMAS KINI) ---
+
+    // Butang terapung utama
     unifiedExportBtn.addEventListener('click', () => {
         exportChoicePopup.classList.remove('hidden');
     });
-    choiceCancelBtn.addEventListener('click', closeChoicePopup);
 
+    // Butang batal pada popup PILIHAN
+    choiceCancelBtn.addEventListener('click', () => {
+        exportChoicePopup.classList.add('hidden');
+        // Pastikan butang utama diaktifkan semula jika proses dibatalkan di sini
+        if (activeExportButton) {
+            activeExportButton.disabled = false;
+            activeExportButton = null;
+        }
+    });
+
+    // Butang pilihan Masihi
     choiceMasihiBtn.addEventListener('click', () => {
-        closeChoicePopup();
+        // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = masihiDaysDisplay.textContent;
         const options = {
             templateSrc: 'media/template/template-masihi.png',
@@ -266,9 +280,7 @@ function drawCenteredTextWithSpacing(textInfo) {
                 font: '700 300px Merriweather', 
                 color: '#FFFFFF', 
                 spacing: 15,
-                // === PERUBAHAN DI SINI: Tambah yOffset ===
-                yOffset: -5, // Nombor negatif untuk gerak ke atas
-                // =======================================
+                yOffset: -5,
                 shadowColor: 'rgba(0,0,0,0.3)', 
                 shadowBlur: 15, 
                 shadowOffsetY: 10 
@@ -279,8 +291,9 @@ function drawCenteredTextWithSpacing(textInfo) {
         generateImage(options);
     });
 
+    // Butang pilihan Hijri
     choiceHijriBtn.addEventListener('click', () => {
-        closeChoicePopup();
+        // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = hijriElements.days.textContent;
         const options = {
             templateSrc: 'media/template/template-hijri.png',
@@ -289,9 +302,7 @@ function drawCenteredTextWithSpacing(textInfo) {
                 font: '700 300px Merriweather', 
                 color: '#FFFFFF', 
                 spacing: 15,
-                // === PERUBAHAN DI SINI: Tambah yOffset ===
-                yOffset: -5, // Nombor negatif untuk gerak ke atas
-                // =======================================
+                yOffset: -5,
                 shadowColor: 'rgba(0,0,0,0.3)', 
                 shadowBlur: 15, 
                 shadowOffsetY: 10 
