@@ -1,6 +1,6 @@
 // Nama dan versi cache.
 // PENTING: Tukar nombor versi ini (cth: v1.4.2) setiap kali anda membuat perubahan pada mana-mana fail di bawah.
-const CACHE_NAME = 'ramadan-countdown-v1.4.1';
+const CACHE_NAME = 'ramadan-countdown-v1.4.3';
 
 // Senarai fail "app shell" yang penting untuk dicache semasa pemasangan PWA.
 const urlsToCache = [
@@ -69,4 +69,11 @@ self.addEventListener('fetch', (event) => {
       }
     )
   );
+});
+
+// 4. Listen for the "SKIP_WAITING" message from the client
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });

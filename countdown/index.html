@@ -141,33 +141,83 @@
 
  <footer class="site-footer">
     <div>Dibangunkan oleh admin MAMTJ6. <a href="info.html" target="_blank">Dapatkan info lanjut tentang countdown dan website ini</a>.</div>
-    <div class="footer-version">Version 1.4.1</div>
+    <div class="footer-version">Version 1.4.3</div>
   </footer>
 
-  
+  <!-- === UPDATE NOTIFICATION TOAST === -->
+  <div id="update-toast" class="update-toast hidden">
+    <div class="toast-content">
+      <span class="toast-message">Versi baharu tersedia!</span>
+      <div class="toast-actions">
+        <button id="reload-btn" class="toast-btn reload">Kemaskini</button>
+        <button id="dismiss-btn" class="toast-btn dismiss">Tutup</button>
+      </div>
+    </div>
+  </div>
+
 
   <script src="script.js" defer></script>
 
- <!-- === PENDAFTARAN SERVICE WORKER === -->
+ <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
   <script>
-    // Pastikan pelayar menyokong serviceWorker
+    let newWorker;
+
     if ('serviceWorker' in navigator) {
-      // Daftar fail sw.js apabila tetingkap selesai dimuatkan
       window.addEventListener('load', () => {
-        // PENTING: Pastikan laluan ke sw.js adalah betul
-        // Jika laman anda berada di https://domain.com/countdown/, laluan ini sudah betul.
-        navigator.serviceWorker.register('/countdown/sw.js')
-          .then(registration => {
-            console.log('Service Worker berjaya didaftarkan dengan skop:', registration.scope);
-          })
-          .catch(error => {
-            console.log('Pendaftaran Service Worker gagal:', error);
+        navigator.serviceWorker.register('/countdown/sw.js').then(reg => {
+          console.log('Service Worker registered:', reg.scope);
+
+          // 1. Check if there is already a worker waiting (from previous ignored update)
+          if (reg.waiting) {
+            newWorker = reg.waiting;
+            showUpdateToast(); 
+          }
+
+          // 2. Listen for new updates being found
+          reg.addEventListener('updatefound', () => {
+            newWorker = reg.installing;
+
+            newWorker.addEventListener('statechange', () => {
+              // Has the new worker finished installing?
+              if (newWorker.state === 'installed') {
+                // Is there an existing controller? (Means this is an update, not first load)
+                if (navigator.serviceWorker.controller) {
+                  showUpdateToast();
+                }
+              }
+            });
           });
+        });
+
+        // 3. Handle the "Reload/SkipWaiting" action
+        let refreshing;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          window.location.reload();
+          refreshing = true;
+        });
       });
     }
+
+    // UI Functions
+    function showUpdateToast() {
+      const toast = document.getElementById('update-toast');
+      toast.classList.remove('hidden');
+    }
+
+    document.getElementById('reload-btn').addEventListener('click', () => {
+      if (newWorker) {
+        // Send message to SW to skip waiting and activate immediately
+        newWorker.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+
+    document.getElementById('dismiss-btn').addEventListener('click', () => {
+      document.getElementById('update-toast').classList.add('hidden');
+    });
   </script>
 
+  
 </body>
 
 </html>
-
