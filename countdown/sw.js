@@ -1,6 +1,6 @@
 // Nama dan versi cache.
 // PENTING: Tukar nombor versi ini (cth: v1.4.2) setiap kali anda membuat perubahan pada mana-mana fail di bawah.
-const CACHE_NAME = 'ramadan-countdown-v1.4.3';
+const CACHE_NAME = 'ramadan-countdown-v1.4.4';
 
 // Senarai fail "app shell" yang penting untuk dicache semasa pemasangan PWA.
 const urlsToCache = [
