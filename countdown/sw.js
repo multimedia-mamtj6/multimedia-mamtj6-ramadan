@@ -1,6 +1,6 @@
 // Nama dan versi cache.
 // PENTING: Tukar nombor versi ini (cth: v1.4.2) setiap kali anda membuat perubahan pada mana-mana fail di bawah.
-const CACHE_NAME = 'ramadan-countdown-v1.4.4';
+const CACHE_NAME = 'ramadan-countdown-v1.4.5';
 
 // Senarai fail "app shell" yang penting untuk dicache semasa pemasangan PWA.
 const urlsToCache = [
@@ -13,8 +13,7 @@ const urlsToCache = [
   'media/icon/download.svg',
   'media/image/ramadan-kareem.svg',
   'media/preview/link-preview.jpg',
-  'media/template/template-hijri.png',
-  'media/template/template-masihi.png',
+  // Template images excluded - fetched fresh with cache-busting
   // Fail-fail Favicon
   'media/favicon/favicon.ico',
   'media/favicon/favicon.svg',

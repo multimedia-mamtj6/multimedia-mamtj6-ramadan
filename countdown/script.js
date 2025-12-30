@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let activeExportButton = null;
     const CIRCUMFERENCE = 220;
 
+    // Generate timestamp for cache-busting template images
+    function getCacheBustParam() {
+        // Use a daily timestamp (updates once per day)
+        const now = new Date();
+        const dayTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        return `?v=${dayTimestamp}`;
+    }
+
     // --- DOM Elements ---
     const tabs = document.querySelectorAll('.tab');
     const tabContainer = document.getElementById('tab-container');
@@ -274,7 +282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = masihiDaysDisplay.textContent;
         const options = {
-            templateSrc: 'media/template/template-masihi.png',
+            templateSrc: `media/template/template-masihi.png${getCacheBustParam()}`,
             texts: [{ 
                 text: days, 
                 font: '700 300px Merriweather', 
@@ -296,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = hijriElements.days.textContent;
         const options = {
-            templateSrc: 'media/template/template-hijri.png',
+            templateSrc: `media/template/template-hijri.png${getCacheBustParam()}`,
             texts: [{ 
                 text: days, 
                 font: '700 300px Merriweather', 
