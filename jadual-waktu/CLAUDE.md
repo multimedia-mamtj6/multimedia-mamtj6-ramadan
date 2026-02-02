@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+**Version:** 1.1.0
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
@@ -37,13 +39,13 @@ This is a static web project displaying Ramadan 2026 prayer times (waktu solat) 
 
 Open `index.html` directly in a browser - no build step required.
 
-**Testing future dates**:
-Add `?testDate=YYYY-MM-DD` to URL to simulate a specific date:
-- `index.html?testDate=2026-02-20` - Test first day of Ramadan
-- `index.html?testDate=2026-03-15` - Test mid-Ramadan
+**URL Parameters**:
+- `?location={zoneCode}` - Load specific zone (e.g., `?location=JHR01`)
+- `?testDate=YYYY-MM-DD` - Simulate specific date (e.g., `?testDate=2026-02-20`)
+- Combine both: `?location=JHR01&testDate=2026-02-20`
 
 **External dependencies** (loaded via CDN):
-- Google Fonts: Poppins
+- Google Fonts: Google Sans
 - API: waktusolat.app (JAKIM data source)
 
 ## Key Features

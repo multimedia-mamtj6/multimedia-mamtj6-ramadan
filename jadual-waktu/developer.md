@@ -1,5 +1,7 @@
 # Developer Guide
 
+**Version:** 1.1.0
+
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
 ## File Structure
@@ -129,14 +131,18 @@ cachedZones = []  // Zone list from API
 
 ## Testing
 
-### Test Date Parameter
+### URL Parameters
 
-Add `?testDate=YYYY-MM-DD` to URL:
+| Parameter | Example | Description |
+|-----------|---------|-------------|
+| `location` | `?location=JHR01` | Auto-load specific zone |
+| `testDate` | `?testDate=2026-02-20` | Simulate specific date |
 
+**Examples:**
 ```
-index.html?testDate=2026-02-19  # First day of Ramadan
-index.html?testDate=2026-02-20  # Second day
-index.html?testDate=2026-03-20  # Last day of Ramadan
+index.html?location=JHR01                      # Load Johor Zone 1
+index.html?testDate=2026-02-20                 # Test Feb 20, 2026
+index.html?location=SGR01&testDate=2026-03-15  # Combine both
 ```
 
 ### Test Scenarios
@@ -168,3 +174,23 @@ index.html?testDate=2026-03-20  # Last day of Ramadan
 - **Start**: 19 February 2026 (1 Ramadan 1447H)
 - **End**: 20 March 2026 (30 Ramadan 1447H)
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
+
+## Changelog
+
+### v1.1.0 (2026-02-02)
+- Green and white theme for countdown timer
+- Green accents for INFO HARI INI time boxes
+- Green highlight with white text for mobile today card
+- Updated date format in INFO HARI INI section
+
+### v1.0.0 (2026-02-02)
+- Initial release for Ramadan 1447H / 2026M
+- Zone selector with 61 zones across Malaysia (grouped by state)
+- Zone persistence via localStorage
+- Compact dropdown display (zone code only when closed, full details in options)
+- Dynamic header showing state name, zone number, and district
+- URL parameters support: `location` and `testDate`
+- Combined date format: "1 Ramadan / 19 Feb (Khamis)"
+- Countdown timer to berbuka/imsak with progress bar
+- Responsive design (desktop table & mobile cards)
+- Data from JAKIM via Waktu Solat API

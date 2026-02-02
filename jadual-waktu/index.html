@@ -12,11 +12,11 @@
   <meta property="og:image" content="https://ramadan.mamtj6.com/media/linkpreview-ramadan.jpg" />
   <meta property="og:url" content="https://ramadan.mamtj6.com/info/jadual" />
   <meta property="og:type" content="website" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600:700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* Custom CSS */
     body {
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Google Sans', sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f4f4f4;
@@ -37,24 +37,24 @@
     }
 
     h1 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 700; /* Poppins Bold */
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 700; /* Google Sans Bold */
   font-size: 32px; /* Biggest size for desktop */
   margin: 0;
   padding: 0 20px; /* Add padding for mobile */
 }
 
 h2 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; /* Poppins SemiBold */
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 600; /* Google Sans SemiBold */
   font-size: 24px; /* 2nd biggest size for desktop */
   margin: 0;
   padding: 20px 0px 0px 0px; /* Add padding for mobile */
 }
 
 h3 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 400; /* Poppins Regular */
+  font-family: 'Google Sans', sans-serif;
+  font-weight: 400; /* Google Sans Regular */
   font-style: italic; /* Italic */
   font-size: 18px; /* Small size for desktop */
   margin: 0;
@@ -78,7 +78,7 @@ h3 {
     #zone-select {
       padding: 8px 15px;
       font-size: 16px;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Google Sans', sans-serif;
       border-radius: 8px;
       border: 1px solid #ccc;
       background-color: #fff;
@@ -140,8 +140,8 @@ h3 {
   max-width: 115px; /* Maximum width to prevent excessive stretching */
   padding: 10px; /* Adjusted padding for mobile */
   text-align: center;
-  background-color: #f0f7ff;
-  border: 1px solid #cce6ff;
+  background-color: #f0fff4;
+  border: 1px solid #a8e6cf;
   border-radius: 10px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
@@ -154,7 +154,7 @@ h3 {
 
     .time-value {
       font-size: 18px;
-      color: #e74c3c;
+      color: #27ae60;
     }
 
     .no-data-message {
@@ -170,7 +170,7 @@ h3 {
       padding: 20px;
       margin: 20px auto;
       max-width: 500px;
-      background-color: #2c3e50;
+      background-color: #27ae60;
       border-radius: 15px;
       color: white;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -189,7 +189,7 @@ h3 {
     }
 
     .countdown-unit {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(3, 90, 36, 0.377);
       border-radius: 10px;
       padding: 10px;
       min-width: 60px;
@@ -208,7 +208,7 @@ h3 {
     .countdown-progress {
       width: 100%;
       height: 15px; /* Increased height */
-      background-color: rgba(255, 255, 255, 0.2);
+      background-color: rgba(3, 90, 36, 0.377);
       border-radius: 8px;
       margin-top: 15px;
       overflow: hidden;
@@ -217,7 +217,7 @@ h3 {
 
     .countdown-progress-bar {
       height: 100%;
-      background-color: #e74c3c;
+      background-color: #ffffff;
       border-radius: 8px;
       transition: width 1s linear;
       display: flex;
@@ -228,12 +228,14 @@ h3 {
 
     .countdown-progress-percentage {
       font-size: 12px;
-      color: #fff;
+      color: #ffffff;
+      font-weight: 600;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       z-index: 1;
+      text-shadow: 0 0 3px #1a7a42, 0 0 5px #1a7a42;
     }
 
     /* Infaq & Wakaf Button */
@@ -340,13 +342,17 @@ h3 {
 
     .mobile-day-header {
   padding: 10px;
-  background-color: #f8f8f8;
+  background-color: #e6ffe1;
   border-bottom: 1px solid #eee;
   text-align: center;
 }
 
     .mobile-day-today {
-      background-color: #e8f5e9;
+      background-color: #27ae60;
+    }
+
+    .mobile-day-today .mobile-day-date {
+      color: #ffffff;
     }
 
     .mobile-day-date {
@@ -384,7 +390,7 @@ h3 {
 
     .mobile-time-value {
       font-weight: 600;
-      color: #e74c3c;
+      color: #27ae60;
     }
 
     #loading-indicator {
@@ -396,7 +402,7 @@ h3 {
 
     @media (max-width: 600px) {
      h1 {
-    font-size: 28px; /* Slightly smaller for mobile */
+    font-size: 25px; /* Slightly smaller for mobile */
     padding: 0 15px; /* Adjust padding for mobile */
   }
 
@@ -542,9 +548,7 @@ h3 {
   <table id="desktop-schedule-table">
     <thead>
       <tr>
-        <th>Tarikh Hijri</th>
-        <th>Tarikh Miladi</th>
-        <th>Hari</th>
+        <th>Tarikh & Hari</th>
         <th>Imsak</th>
         <th>Subuh</th>
         <th>Berbuka</th>
@@ -561,7 +565,7 @@ h3 {
   </div>
 
   <footer>
-    <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> menggunakan <a href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
+    <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> melalui <a href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
     <p>&copy; 2026 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="https://wa.me/601156828198">Hubungi Kami</a></p>
   </footer>
 
@@ -588,8 +592,14 @@ h3 {
     // Cache for zones data
     let cachedZones = [];
 
-    // Get saved zone from localStorage or default to PHG03
+    // Get zone from URL parameter, localStorage, or default to PHG03
     function getSavedZone() {
+      // Check URL parameter first
+      const params = new URLSearchParams(window.location.search);
+      const urlZone = params.get('location');
+      if (urlZone) return urlZone;
+
+      // Fall back to localStorage or default
       return localStorage.getItem('selectedZone') || 'PHG03';
     }
 
@@ -659,8 +669,8 @@ h3 {
       if (zone) {
         // Extract zone number from jakimCode (e.g., "PHG03" → "3")
         const zoneNumber = parseInt(zone.jakimCode.slice(-2), 10);
-        document.querySelector('h2').textContent = `Negeri ${zone.negeri} (Zon ${zoneNumber})`;
-        document.querySelector('h3').textContent = zone.daerah;
+        document.querySelector('h2').textContent = `Negeri ${zone.negeri}`;
+        document.querySelector('h3').textContent = `Zon ${zoneNumber}: ${zone.daerah}`;
       }
     }
 
@@ -984,9 +994,7 @@ h3 {
           }
 
           tr.innerHTML = `
-            <td>${hijriFormatted}</td>
-            <td>${gregorianDate}</td>
-            <td>${dayOfWeek}</td>
+            <td>${hijriFormatted} / ${gregorianDate} (${dayOfWeek})</td>
             <td>${imsakFormatted}</td>
             <td>${fajrFormatted}</td>
             <td>${maghribFormatted}</td>
@@ -999,8 +1007,7 @@ mobileDay.className = "mobile-day-entry";
 
 mobileDay.innerHTML = `
   <div class="mobile-day-header ${isCurrentDay ? 'mobile-day-today' : ''}">
-    <div class="mobile-day-date">${dayOfWeek}, ${hijriFormatted}</div>
-    <div class="mobile-day-gregorian">${gregorianDate}</div>
+    <div class="mobile-day-date">${hijriFormatted} / ${gregorianDate} (${dayOfWeek})</div>
   </div>
   <div class="mobile-day-times">
     <div class="mobile-time-item">
@@ -1028,7 +1035,7 @@ mobileContainer.appendChild(mobileDay);
           todaySection.innerHTML = `
             <div class="today-data">
               <div class="today-title">INFO HARI INI</div>
-              <div class="today-date"><strong>${todayData.day}, ${todayData.hijri} (${todayData.gregorian})</strong></div>
+              <div class="today-date"><strong>${todayData.hijri} / ${todayData.gregorian} (${todayData.day})</strong></div>
               <div class="time-boxes">
                 <div class="time-box">
                   <div class="time-label">Imsak</div>
