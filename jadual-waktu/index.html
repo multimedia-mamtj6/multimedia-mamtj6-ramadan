@@ -104,20 +104,32 @@ h3 {
     }
 
     #zone-select {
-      padding: 8px 15px;
-      font-size: 16px;
+      padding: 8px 16px;
+      font-size: 14px;
       font-family: 'Google Sans', sans-serif;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      border-radius: 20px;
+      border: 1px solid #bdc3c7;
       background-color: #fff;
       cursor: pointer;
       width: 110px;
+      color: #7f8c8d;
+      transition: all 0.2s ease;
+    }
+
+    #zone-select:hover {
+      border-color: #27ae60;
+      color: #27ae60;
     }
 
     #zone-select:focus {
       outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+      border-color: #27ae60;
+      box-shadow: 0 0 5px rgba(39, 174, 96, 0.3);
+      color: #27ae60;
+    }
+
+    #zone-select option {
+      color: #333;
     }
 
     /* New container for today info and countdown */
@@ -321,6 +333,16 @@ h3 {
     .infaq-button:active {
       transform: translateY(1px);
       box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
+    }
+
+    /* Schedule section title */
+    .schedule-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 30px auto 10px;
+      padding: 0 20px;
     }
 
     table {
@@ -589,6 +611,9 @@ h3 {
       Jom Berinfaq
     </a>
   </div>
+
+  <!-- Schedule Section Title -->
+  <h2 class="schedule-title">Jadual Keseluruhan Bulan Ramadan</h2>
 
   <!-- Desktop Table View -->
   <table id="desktop-schedule-table">
@@ -1218,5 +1243,4 @@ mobileContainer.appendChild(mobileDay);
     }, 60000); // Check every minute for transitions
   </script>
 </body>
-
 </html>

@@ -1,18 +1,34 @@
 # Developer Guide
 
-**Version:** 1.1.0
+**Version:** 1.2.0
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
 ## File Structure
 
 ```
-info/
+jadual-waktu/
 ├── index.html     # Main application (single-file)
+├── info.html      # Information/documentation page
 ├── CLAUDE.md      # Claude Code instructions
 ├── README.md      # User documentation (Malay)
 └── developer.md   # This file
 ```
+
+## Pages
+
+### index.html (Main Application)
+- Prayer times display with countdown
+- Zone selector with 61 zones
+- Desktop table and mobile card views
+- Share functionality
+
+### info.html (Information Page)
+- Project information and CSR details
+- Data source documentation
+- Time accuracy reminder with MST SIRIM widget
+- Infaq & Wakaf section
+- Anchor links for sharing specific sections
 
 ## API Endpoints
 
@@ -58,10 +74,10 @@ Response structure:
 ### Zone Management
 
 ```javascript
-// Get saved zone or default
+// Get saved zone from URL, localStorage, or default
 getSavedZone() // Returns: "PHG03" (default)
 
-// Save zone to localStorage
+// Save zone to localStorage and update URL
 saveZone(zoneCode)
 
 // Load and populate zone dropdown
@@ -69,6 +85,16 @@ async loadZones()
 
 // Update header with zone info
 updateZoneHeader(zone)
+```
+
+### Share Functionality
+
+```javascript
+// Share/copy current page URL
+shareLink()
+// - Uses navigator.share on mobile (native share sheet)
+// - Falls back to clipboard copy on desktop
+// - Shows "Disalin!" feedback for 2 seconds
 ```
 
 ### Data Fetching
@@ -80,6 +106,7 @@ async fetchData()
 // - Filters to Ramadan dates (Feb 19 - Mar 20)
 // - Populates desktop table and mobile cards
 // - Sets up countdown timer
+// - Shows contextual messages before/after Ramadan
 ```
 
 ### Countdown Timer
@@ -147,17 +174,23 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 
 ### Test Scenarios
 
-1. **Zone Selection**: Change zones, verify header updates
+1. **Zone Selection**: Change zones, verify header and URL updates
 2. **Zone Persistence**: Refresh page, verify zone is remembered
-3. **Countdown**: Test during fasting hours vs after berbuka
-4. **Responsive**: Test on mobile and desktop widths
+3. **Share Button**: Click share, verify URL is copied/shared
+4. **Countdown**: Test during fasting hours vs after berbuka
+5. **Before Ramadan**: Test with date before Feb 19, verify message
+6. **After Ramadan**: Test with date after Mar 20, verify message
+7. **Responsive**: Test on mobile and desktop widths
+8. **Info Page Anchors**: Test `info.html#waktu`, `info.html#sumber`, etc.
 
 ## CSS Classes
 
 ### Layout
-- `.zone-selector` - Dropdown container
+- `.zone-selector` - Dropdown and share button container
+- `.share-btn` - Share button (pill-shaped)
 - `.today-container` - Today's info and countdown section
 - `.infaq-section` - Donation promotion section
+- `.schedule-title` - Table section heading
 
 ### Tables
 - `#desktop-schedule-table` - Desktop table view
@@ -168,6 +201,14 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - `#countdown-section` - Countdown container
 - `.countdown-item` - Hours/minutes/seconds boxes
 - `#countdown-progress-bar` - Progress bar fill
+- `.time-reminder-link` - Link to time accuracy info
+
+### Info Page
+- `.info-section` - Content section with anchor
+- `.anchor-link` - Shareable section link (#)
+- `.highlight-box` - Highlighted info box
+- `.toc` - Table of contents
+- `.infaq-btn` - Infaq button
 
 ## Ramadan 2026 Dates
 
@@ -176,6 +217,18 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.2.0 (2026-02-03)
+- New info page (`info.html`) with shareable anchor sections
+- URL auto-updates with `?location=` parameter for easy sharing
+- Share button next to zone dropdown (native share on mobile, clipboard on desktop)
+- Contextual messages for before/after Ramadan period
+- Pill-shaped dropdown matching share button style
+- "Jadual Keseluruhan Bulan Ramadan" title above schedule
+- Navigation links between main page and info page
+- MST SIRIM widget for time verification
+- Infaq & Wakaf section on both pages
+- Black text color for dropdown options
 
 ### v1.1.0 (2026-02-02)
 - Green and white theme for countdown timer
