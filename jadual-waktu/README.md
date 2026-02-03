@@ -1,6 +1,6 @@
 # Jadual Waktu Ramadan 2026
 
-**Versi:** 1.2.1
+**Versi:** 1.2.2
 
 Aplikasi web untuk memaparkan jadual waktu Imsak, Subuh dan Berbuka sepanjang bulan Ramadan 1447H / 2026M untuk semua zon di Malaysia.
 
@@ -10,7 +10,7 @@ Aplikasi web untuk memaparkan jadual waktu Imsak, Subuh dan Berbuka sepanjang bu
 - Pilihan 61 zon seluruh Malaysia
 - Pemilihan zon disimpan secara automatik
 - **Pautan boleh dikongsi** - URL dikemaskini mengikut zon yang dipilih
-- **Butang kongsi** untuk berkongsi pautan dengan maklumat zon (negeri, kod, daerah)
+- **Butang kongsi** untuk berkongsi pautan dengan maklumat zon (Negeri, Zon, Daerah)
 - Countdown masa berbuka / imsak
 - Paparan responsif (desktop & mobile)
 - **Halaman maklumat** dengan dokumentasi projek
@@ -61,6 +61,9 @@ Data waktu solat diperolehi dari [JAKIM](https://www.e-solat.gov.my/) melalui [W
 - MST SIRIM Widget (halaman info)
 
 ## Changelog
+
+### v1.2.2 (2026-02-03)
+- Format teks kongsi dikemaskini: "Negeri {Negeri} (Zon {Nombor}): {Daerah}"
 
 ### v1.2.1 (2026-02-03)
 - Butang kongsi kini menyertakan maklumat zon (negeri, kod, daerah) dalam teks kongsi

@@ -690,10 +690,11 @@ h3 {
       const zoneCode = document.getElementById('zone-select').value;
       const zone = cachedZones.find(z => z.jakimCode === zoneCode);
 
-      // Build share text with zone info
+      // Build share text with zone info only (title already has app name)
+      const zoneNumber = zone ? parseInt(zone.jakimCode.slice(-2), 10) : null;
       const text = zone
-        ? `Jadual Waktu Ramadan 2026 - ${zone.negeri} (${zone.jakimCode}): ${zone.daerah}`
-        : 'Jadual Waktu Ramadan 2026';
+        ? `Negeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}`
+        : null;
 
       // Try native share API first (mobile)
       if (navigator.share) {

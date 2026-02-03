@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.2.1
+**Version:** 1.2.2
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -94,7 +94,7 @@ updateZoneHeader(zone)
 shareLink()
 // - Gets selected zone from dropdown
 // - Looks up zone details (negeri, jakimCode, daerah) from cachedZones
-// - Builds share text: "Jadual Waktu Ramadan 2026 - {State} ({Code}): {District}"
+// - Builds share text: "Negeri {State} (Zon {Number}): {District}"
 // - Uses navigator.share on mobile (native share sheet with text)
 // - Falls back to clipboard copy on desktop
 // - Shows "Disalin!" feedback for 2 seconds
@@ -220,6 +220,9 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.2.2 (2026-02-03)
+- Updated share text format: "Negeri {State} (Zon {Number}): {District}"
 
 ### v1.2.1 (2026-02-03)
 - Share button now includes zone info (state, code, district) in share text
