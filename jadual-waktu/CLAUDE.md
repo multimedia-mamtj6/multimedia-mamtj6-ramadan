@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Version:** 1.2.0
+**Version:** 1.2.1
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -32,7 +32,7 @@ This is a static web project displaying Ramadan 2026 prayer times (waktu solat) 
 - `updateZoneHeader(zone)` - Updates header with state name, zone number, and district
 - `getSavedZone()` / `saveZone()` - localStorage and URL helpers for zone persistence
 - `getTestDate()` - Returns test date from URL parameter or current date
-- `shareLink()` - Share/copy current page URL with location parameter
+- `shareLink()` - Share/copy URL with zone info (state, code, district) in share text
 
 **Data flow**:
 1. On load: fetch zones list, populate dropdown, restore saved zone from URL or localStorage
