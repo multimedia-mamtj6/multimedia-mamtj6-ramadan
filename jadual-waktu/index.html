@@ -687,11 +687,19 @@ h3 {
     // Share link function
     function shareLink() {
       const url = window.location.href;
+      const zoneCode = document.getElementById('zone-select').value;
+      const zone = cachedZones.find(z => z.jakimCode === zoneCode);
+
+      // Build share text with zone info
+      const text = zone
+        ? `Jadual Waktu Ramadan 2026 - ${zone.negeri} (${zone.jakimCode}): ${zone.daerah}`
+        : 'Jadual Waktu Ramadan 2026';
 
       // Try native share API first (mobile)
       if (navigator.share) {
         navigator.share({
           title: 'Jadual Waktu Ramadan 2026',
+          text: text,
           url: url
         });
       } else {
@@ -1245,4 +1253,3 @@ mobileContainer.appendChild(mobileDay);
 </body>
 
 </html>
-
