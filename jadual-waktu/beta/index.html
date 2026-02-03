@@ -61,34 +61,6 @@ h3 {
   padding: 0 20px; /* Add padding for mobile */
 }
 
-    /* Share button */
-    .share-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 16px;
-      background-color: transparent;
-      border: 1px solid #bdc3c7;
-      border-radius: 20px;
-      color: #7f8c8d;
-      font-family: 'Google Sans', sans-serif;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .share-btn:hover {
-      background-color: #27ae60;
-      border-color: #27ae60;
-      color: #fff;
-    }
-
-    .share-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: currentColor;
-    }
-
     /* Zone selector dropdown */
     .zone-selector {
       margin-top: 15px;
@@ -111,7 +83,7 @@ h3 {
       border: 1px solid #ccc;
       background-color: #fff;
       cursor: pointer;
-      width: 110px;
+      width: 120px;
     }
 
     #zone-select:focus {
@@ -264,19 +236,6 @@ h3 {
       transform: translate(-50%, -50%);
       z-index: 1;
       text-shadow: 0 0 3px #1a7a42, 0 0 5px #1a7a42;
-    }
-
-    .time-reminder-link {
-      display: inline-block;
-      margin-top: 12px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-    }
-
-    .time-reminder-link:hover {
-      color: #ffffff;
-      text-decoration: underline;
     }
 
     /* Infaq & Wakaf Button */
@@ -536,10 +495,6 @@ h3 {
       <select id="zone-select">
         <option value="">Memuat...</option>
       </select>
-      <button id="share-btn" class="share-btn" onclick="shareLink()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
-        Share waktu untuk lokasi ini
-      </button>
     </div>
   </header>
 
@@ -576,7 +531,6 @@ h3 {
         <div id="countdown-progress-bar" class="countdown-progress-bar" style="width: 0%;"></div>
         <div id="countdown-progress-percentage" class="countdown-progress-percentage">0%</div>
       </div>
-      <a href="info.html#waktu" class="time-reminder-link">Peringatan: Pastikan tetapan waktu peranti anda tepat</a>
     </div>
   </div>
 
@@ -612,7 +566,7 @@ h3 {
 
   <footer>
     <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> melalui <a href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
-    <p>&copy; 2026 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="info.html">Maklumat</a> | <a href="https://wa.me/601156828198">Hubungi Kami</a></p>
+    <p>&copy; 2026 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="https://wa.me/601156828198">Hubungi Kami</a></p>
   </footer>
 
   <script>
@@ -649,35 +603,9 @@ h3 {
       return localStorage.getItem('selectedZone') || 'PHG03';
     }
 
-    // Save zone to localStorage and update URL
+    // Save zone to localStorage
     function saveZone(zoneCode) {
       localStorage.setItem('selectedZone', zoneCode);
-
-      // Update URL with location parameter
-      const url = new URL(window.location);
-      url.searchParams.set('location', zoneCode);
-      history.replaceState({}, '', url);
-    }
-
-    // Share link function
-    function shareLink() {
-      const url = window.location.href;
-
-      // Try native share API first (mobile)
-      if (navigator.share) {
-        navigator.share({
-          title: 'Jadual Waktu Ramadan 2026',
-          url: url
-        });
-      } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(url).then(() => {
-          const btn = document.getElementById('share-btn');
-          const originalHTML = btn.innerHTML;
-          btn.innerHTML = '✓ Disalin!';
-          setTimeout(() => btn.innerHTML = originalHTML, 2000);
-        });
-      }
     }
 
     // Fetch and populate zone dropdown
@@ -706,19 +634,13 @@ h3 {
             const option = document.createElement('option');
             option.value = zone.jakimCode;
             option.dataset.full = `${zone.jakimCode} - ${zone.daerah}`;
-            // Always use full text initially
-            option.textContent = option.dataset.full;
+            // Selected option shows zone code only (for dropdown button), others show full text
+            option.textContent = (zone.jakimCode === savedZone) ? zone.jakimCode : option.dataset.full;
             if (zone.jakimCode === savedZone) option.selected = true;
             optgroup.appendChild(option);
           });
           select.appendChild(optgroup);
         });
-
-        // Compact selected option for closed state
-        const selectedOpt = select.options[select.selectedIndex];
-        if (selectedOpt && selectedOpt.dataset.full) {
-          selectedOpt.textContent = selectedOpt.value;
-        }
 
         // Update header with current zone info
         updateZoneHeader(zones.find(z => z.jakimCode === savedZone));
@@ -727,25 +649,13 @@ h3 {
         select.addEventListener('change', function() {
           saveZone(this.value);
           updateZoneHeader(cachedZones.find(z => z.jakimCode === this.value));
-          fetchData();
-        });
-
-        // On focus (dropdown opens): show full details for all options
-        select.addEventListener('focus', function() {
-          Array.from(this.options).forEach(opt => {
-            if (opt.dataset.full) {
-              opt.textContent = opt.dataset.full;
-            }
-          });
-        });
-
-        // On blur (dropdown closes): compact the selected option
-        select.addEventListener('blur', function() {
+          // Update text: selected shows zone code only, others show full text
           Array.from(this.options).forEach(opt => {
             if (opt.dataset.full) {
               opt.textContent = opt.selected ? opt.value : opt.dataset.full;
             }
           });
+          fetchData();
         });
 
       } catch (error) {
@@ -1146,36 +1056,11 @@ mobileContainer.appendChild(mobileDay);
           // Setup countdown based on current time
           setupCountdown();
         } else {
-          // No data for today - check if before or after Ramadan
-          const today = getTestDate();
-          const ramadanStart = new Date('2026-02-19T00:00:00');
-
-          if (today < ramadanStart) {
-            // Before Ramadan - show countdown
-            const daysUntil = Math.ceil((ramadanStart - today) / (1000 * 60 * 60 * 24));
-            todaySection.innerHTML = `
-              <div class="no-data-message">
-                Tiada data untuk hari ini
-                <div style="font-size: 14px; margin-top: 10px; color: #555;">
-                  Jadual ini akan mula digunakan dalam tempoh <strong>${daysUntil} hari</strong> lagi
-                </div>
-              </div>
-            `;
-            // Hide countdown section (no timer before Ramadan)
-            document.getElementById('countdown-section').style.display = 'none';
-          } else {
-            // After Ramadan
-            todaySection.innerHTML = `
-              <div class="no-data-message">
-                Tiada data untuk hari ini
-                <div style="font-size: 14px; margin-top: 10px; color: #555;">
-                  In Sya Allah jadual ini akan boleh digunakan semula pada Ramadan akan datang
-                </div>
-              </div>
-            `;
-            // Hide countdown section
-            document.getElementById('countdown-section').style.display = 'none';
-          }
+          todaySection.innerHTML = `
+            <div class="no-data-message">
+              Tiada data untuk hari ini
+            </div>
+          `;
         }
 
         loadingIndicator.style.display = "none";
