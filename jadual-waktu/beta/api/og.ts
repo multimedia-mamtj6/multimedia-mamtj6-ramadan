@@ -1,6 +1,6 @@
-export const config = {
-  runtime: 'edge',
-};
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 interface Zone {
   jakimCode: string;
@@ -8,83 +8,47 @@ interface Zone {
   daerah: string;
 }
 
-export default async function handler(request: Request): Promise<Response> {
-  const url = new URL(request.url);
-  const location = url.searchParams.get('location');
-  const testDate = url.searchParams.get('testDate');
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  const location = req.query.location as string;
 
-  // Build the original URL to fetch (without the rewrite)
-  const baseUrl = url.origin;
-  const originalUrl = new URL('/index.html', baseUrl);
-  if (testDate) {
-    originalUrl.searchParams.set('testDate', testDate);
+  // Read static HTML from disk
+  const htmlPath = join(process.cwd(), 'index.html');
+  let html = readFileSync(htmlPath, 'utf-8');
+
+  if (!location) {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.send(html);
   }
 
   try {
-    // Fetch the original HTML
-    const htmlResponse = await fetch(originalUrl.toString());
-    let html = await htmlResponse.text();
-
-    // If no location, return original HTML
-    if (!location) {
-      return new Response(html, {
-        headers: { 'content-type': 'text/html; charset=utf-8' },
-      });
-    }
-
-    // Fetch zone data from API
-    const zonesResponse = await fetch('https://api.waktusolat.app/zones', {
-      headers: { 'Accept': 'application/json' },
-    });
+    // Fetch zone data
+    const zonesResponse = await fetch('https://api.waktusolat.app/zones');
     const zones: Zone[] = await zonesResponse.json();
     const zone = zones.find((z) => z.jakimCode === location);
 
-    // If zone not found, return original HTML
-    if (!zone) {
-      return new Response(html, {
-        headers: { 'content-type': 'text/html; charset=utf-8' },
-      });
+    if (zone) {
+      const zoneNumber = parseInt(location.slice(-2), 10);
+      const ogDescription = `Bagi Negeri ${zone.negeri} (Zon ${zoneNumber})`;
+      const pageTitle = `Jadual Waktu Ramadan 2026 - ${zone.negeri} (Zon ${zoneNumber})`;
+
+      // Replace OG meta tags
+      html = html.replace(
+        /<meta property="og:description" content="[^"]*" \/>/,
+        `<meta property="og:description" content="${ogDescription}" />`
+      );
+      html = html.replace(
+        /<meta property="og:title" content="[^"]*" \/>/,
+        `<meta property="og:title" content="${pageTitle}" />`
+      );
+      html = html.replace(
+        /<title>[^<]*<\/title>/,
+        `<title>${pageTitle}</title>`
+      );
     }
-
-    // Generate dynamic OG content
-    const zoneNumber = parseInt(location.slice(-2), 10);
-    const ogDescription = `Bagi Negeri ${zone.negeri} (Zon ${zoneNumber})`;
-    const ogUrl = `${baseUrl}/?location=${location}`;
-
-    // Replace OG meta tags
-    html = html.replace(
-      /<meta property="og:description" content="[^"]*" \/>/,
-      `<meta property="og:description" content="${ogDescription}" />`
-    );
-    html = html.replace(
-      /<meta property="og:url" content="[^"]*" \/>/,
-      `<meta property="og:url" content="${ogUrl}" />`
-    );
-
-    // Also update the page title for better sharing
-    const pageTitle = `Jadual Waktu Ramadan 2026 - ${zone.negeri} (Zon ${zoneNumber})`;
-    html = html.replace(
-      /<title>[^<]*<\/title>/,
-      `<title>${pageTitle}</title>`
-    );
-    html = html.replace(
-      /<meta property="og:title" content="[^"]*" \/>/,
-      `<meta property="og:title" content="${pageTitle}" />`
-    );
-
-    return new Response(html, {
-      headers: { 'content-type': 'text/html; charset=utf-8' },
-    });
   } catch (error) {
-    // On error, try to serve the original page
-    try {
-      const fallbackResponse = await fetch(originalUrl.toString());
-      const fallbackHtml = await fallbackResponse.text();
-      return new Response(fallbackHtml, {
-        headers: { 'content-type': 'text/html; charset=utf-8' },
-      });
-    } catch {
-      return new Response('Error loading page', { status: 500 });
-    }
+    // On error, serve original HTML
   }
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  return res.send(html);
 }
