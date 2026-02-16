@@ -650,6 +650,9 @@ h3 {
     // Store countdown timer ID for cleanup
     let countdownTimerId = null;
 
+    // Flag to prevent repeated fetches when data has already been loaded
+    let initialDataLoaded = false;
+
     // Get current date (or test date from URL parameter)
     function getTestDate() {
       const params = new URLSearchParams(window.location.search);
@@ -909,8 +912,8 @@ h3 {
           progressBar.style.width = '100%';
           percentageElement.textContent = '100%';
 
-          // Refresh data to update countdown target
-          fetchData();
+          // Transition to next countdown target without full refetch
+          setupCountdown();
           return;
         }
 
@@ -1213,6 +1216,7 @@ mobileContainer.appendChild(mobileDay);
         }
 
         loadingIndicator.style.display = "none";
+        initialDataLoaded = true;
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -1237,17 +1241,17 @@ mobileContainer.appendChild(mobileDay);
 
     // Only refresh the countdown timer and values that need updating
     setInterval(() => {
-      // Only refetch if there's no data or when the countdown needs to change target
-      const now = Math.floor(Date.now() / 1000);
-
-      if (!globalPrayerTimes.today) {
-        fetchData();
+      // Don't refetch if data has already been loaded and today is outside Ramadan
+      if (initialDataLoaded && !globalPrayerTimes.today) {
         return;
       }
 
+      const now = Math.floor(Date.now() / 1000);
+
       // Check if we need to transition between countdown targets
-      if (globalPrayerTimes.today.fajr === now || globalPrayerTimes.today.maghrib === now) {
-        fetchData();
+      if (globalPrayerTimes.today &&
+          (globalPrayerTimes.today.fajr === now || globalPrayerTimes.today.maghrib === now)) {
+        setupCountdown();
       }
     }, 60000); // Check every minute for transitions
   </script>
