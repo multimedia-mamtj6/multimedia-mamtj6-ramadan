@@ -1,6 +1,6 @@
 // Nama dan versi cache.
 // PENTING: Tukar nombor versi ini (cth: v1.4.6) setiap kali anda membuat perubahan pada mana-mana fail di bawah.
-const CACHE_NAME = 'mamtj6-pwa-test-v1.4.5';
+const CACHE_NAME = 'mamtj6-pwa-test-v1.4.6';
 
 // Senarai fail "app shell" yang penting untuk dicache semasa pemasangan PWA.
 const urlsToCache = [
@@ -16,7 +16,8 @@ const urlsToCache = [
   'favicon/site.webmanifest',
   // Aset luaran
   'https://i.postimg.cc/JnM7F2FC/mamtj6-white-text.webp',
-  'https://multimedia.mamtj6.com/media/img/plain-blue-bg.png'
+  'https://multimedia.mamtj6.com/media/img/plain-blue-bg.png',
+  'https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg'
 ];
 
 // 1. Proses Pemasangan (Install)

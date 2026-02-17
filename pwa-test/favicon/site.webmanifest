@@ -28,7 +28,15 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
+
+    
   ],
   "theme_color": "#333333",
   "background_color": "#333333",

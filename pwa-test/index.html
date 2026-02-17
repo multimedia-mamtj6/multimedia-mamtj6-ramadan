@@ -5,10 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MULTIMEDIA MAMTJ6</title>
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/multimedia-mamtj6/dev/refs/heads/main/media/logo-mamtj6/SVG/mamtj6_single.svg" />
+    <!-- 1. Modern Browsers: Try the SVG first -->
+    <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg" sizes="any">
+
+    <!-- 2. Recent Browsers: Try the PNG if SVG fails -->
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96">
+
+    <!-- 3. Apple: Specific requirements for iOS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+
+    <!-- 4. Legacy/Root Fallback: The .ico goes LAST -->
+    <!-- Using 'shortcut' ensures IE finds it; being last ensures modern browsers 
+        have already seen (and hopefully preferred) the SVG/PNG -->
     
-    <link rel="shortcut icon" href="favicon/favicon.ico" />
+
+    <!-- 5. PWA: The manifest handles the installed app icon -->
+    <link rel="manifest" href="favicon/site.webmanifest">
+    
+    
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="MULTIMEDIA MAMTJ6" />
     <meta name="theme-color" content="#333333" />
