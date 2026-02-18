@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.3.1
+**Version:** 1.3.2
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -220,6 +220,10 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.3.2 (2026-02-18)
+- Updated share text format: removed "Bagi" prefix, added blank line before URL
+- Bumped SW cache name to `v1.5.0`
 
 ### v1.3.1 (2026-02-18)
 - Fixed share link bug: URL now always includes `?location=` even on first page load

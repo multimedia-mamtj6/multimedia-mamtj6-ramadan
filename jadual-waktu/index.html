@@ -718,8 +718,8 @@ h3 {
 
       const zoneNumber = zone ? parseInt(zone.jakimCode.slice(-2), 10) : null;
       const shareText = zone
-        ? `Jadual Waktu Imsak, Subuh dan Berbuka\nBagi Negeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}\n${shareUrl}`
-        : `Jadual Waktu Imsak, Subuh dan Berbuka\n${shareUrl}`;
+        ? `Jadual Waktu Imsak, Subuh dan Berbuka\nNegeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}\n\n${shareUrl}`
+        : `Jadual Waktu Imsak, Subuh dan Berbuka\n\n${shareUrl}`;
 
       // Try native share API first (mobile)
       if (navigator.share) {
