@@ -1,18 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jadual Waktu Ramadan 2026-1447h</title>
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="https://multimedia.mamtj6.com/media/logo/mamtj6_single.svg" />
-  <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
-  <meta property="og:title" content=" Waktu Imsak, Subuh dan Berbuka" />
+ <!-- Favicon -->
+    <!-- 1. Modern Browsers: Try the SVG first -->
+    <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg" sizes="any">
+
+    <!-- 2. Recent Browsers: Try the PNG if SVG fails -->
+    <link rel="icon" type="image/png" href="/jadual-waktu/favicon/favicon-96x96.png" sizes="96x96">
+
+    <!-- 3. Apple: Specific requirements for iOS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/jadual-waktu/favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="RAMADAN 2026" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <!-- 4. PWA: The manifest handles the installed app icon -->
+    <link rel="manifest" href="/jadual-waktu/favicon/site.webmanifest" />
+
+    <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
+  <meta property="og:title" content="Waktu Imsak, Subuh dan Berbuka" />
   <meta property="og:description" content="Bagi semua zon waktu solat di Malaysia" />
   <meta property="og:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
-  <meta property="og:url" content="https://ramadan.mamtj6.com/info/jadual" />
+  <meta property="og:url" content="https://ramadan.mamtj6.com/jadual-waktu" />
   <meta property="og:type" content="website" />
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Twitter Card (for Twitter link preview) -->
+    <meta name="twitter:card" content="Jadual Waktu Ramadan 2026-1447h" />
+    <meta name="twitter:title" content="Waktu Imsak, Subuh dan Berbuka" />
+    <meta name="twitter:description" content="Bagi semua zon waktu solat di Malaysia" />
+    <meta name="twitter:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
   <style>
     /* Custom CSS */
     body {
@@ -650,6 +671,9 @@ h3 {
     // Store countdown timer ID for cleanup
     let countdownTimerId = null;
 
+    // Flag to prevent repeated fetches when data has already been loaded
+    let initialDataLoaded = false;
+
     // Get current date (or test date from URL parameter)
     function getTestDate() {
       const params = new URLSearchParams(window.location.search);
@@ -686,26 +710,23 @@ h3 {
 
     // Share link function
     function shareLink() {
-      const url = window.location.href;
       const zoneCode = document.getElementById('zone-select').value;
       const zone = cachedZones.find(z => z.jakimCode === zoneCode);
 
-      // Build share text with zone info only (title already has app name)
+      // Build URL explicitly from zone code so it always includes ?location= even on first load
+      const shareUrl = `${window.location.origin}${window.location.pathname}?location=${zoneCode}`;
+
       const zoneNumber = zone ? parseInt(zone.jakimCode.slice(-2), 10) : null;
-      const text = zone
-        ? `Negeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}`
-        : null;
+      const shareText = zone
+        ? `Jadual Waktu Imsak, Subuh dan Berbuka\nNegeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}\n\n${shareUrl}`
+        : `Jadual Waktu Imsak, Subuh dan Berbuka\n\n${shareUrl}`;
 
       // Try native share API first (mobile)
       if (navigator.share) {
-        navigator.share({
-          title: 'Jadual Waktu Ramadan 2026',
-          text: text,
-          url: url
-        });
+        navigator.share({ text: shareText });
       } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(url).then(() => {
+        // Fallback: copy full formatted text to clipboard
+        navigator.clipboard.writeText(shareText).then(() => {
           const btn = document.getElementById('share-btn');
           const originalHTML = btn.innerHTML;
           btn.innerHTML = '✓ Disalin!';
@@ -909,8 +930,8 @@ h3 {
           progressBar.style.width = '100%';
           percentageElement.textContent = '100%';
 
-          // Refresh data to update countdown target
-          fetchData();
+          // Transition to next countdown target without full refetch
+          setupCountdown();
           return;
         }
 
@@ -1213,6 +1234,7 @@ mobileContainer.appendChild(mobileDay);
         }
 
         loadingIndicator.style.display = "none";
+        initialDataLoaded = true;
 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -1235,21 +1257,145 @@ mobileContainer.appendChild(mobileDay);
       fetchData();
     });
 
+    // === UPDATE TOAST CSS ===
+    const toastStyle = document.createElement('style');
+    toastStyle.textContent = `
+      .update-toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #27ae60;
+        color: #ffffff;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        z-index: 2000;
+        width: 90%;
+        max-width: 400px;
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        font-family: 'Google Sans', sans-serif;
+      }
+      .update-toast.hidden {
+        transform: translate(-50%, 150%);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .toast-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .toast-message {
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .toast-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .toast-btn {
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'Google Sans', sans-serif;
+      }
+      .toast-btn.reload {
+        background-color: #fff;
+        color: #27ae60;
+      }
+      .toast-btn.dismiss {
+        background-color: transparent;
+        color: #fff;
+        border: 1px solid #fff;
+      }
+    `;
+    document.head.appendChild(toastStyle);
+
     // Only refresh the countdown timer and values that need updating
     setInterval(() => {
-      // Only refetch if there's no data or when the countdown needs to change target
-      const now = Math.floor(Date.now() / 1000);
-
-      if (!globalPrayerTimes.today) {
-        fetchData();
+      // Don't refetch if data has already been loaded and today is outside Ramadan
+      if (initialDataLoaded && !globalPrayerTimes.today) {
         return;
       }
 
+      const now = Math.floor(Date.now() / 1000);
+
       // Check if we need to transition between countdown targets
-      if (globalPrayerTimes.today.fajr === now || globalPrayerTimes.today.maghrib === now) {
-        fetchData();
+      if (globalPrayerTimes.today &&
+          (globalPrayerTimes.today.fajr === now || globalPrayerTimes.today.maghrib === now)) {
+        setupCountdown();
       }
     }, 60000); // Check every minute for transitions
+
+  </script>
+
+  <!-- === UPDATE NOTIFICATION TOAST === -->
+  <div id="update-toast" class="update-toast hidden">
+    <div class="toast-content">
+      <span class="toast-message">Versi baharu tersedia!</span>
+      <div class="toast-actions">
+        <button id="reload-btn" class="toast-btn reload">Kemaskini</button>
+        <button id="dismiss-btn" class="toast-btn dismiss">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
+  <script>
+    let newWorker;
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/jadual-waktu/sw.js').then(reg => {
+          console.log('Service Worker registered:', reg.scope);
+
+          // 1. Check if there is already a worker waiting (from previous ignored update)
+          if (reg.waiting) {
+            newWorker = reg.waiting;
+            showUpdateToast();
+          }
+
+          // 2. Listen for new updates being found
+          reg.addEventListener('updatefound', () => {
+            newWorker = reg.installing;
+
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed') {
+                if (navigator.serviceWorker.controller) {
+                  showUpdateToast();
+                }
+              }
+            });
+          });
+        });
+
+        // 3. Handle the reload after SW activates
+        let refreshing;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (refreshing) return;
+          window.location.reload();
+          refreshing = true;
+        });
+      });
+    }
+
+    function showUpdateToast() {
+      document.getElementById('update-toast').classList.remove('hidden');
+    }
+
+    document.getElementById('reload-btn').addEventListener('click', () => {
+      if (newWorker) {
+        newWorker.postMessage({ type: 'SKIP_WAITING' });
+      }
+    });
+
+    document.getElementById('dismiss-btn').addEventListener('click', () => {
+      document.getElementById('update-toast').classList.add('hidden');
+    });
   </script>
 </body>
 

@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MULTIMEDIA MAMTJ6</title>
+    <!-- Favicon -->
+    <!-- 1. Modern Browsers: Try the SVG first -->
+    <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg" sizes="any">
+
+    <!-- 2. Recent Browsers: Try the PNG if SVG fails -->
+    <link rel="icon" type="image/png" href="favicon/favicon-96x96.png" sizes="96x96">
+
+    <!-- 3. Apple: Specific requirements for iOS -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="MULTIMEDIA MAMTJ6" />
+    <meta name="theme-color" content="#333333" />
+
+    <!-- 4. PWA: The manifest handles the installed app icon -->
+    <link rel="manifest" href="/pwa-test/favicon/site.webmanifest" />
+
+    <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
+    <meta property="og:title" content="MULTIMEDIA MAMTJ6" />
+    <meta property="og:description" content="Info tentang projek multimedia yang dibangunkan untuk kegunaan umum" />
+    <meta property="og:image" content="https://multimedia.mamtj6.com/media/web/linkpreview.jpg" />
+    <meta property="og:url" content="https://multimedia.mamtj6.com" />
+    <meta property="og:type" content="website" />
+    <!-- Twitter Card (for Twitter link preview) --> 
+    <meta name="twitter:card" content="MULTIMEDIA MAMTJ6" />
+    <meta name="twitter:title" content="MULTIMEDIA MAMTJ6" />
+    <meta name="twitter:description" content="Info tentang projek multimedia yang dibangunkan untuk kegunaan MAMTJ6" />
+    <meta name="twitter:image" content="https://multimedia.mamtj6.com/media/web/linkpreview.jpg" />
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #333;
+        color: #f4f4f4;
+        transition: background-color 0.3s, color 0.3s;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      header {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        height: 30vh;
+        min-height: 150px;
+        background-image: url("https://multimedia.mamtj6.com/media/img/plain-blue-bg.png");
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 20px 10px;
+        transition: background-color 0.3s;
+      }
+
+      .logo {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 10px;
+        border: none;
+        box-shadow: none;
+      }
+
+      header h1 {
+        margin: 10px 0;
+        font-size: 2em;
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      .description {
+        text-align: center;
+        padding: 20px;
+        background-color: #444;
+        margin: 20px 10px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.3s, box-shadow 0.3s;
+      }
+
+      .buttons {
+        margin-top: 20px;
+      }
+
+      .button {
+        display: inline-block;
+        margin: 10px;
+        padding: 12px 24px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .button:hover {
+        background-color: #0056b3;
+        transform: translateY(-5px);
+      }
+
+      .popup-buttons {
+        margin: 10px auto;
+        max-width: 600px;
+        text-align: center;
+      }
+
+      .popup-button {
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        padding: 12px 20px;
+        width: 80%;
+        border: none;
+        text-align: center;
+        outline: none;
+        font-size: 16px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        transition: background-color 0.3s;
+      }
+
+      .popup-button:hover {
+        background-color: #0056b3;
+      }
+
+      .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #555;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        width: 80%;
+        max-width: 500px;
+      }
+
+      .popup .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #f4f4f4;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .popup .close-button:hover {
+        color: #007bff;
+      }
+
+      .popup .title {
+        font-size: 16px;
+        font-weight: bold;
+        margin: 15px 0 10px 0;
+        color: #f4f4f4;
+      }
+
+      .popup .link-button {
+        display: block;
+        margin: 5px 0;
+        padding: 8px 16px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 14px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .popup .link-button:hover {
+        background-color: #0056b3;
+        transform: translateY(-3px);
+      }
+
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+      }
+
+      /* Notification Styles */
+      .notification {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #007bff;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        z-index: 1000;
+        width: 300px;
+        text-align: center;
+        animation: slideUp 0.5s ease-out;
+      }
+
+      .notification.fade-out {
+        animation: fadeOut 0.5s ease-out forwards;
+      }
+
+      .notification .close-notification {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: white;
+        cursor: pointer;
+        line-height: 1;
+      }
+
+      .notification .close-notification:hover {
+        color: #ddd;
+      }
+
+      .notification .notification-content {
+        margin-top: 10px;
+      }
+
+      .notification .link-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        background-color: #0056b3;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 14px;
+        transition: background-color 0.3s, transform 0.3s;
+      }
+
+      .notification .link-button:hover {
+        background-color: #004080;
+        transform: translateY(-3px);
+      }
+
+      /* Animations */
+      @keyframes slideUp {
+        from {
+          transform: translate(-50%, 100%);
+          opacity: 0;
+        }
+        to {
+          transform: translate(-50%, -50%);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+        }
+        to {
+          opacity: 0;
+        }
+      }
+
+      footer {
+        background-color: #222;
+        color: #f4f4f4;
+        text-align: center;
+        padding: 20px 0;
+        border-top: 1px solid #444;
+        margin-top: auto;
+      }
+
+      footer p {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      footer a {
+        color: #007bff;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      footer a:hover {
+        color: #0056b3;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 768px) {
+        header {
+          height: 25vh;
+          min-height: 120px;
+          padding: 10px 5px;
+        }
+
+        .logo {
+          max-width: 200px;
+        }
+
+        header h1 {
+          font-size: 1.2em;
+        }
+
+        .description {
+          padding: 15px;
+          margin: 10px 5px;
+        }
+
+        .button {
+          padding: 10px 20px;
+        }
+
+        .popup-button {
+          width: 90%;
+        }
+
+        .popup {
+          width: 90%;
+        }
+      }
+
+      /* === SERVICE WORKER UPDATE BOTTOM SHEET === */
+      .update-toast {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #f1c40f;
+        color: #000000;
+        padding: 0;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+        z-index: 2000;
+        transform: translateY(0);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .update-toast.hidden {
+        transform: translateY(100%);
+        pointer-events: none;
+      }
+
+      .toast-handle {
+        width: 36px;
+        height: 4px;
+        background-color: rgba(0, 0, 0, 0.25);
+        border-radius: 2px;
+        margin: 10px auto 0;
+      }
+
+      .toast-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 12px 20px 20px;
+        gap: 4px;
+      }
+
+      .toast-icon {
+        font-size: 1.6rem;
+        line-height: 1;
+      }
+
+      .toast-message {
+        font-weight: 700;
+        font-size: 1.05rem;
+      }
+
+      .toast-subtitle {
+        font-size: 0.85rem;
+        color: rgba(0, 0, 0, 0.6);
+        margin-bottom: 8px;
+      }
+
+      .toast-actions {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .toast-btn {
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        font-family: "Arial", sans-serif;
+        flex: 1;
+        transition: opacity 0.2s;
+      }
+
+      .toast-btn:active {
+        opacity: 0.8;
+      }
+
+      .toast-btn.reload {
+        background-color: #000;
+        color: #f1c40f;
+      }
+
+      .toast-btn.dismiss {
+        background-color: transparent;
+        color: #000;
+        border: 2px solid rgba(0, 0, 0, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="https://i.postimg.cc/JnM7F2FC/mamtj6-white-text.webp" alt="Logo" class="logo" />
+      <h1>PROJEK MULTIMEDIA MAMTJ6</h1>
+    </header>
+
+    <section class="description">
+      <p>Info tentang projek multimedia yang dibangunkan untuk kegunaan MAMTJ6</p>
+      <div class="buttons">
+        <a href="https://mamtj6.com" class="button">Website MAMTJ6</a>
+        <a href="https://github.com/multimedia-mamtj6/multimedia-mamtj6" class="button">Github repositories</a>
+      </div>
+    </section>
+
+    <section class="popup-buttons">
+      <h2>Sila tekan butang di bawah untuk melihat item yang berkaitan</h2>
+      <button class="popup-button" data-popup="popup1">1. Paparan Tabung</button>
+      <button class="popup-button" data-popup="popup2">2. Waktu Solat</button>
+      <button class="popup-button" data-popup="popup3">3. Jadual Kuliah</button>
+      <button class="popup-button" data-popup="popup4">4. Ramadan</button>
+      <button class="popup-button" data-popup="popup5">5. Paparan tajuk khutbah</button>
+      <button class="popup-button" data-popup="popup6">6. Info Kalendar Hijrah</button>
+    </section>
+
+    <!-- Popup Menus -->
+    <div id="popup1" class="popup">
+      <button class="close-button">&times;</button>
+      <div class="title">Alpha</div>
+      <a href="tabung/tabung-bulanini.html" class="link-button">Tabung Bulan Ini</a>
+      <a href="tabung/tabung-bulanlepas.html" class="link-button">Tabung Bulan Lepas</a>
+      <a href="tabung/infaq-pembangunan.html" class="link-button">Infaq Pembangunan</a>
+      <div class="title">Beta</div>
+      <a href=" tabung/test/infaq-pembangunan.html" class="link-button">>Infaq Pembangunan (beta 1)</a>
+      <a href=" tabung/test/tabung-bulanini-beta1.html" class="link-button">Tabung bulan ini (alt display)</a>
+    </div>
+
+    <div id="popup2" class="popup">
+      <button class="close-button">&times;</button>
+      <div class="title">Alpha</div>
+      <a href="waktu-solat/waktusolat-PHG03-TEMERLOH.html" class="link-button">Waktu Solat Temerloh</a>
+      <div class="title">Beta</div>
+      <div class="title">-</div>
+    </div>
+
+    <div id="popup3" class="popup">
+      <button class="close-button">&times;</button>
+      <div class="title">Alpha</div>
+       <a href="kuliah/index.html" class="link-button">Sistem Jadual dan Info Kuliah</a>
+      <div class="title">-</div>
+      <div class="title">Beta</div>
+       <div class="title">-</div>
+      
+    </div><div id="popup4" class="popup">
+      <button class="close-button">&times;</button>
+      <div class="title">Alpha</div>
+      <a href="https://t.me/Islamic_countdown" class="link-button">Telegram Reminder</a>
+      <div class="title">Beta</div>
+      <div class="title">-</div>
+    </div>
+
+     </div><div id="popup5" class="popup">
+      <button class="close-button">&times;</button>
+      <div class="title">Alpha</div>
+       <a href="khutbah/tajuk-khutbah.html" class="link-button">Paparan Tajuk Khutbah</a>
+      <div class="title">Beta</div>
+       <a href="khutbah/khutbah-beta1.html" class="link-button">Paparan Khutbah (beta 1)</a>
+       <a href="khutbah/khutbah-beta2.html" class="link-button">Paparan Khutbah (beta 2)</a>
+    </div>
+
+      </div><div id="popup6" class="popup">
+      <button class="close-button">&times;</button>
+      <div class="title">Alpha</div>
+       <a href="calendar/hijri/info.html" class="link-button">Paparan Takwim Islam</a>
+        <a href="https://multimedia.mamtj6.com/calendar/hijri/hari-ini.html" class="link-button">Info Hari Ini</a>
+       <a href="https://github.com/multimedia-mamtj6/multimedia-mamtj6/tree/main/calendar/hijri/readme.md" class="link-button">Info Projek Takwim</a>
+      <div class="title">Beta</div>
+        <div class="title">-</div>
+    </div>
+
+    <!-- Overlay for Popup -->
+    <div class="overlay"></div>
+
+    <!-- Notification Popup -->
+    <div id="notification" class="notification">
+      <button class="close-notification">&times;</button>
+      <div class="notification-content">
+        <p>New page added:</p>
+         <p><strong>Infaq Pembangunan (Beta 0)</strong></p>
+        <a href="tabung/infaq-pembangunan.html" class="link-button">Go to Page</a>
+        <p><strong>Infaq Pembangunan (Beta 1)</strong></p>
+        <a href=" tabung/test/infaq-pembangunan-beta1.html" class="link-button">Infaq Pembangunan (Beta 1)</a>
+        <p><strong>Infaq Pembangunan (Beta 2)</strong></p>
+       <a href=" tabung/test/infaq-pembangunan-beta2.html" class="link-button">Infaq Pembangunan (Beta 2)</a>
+      </div>
+    </div>
+
+    <!-- Service Worker Update Bottom Sheet -->
+    <div id="update-toast" class="update-toast hidden">
+      <div class="toast-handle"></div>
+      <div class="toast-content">
+        <span class="toast-icon">&#x26A0;</span>
+        <span class="toast-message">Versi baharu tersedia!</span>
+        <span class="toast-subtitle">Kemaskini untuk pengalaman terbaik</span>
+        <div class="toast-actions">
+          <button id="dismiss-btn" class="toast-btn dismiss">Tutup</button>
+          <button id="reload-btn" class="toast-btn reload">Kemaskini</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <p>&copy; 2025 MAMTJ6. All rights reserved. | <a href="https://mamtj6.com">mamtj6.com</a></p>
+      <p>Last updated: <strong>12 September, 2025</strong></p>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Popup Button Logic
+        const popupButtons = document.querySelectorAll(".popup-button");
+        const popups = document.querySelectorAll(".popup");
+        const overlay = document.querySelector(".overlay");
+        const closeButtons = document.querySelectorAll(".close-button");
+
+        popupButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const popupId = this.getAttribute("data-popup");
+            const popup = document.getElementById(popupId);
+
+            // Close all other popups
+            popups.forEach((p) => {
+              if (p !== popup) {
+                p.style.display = "none";
+              }
+            });
+
+            // Show the clicked popup and overlay
+            popup.style.display = "block";
+            overlay.style.display = "block";
+          });
+        });
+
+        // Close popup when clicking the close button
+        closeButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const popup = this.closest(".popup");
+            popup.style.display = "none";
+            overlay.style.display = "none";
+          });
+        });
+
+        // Notification Logic
+        const notification = document.getElementById("notification");
+        const closeNotificationButton = document.querySelector(".close-notification");
+        const hasNewUpdate = false; // Set this to false if no new updates
+
+        if (hasNewUpdate) {
+          setTimeout(() => {
+            notification.style.display = "block";
+          }, 2000); // Show notification after 2 seconds
+        }
+
+        // Close notification when clicking the close button
+        closeNotificationButton.addEventListener("click", function () {
+          notification.classList.add("fade-out");
+          setTimeout(() => {
+            notification.style.display = "none";
+          }, 500); // Wait for fade-out animation to complete
+        });
+
+        // Automatically hide notification after 5 seconds
+        if (hasNewUpdate) {
+          setTimeout(() => {
+            notification.classList.add("fade-out");
+            setTimeout(() => {
+              notification.style.display = "none";
+            }, 500); // Wait for fade-out animation to complete
+          }, 10000); // Hide notification after 7 seconds (2s delay + 5s display)
+        }
+      });
+    </script>
+
+    <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
+    <script>
+      let newWorker;
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js').then(reg => {
+            console.log('Service Worker registered:', reg.scope);
+
+            // 1. Check if there is already a worker waiting (from previous ignored update)
+            if (reg.waiting) {
+              newWorker = reg.waiting;
+              showUpdateToast();
+            }
+
+            // 2. Listen for new updates being found
+            reg.addEventListener('updatefound', () => {
+              newWorker = reg.installing;
+
+              newWorker.addEventListener('statechange', () => {
+                // Has the new worker finished installing?
+                if (newWorker.state === 'installed') {
+                  // Is there an existing controller? (Means this is an update, not first load)
+                  if (navigator.serviceWorker.controller) {
+                    showUpdateToast();
+                  }
+                }
+              });
+            });
+          });
+
+          // 3. Handle the "Reload/SkipWaiting" action
+          let refreshing;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            window.location.reload();
+            refreshing = true;
+          });
+        });
+      }
+
+      // UI Functions
+      function showUpdateToast() {
+        const toast = document.getElementById('update-toast');
+        toast.classList.remove('hidden');
+      }
+
+      document.getElementById('reload-btn').addEventListener('click', () => {
+        if (newWorker) {
+          // Send message to SW to skip waiting and activate immediately
+          newWorker.postMessage({ type: 'SKIP_WAITING' });
+        }
+      });
+
+      document.getElementById('dismiss-btn').addEventListener('click', () => {
+        document.getElementById('update-toast').classList.add('hidden');
+      });
+    </script>
+  </body>
+</html>
