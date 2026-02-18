@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.3.2
+**Version:** 1.3.3
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -220,6 +220,12 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.3.3 (2026-02-18)
+- Added PWA installation guide section to info.html (Android, iOS, Desktop)
+- Added offline usage note and update notification explanation
+- Added PWA feature bullets to Ciri-ciri utama list
+- Bumped SW cache name to `v1.5.2`
 
 ### v1.3.2 (2026-02-18)
 - Updated share text format: removed "Bagi" prefix, added blank line before URL

@@ -1,11 +1,12 @@
 // Nama dan versi cache.
 // PENTING: Tukar nombor versi ini (cth: v1.4.6) setiap kali anda membuat perubahan pada mana-mana fail di bawah.
-const CACHE_NAME = 'mamtj6-jadual-waktu-ramadan-v1.5.0';
+const CACHE_NAME = 'mamtj6-jadual-waktu-ramadan-v1.5.2';
 
 // Senarai fail "app shell" yang penting untuk dicache semasa pemasangan PWA.
 const urlsToCache = [
   './',
   'index.html',
+  'info.html',
   // Fail-fail Favicon
   'favicon/favicon.ico',
   'favicon/favicon.svg',
