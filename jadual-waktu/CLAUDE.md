@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Version:** 1.3.3
+**Version:** 1.4.0
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -31,7 +31,9 @@ This is a static web project displaying Ramadan 2026 prayer times (waktu solat) 
 - `startCountdown()` - Manages the countdown timer with progress bar
 - `updateZoneHeader(zone)` - Updates header with state name, zone number, and district
 - `getSavedZone()` / `saveZone()` - localStorage and URL helpers for zone persistence
-- `getTestDate()` - Returns test date from URL parameter or current date
+- `getTestDate()` - Returns test date/time from URL parameters or current date
+- `getNow()` - Returns offset-adjusted current time (supports `testTime` URL param)
+- `highlightNextPrayer()` - Highlights the next upcoming time box (Imsak/Subuh/Berbuka)
 - `shareLink()` - Share/copy URL with zone info (state, code, district) in share text
 
 **Data flow**:
@@ -50,7 +52,8 @@ Open `index.html` directly in a browser - no build step required.
 **URL Parameters**:
 - `?location={zoneCode}` - Load specific zone (e.g., `?location=JHR01`)
 - `?testDate=YYYY-MM-DD` - Simulate specific date (e.g., `?testDate=2026-02-20`)
-- Combine both: `?location=JHR01&testDate=2026-02-20`
+- `?testTime=HH:MM` - Simulate specific time, ticks forward (e.g., `?testTime=18:30`)
+- Combine: `?location=JHR01&testDate=2026-02-20&testTime=12:00`
 
 **External dependencies** (loaded via CDN):
 - Google Fonts: Google Sans
@@ -65,7 +68,10 @@ Open `index.html` directly in a browser - no build step required.
 4. **Share Button**: Quick share/copy link button next to zone selector
 5. **Compact Dropdown**: Shows zone code only when closed, full details when opened
 6. **Dynamic Header**: Shows "Negeri {State} (Zon {Number})" and district name
-7. **Countdown Timer**: Auto-switches between berbuka and next day's imsak
-8. **Responsive Design**: Table view for desktop, card view for mobile
+7. **Countdown Timer**: Auto-switches between berbuka and next day's imsak with seamless phase transitions
+8. **Time Box Highlight**: Green-filled highlight on the next upcoming prayer time box
+9. **Warning Pulse**: Orange color pulse animation on countdown and time box 5 minutes before prayer time
+10. **Midnight Auto-Refresh**: Data automatically refreshes at midnight for the next day
+11. **Responsive Design**: Table view for desktop, card view for mobile
 9. **Contextual Messages**: Shows appropriate message before/after Ramadan period
 10. **Info Page**: Documentation with shareable anchor sections

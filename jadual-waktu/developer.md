@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.3.3
+**Version:** 1.4.0
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -115,20 +115,39 @@ async fetchData()
 ### Countdown Timer
 
 ```javascript
-// Determine countdown target
+// Determine countdown target and highlight next time box
 setupCountdown()
-// - Before Maghrib: countdown to berbuka
-// - After Maghrib: countdown to tomorrow's Imsak
+// - Before Fajr: countdown to imsak/subuh
+// - Fajr to Maghrib: countdown to berbuka
+// - After Maghrib: countdown to tomorrow's imsak
+// - Calls highlightNextPrayer() on each transition
 
-// Start countdown with progress bar
+// Start countdown with progress bar and warning pulse
 startCountdown(targetTime, startTime, label, totalDuration)
+// - Adds .warning class at ≤5 min remaining (orange pulse)
+// - Calls highlightNextPrayer() every second
+
+// Highlight next upcoming time box (Imsak/Subuh/Berbuka)
+highlightNextPrayer()
+// - Before imsak: Imsak box active
+// - Imsak to fajr: Subuh box active
+// - Fajr to maghrib: Berbuka box active
+// - After maghrib: no box active
+
+// Auto-refresh data at midnight for next day
+scheduleMiddnightRefresh()
 ```
 
-### Date Helpers
+### Date/Time Helpers
 
 ```javascript
-// Get test date from URL or current date
+// Get test date/time from URL parameters or current date
 getTestDate()
+// - Supports: ?testDate=2026-02-20&testTime=18:30
+// - Sets timeOffset for getNow()
+
+// Get offset-adjusted current time in ms
+getNow() // Returns: Date.now() + timeOffset
 
 // Check if date matches today
 isToday(day, month)
@@ -155,6 +174,8 @@ globalPrayerTimes = {
 }
 
 countdownTimerId = null  // setInterval ID for cleanup
+initialDataLoaded = false  // Prevents repeated fetches
+timeOffset = 0  // ms offset for testTime simulation
 
 cachedZones = []  // Zone list from API
 ```
@@ -167,12 +188,16 @@ cachedZones = []  // Zone list from API
 |-----------|---------|-------------|
 | `location` | `?location=JHR01` | Auto-load specific zone |
 | `testDate` | `?testDate=2026-02-20` | Simulate specific date |
+| `testTime` | `?testTime=18:30` | Simulate specific time (ticks forward) |
 
 **Examples:**
 ```
-index.html?location=JHR01                      # Load Johor Zone 1
-index.html?testDate=2026-02-20                 # Test Feb 20, 2026
-index.html?location=SGR01&testDate=2026-03-15  # Combine both
+index.html?location=JHR01                              # Load Johor Zone 1
+index.html?testDate=2026-02-20                         # Test Feb 20, 2026
+index.html?testDate=2026-02-20&testTime=06:00          # Pre-fajr countdown
+index.html?testDate=2026-02-20&testTime=12:00          # Berbuka countdown
+index.html?testDate=2026-02-20&testTime=19:30          # Post-maghrib countdown
+index.html?testTime=18:30                               # Today + simulated time
 ```
 
 ### Test Scenarios
@@ -204,7 +229,13 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - `#countdown-section` - Countdown container
 - `.countdown-item` - Hours/minutes/seconds boxes
 - `#countdown-progress-bar` - Progress bar fill
-- `.time-reminder-link` - Link to time accuracy info
+- `.time-reminder-link` - Link to time accuracy info (underlined)
+- `.countdown-section.warning` - Orange pulse animation (≤5 min)
+
+### Time Boxes (INFO HARI INI)
+- `.time-box` - Individual prayer time card
+- `.time-box.active` - Green-filled highlight on next upcoming time
+- `.time-box.active.warning` - Orange pulse on active box (≤5 min)
 
 ### Info Page
 - `.info-section` - Content section with anchor
@@ -220,6 +251,18 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.4.0 (2026-02-19)
+- Added `testTime` URL parameter for simulating specific times (ticks forward from specified moment)
+- Added `getNow()` helper and `timeOffset` global for time simulation across all countdown logic
+- Added green-filled highlight (`.time-box.active`) on next upcoming prayer time box (Imsak → Subuh → Berbuka)
+- Added 5-minute warning pulse animation (green ↔ orange) on countdown section and active time box
+- Fixed countdown phase transition bug: changed `>` to `>=` in `setupCountdown()` for seamless auto-transition
+- Added midnight auto-refresh (`scheduleMiddnightRefresh()`) to reload data for the next day without page refresh
+- Underlined time reminder link in countdown section
+- Updated info.html with new feature descriptions (highlight, warning pulse, auto-refresh, auto-transition)
+- Removed dead code (`today`/`currentDay` unused variables in `fetchData()`)
+- Bumped SW cache name to `v1.5.3`
 
 ### v1.3.3 (2026-02-18)
 - Added PWA installation guide section to info.html (Android, iOS, Desktop)

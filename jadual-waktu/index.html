@@ -218,6 +218,31 @@ h3 {
       color: #27ae60;
     }
 
+    .time-box.active {
+      background-color: #27ae60;
+      border-color: #27ae60;
+    }
+    .time-box.active .time-label {
+      color: #fff;
+    }
+    .time-box.active .time-value {
+      color: #fff;
+    }
+
+    @keyframes warningPulse {
+      0%, 100% { background-color: #27ae60; }
+      50% { background-color: #e67e22; }
+    }
+
+    .countdown-section.warning {
+      animation: warningPulse 1.5s ease-in-out infinite;
+    }
+
+    .time-box.active.warning {
+      animation: warningPulse 1.5s ease-in-out infinite;
+      border-color: #e67e22;
+    }
+
     .no-data-message {
       padding: 20px;
       text-align: center;
@@ -304,12 +329,11 @@ h3 {
       margin-top: 12px;
       font-size: 12px;
       color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
+      text-decoration: underline;
     }
 
     .time-reminder-link:hover {
       color: #ffffff;
-      text-decoration: underline;
     }
 
     /* Infaq & Wakaf Button */
@@ -674,14 +698,35 @@ h3 {
     // Flag to prevent repeated fetches when data has already been loaded
     let initialDataLoaded = false;
 
-    // Get current date (or test date from URL parameter)
+    // Millisecond offset for test time simulation (testTime URL param)
+    let timeOffset = 0;
+
+    // Get current date (or test date/time from URL parameters)
     function getTestDate() {
       const params = new URLSearchParams(window.location.search);
       const testDate = params.get('testDate');
+      const testTime = params.get('testTime');
+      if (testDate && testTime) {
+        const simulated = new Date(testDate + 'T' + testTime + ':00');
+        timeOffset = simulated.getTime() - Date.now();
+        return simulated;
+      }
       if (testDate) {
         return new Date(testDate + 'T12:00:00');
       }
+      if (testTime) {
+        const today = new Date();
+        const [h, m] = testTime.split(':').map(Number);
+        today.setHours(h, m, 0, 0);
+        timeOffset = today.getTime() - Date.now();
+        return today;
+      }
       return new Date();
+    }
+
+    // Get offset-adjusted current time in milliseconds
+    function getNow() {
+      return Date.now() + timeOffset;
     }
 
     // Cache for zones data
@@ -914,8 +959,8 @@ h3 {
 
       // Update the countdown every second
       countdownTimerId = setInterval(() => {
-        // Get current time in Malaysia (MYT)
-        const now = Math.floor(Date.now() / 1000);
+        // Get current time in Malaysia (MYT), adjusted for testTime offset
+        const now = Math.floor(getNow() / 1000);
 
         // Calculate remaining time
         const remainingTime = targetTime - now;
@@ -929,6 +974,9 @@ h3 {
           secondsElement.textContent = '00';
           progressBar.style.width = '100%';
           percentageElement.textContent = '100%';
+
+          // Clean up warning pulse before transitioning
+          countdownSection.classList.remove('warning');
 
           // Transition to next countdown target without full refetch
           setupCountdown();
@@ -951,10 +999,42 @@ h3 {
         progressBar.style.width = `${progress}%`;
         percentageElement.textContent = `${Math.round(progress)}%`;
 
+        // Warning pulse when 5 minutes or less remain
+        const activeBox = document.querySelector('.time-box.active');
+        if (remainingTime <= 300) {
+          countdownSection.classList.add('warning');
+          if (activeBox) activeBox.classList.add('warning');
+        } else {
+          countdownSection.classList.remove('warning');
+          if (activeBox) activeBox.classList.remove('warning');
+        }
+
+        highlightNextPrayer();
       }, 1000);
 
       // Return the timer ID for potential cleanup
       return countdownTimerId;
+    }
+
+    // Highlight the next upcoming prayer time box
+    function highlightNextPrayer() {
+      const boxes = document.querySelectorAll('.time-box');
+      if (!boxes.length || !globalPrayerTimes.today) return;
+
+      boxes.forEach(box => box.classList.remove('active'));
+
+      const now = Math.floor(getNow() / 1000);
+      const imsak = globalPrayerTimes.today.fajr - 600;
+      const fajr = globalPrayerTimes.today.fajr;
+      const maghrib = globalPrayerTimes.today.maghrib;
+
+      if (now < imsak) {
+        boxes[0].classList.add('active'); // Imsak
+      } else if (now < fajr) {
+        boxes[1].classList.add('active'); // Subuh
+      } else if (now < maghrib) {
+        boxes[2].classList.add('active'); // Berbuka
+      }
     }
 
     // Function to determine the appropriate countdown target
@@ -963,11 +1043,13 @@ h3 {
         return; // No data available yet
       }
 
-      // Get current time (Unix timestamp in seconds)
-      const now = Math.floor(Date.now() / 1000);
+      highlightNextPrayer();
+
+      // Get current time (Unix timestamp in seconds), adjusted for testTime offset
+      const now = Math.floor(getNow() / 1000);
 
       // If Subuh time has passed but Maghrib hasn't yet, countdown to Berbuka
-      if (now > globalPrayerTimes.today.fajr && now < globalPrayerTimes.today.maghrib) {
+      if (now >= globalPrayerTimes.today.fajr && now < globalPrayerTimes.today.maghrib) {
         // Countdown to Berbuka
         const startTime = globalPrayerTimes.today.fajr;
         const targetTime = globalPrayerTimes.today.maghrib;
@@ -980,7 +1062,7 @@ h3 {
         );
       }
       // If Maghrib has passed, countdown to next day's Subuh
-      else if (now > globalPrayerTimes.today.maghrib && globalPrayerTimes.tomorrow) {
+      else if (now >= globalPrayerTimes.today.maghrib && globalPrayerTimes.tomorrow) {
         // Countdown to tomorrow's Subuh
         const startTime = globalPrayerTimes.today.maghrib;
         const targetTime = globalPrayerTimes.tomorrow.fajr;
@@ -995,7 +1077,7 @@ h3 {
       // If before Subuh, countdown to today's Subuh
       else if (now < globalPrayerTimes.today.fajr) {
         // We don't have yesterday's maghrib time, so use midnight as a fallback starting point
-        const midnightToday = new Date();
+        const midnightToday = new Date(getNow());
         midnightToday.setHours(0, 0, 0, 0);
         const startTime = Math.floor(midnightToday.getTime() / 1000);
         const targetTime = globalPrayerTimes.today.fajr;
@@ -1058,10 +1140,6 @@ h3 {
         // Variables to store today's data
         let todayData = null;
         let tomorrowData = null;
-
-        // Get current date
-        const today = new Date();
-        const currentDay = today.getDate();
 
         // Populate desktop table
         const desktopTbody = document.querySelector("#desktop-schedule-table tbody");
@@ -1322,7 +1400,7 @@ mobileContainer.appendChild(mobileDay);
         return;
       }
 
-      const now = Math.floor(Date.now() / 1000);
+      const now = Math.floor(getNow() / 1000);
 
       // Check if we need to transition between countdown targets
       if (globalPrayerTimes.today &&
@@ -1330,6 +1408,21 @@ mobileContainer.appendChild(mobileDay);
         setupCountdown();
       }
     }, 60000); // Check every minute for transitions
+
+    // Auto-refresh data at midnight to transition to the next day
+    function scheduleMiddnightRefresh() {
+      const now = new Date(getNow());
+      const midnight = new Date(now);
+      midnight.setDate(midnight.getDate() + 1);
+      midnight.setHours(0, 0, 5, 0); // 5 seconds past midnight to ensure date has changed
+      const msUntilMidnight = midnight.getTime() - now.getTime();
+      setTimeout(() => {
+        initialDataLoaded = false;
+        fetchData();
+        scheduleMiddnightRefresh(); // schedule the next one
+      }, msUntilMidnight);
+    }
+    scheduleMiddnightRefresh();
 
   </script>
 
