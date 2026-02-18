@@ -710,26 +710,23 @@ h3 {
 
     // Share link function
     function shareLink() {
-      const url = window.location.href;
       const zoneCode = document.getElementById('zone-select').value;
       const zone = cachedZones.find(z => z.jakimCode === zoneCode);
 
-      // Build share text with zone info only (title already has app name)
+      // Build URL explicitly from zone code so it always includes ?location= even on first load
+      const shareUrl = `${window.location.origin}${window.location.pathname}?location=${zoneCode}`;
+
       const zoneNumber = zone ? parseInt(zone.jakimCode.slice(-2), 10) : null;
-      const text = zone
-        ? `Negeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}`
-        : null;
+      const shareText = zone
+        ? `Jadual Waktu Imsak, Subuh dan Berbuka\nBagi Negeri ${zone.negeri} (Zon ${zoneNumber}): ${zone.daerah}\n${shareUrl}`
+        : `Jadual Waktu Imsak, Subuh dan Berbuka\n${shareUrl}`;
 
       // Try native share API first (mobile)
       if (navigator.share) {
-        navigator.share({
-          title: 'Jadual Waktu Ramadan 2026',
-          text: text,
-          url: url
-        });
+        navigator.share({ text: shareText });
       } else {
-        // Fallback: copy to clipboard
-        navigator.clipboard.writeText(url).then(() => {
+        // Fallback: copy full formatted text to clipboard
+        navigator.clipboard.writeText(shareText).then(() => {
           const btn = document.getElementById('share-btn');
           const originalHTML = btn.innerHTML;
           btn.innerHTML = '✓ Disalin!';
