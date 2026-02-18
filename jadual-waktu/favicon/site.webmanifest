@@ -41,7 +41,8 @@
   "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
-  "categories": ["education", "utilities"]
+  "categories": ["education", "utilities"],
+  "version": "1.4.0"
 }
 
 
