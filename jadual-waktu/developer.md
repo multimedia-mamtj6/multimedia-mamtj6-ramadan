@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.2.2
+**Version:** 1.3.0
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -220,6 +220,15 @@ index.html?location=SGR01&testDate=2026-03-15  # Combine both
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.3.0 (2026-02-18)
+- Registered service worker for full PWA support (cache-first, offline support)
+- Added update notification toast (green) when a new SW version is available
+- Fixed HTML `lang` attribute to `ms`
+- Aligned `theme_color` between HTML meta and web manifest to `#ffffff`
+- Fixed extra double-quote in OG meta title tag
+- Added `any` purpose icon entries in web manifest for 192×192 and 512×512 PNGs
+- Bumped SW cache name to `v1.4.8`
 
 ### v1.2.2 (2026-02-03)
 - Updated share text format: "Negeri {State} (Zon {Number}): {District}"
