@@ -82,6 +82,46 @@ h3 {
   padding: 0 20px; /* Add padding for mobile */
 }
 
+    /* GPS button */
+    .gps-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      background-color: transparent;
+      border: 1px solid #bdc3c7;
+      border-radius: 50%;
+      color: #7f8c8d;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .gps-btn:hover {
+      background-color: #27ae60;
+      border-color: #27ae60;
+      color: #fff;
+    }
+
+    .gps-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .gps-btn.loading {
+      animation: gpsSpin 1s linear infinite;
+      pointer-events: none;
+      border-color: #27ae60;
+      color: #27ae60;
+    }
+
+    @keyframes gpsSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
     /* Share button */
     .share-btn {
       display: inline-flex;
@@ -602,6 +642,9 @@ h3 {
     <h3>Daerah Jerantut, Temerloh, Maran, Bera, Chenor, Jengka & Kawasan sekitarnya</h3>
     <div class="zone-selector">
       <label for="zone-select">Pilih Zon:</label>
+      <button id="gps-btn" class="gps-btn" onclick="triggerGPSDetection()" title="Kesan lokasi automatik">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      </button>
       <select id="zone-select">
         <option value="">Memuat...</option>
       </select>
@@ -1348,6 +1391,21 @@ mobileContainer.appendChild(mobileDay);
           { timeout: 10000 }
         );
       });
+    }
+
+    // Manually trigger GPS detection from button click
+    async function triggerGPSDetection() {
+      const btn = document.getElementById('gps-btn');
+      btn.classList.add('loading');
+      const detectedZone = await detectZoneByGPS();
+      btn.classList.remove('loading');
+      if (detectedZone) {
+        saveZone(detectedZone);
+        const select = document.getElementById('zone-select');
+        select.value = detectedZone;
+        updateZoneHeader(cachedZones.find(z => z.jakimCode === detectedZone));
+        fetchData();
+      }
     }
 
     // Fetch data on page load
