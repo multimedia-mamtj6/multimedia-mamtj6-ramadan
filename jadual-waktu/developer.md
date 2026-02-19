@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.4.0
+**Version:** 1.4.1
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -251,6 +251,12 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.4.1 (2026-02-19)
+- Fixed warning pulse animation not working on mobile — added `background-color: transparent` to `.countdown-section.warning` and `.time-box.active.warning` so the `@keyframes` animation is not overridden by static background-color
+- Fixed animation duration still showing 1.5s instead of 1s on both warning rules
+- Added `"version": "1.4.0"` to site.webmanifest (Android was displaying "version: 1" without it)
+- Bumped SW cache name to `v1.5.5`
 
 ### v1.4.0 (2026-02-19)
 - Added `testTime` URL parameter for simulating specific times (ticks forward from specified moment)

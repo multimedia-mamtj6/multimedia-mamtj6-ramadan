@@ -1,6 +1,6 @@
 # Jadual Waktu Ramadan 2026
 
-**Versi:** 1.3.3
+**Versi:** 1.4.1
 
 Aplikasi web untuk memaparkan jadual waktu Imsak, Subuh dan Berbuka sepanjang bulan Ramadan 1447H / 2026M untuk semua zon di Malaysia.
 
@@ -11,7 +11,10 @@ Aplikasi web untuk memaparkan jadual waktu Imsak, Subuh dan Berbuka sepanjang bu
 - Pemilihan zon disimpan secara automatik
 - **Pautan boleh dikongsi** - URL dikemaskini mengikut zon yang dipilih
 - **Butang kongsi** untuk berkongsi pautan dengan maklumat zon (Negeri, Zon, Daerah)
-- Countdown masa berbuka / imsak
+- Countdown masa berbuka / imsak dengan peralihan automatik antara fasa
+- Sorotan hijau pada kotak waktu seterusnya (Imsak, Subuh atau Berbuka)
+- Amaran denyutan oren 5 minit sebelum waktu tiba
+- Kemaskini data automatik pada tengah malam
 - Paparan responsif (desktop & mobile)
 - **Halaman maklumat** dengan dokumentasi projek
 - Data dari JAKIM melalui Waktu Solat API
@@ -39,8 +42,9 @@ Buka `index.html` dalam pelayar web. Tiada pemasangan diperlukan.
 |-----------|--------|------------|
 | `location` | `?location=JHR01` | Muatkan zon tertentu secara automatik |
 | `testDate` | `?testDate=2026-02-20` | Simulasi tarikh tertentu untuk ujian |
+| `testTime` | `?testTime=18:30` | Simulasi masa tertentu untuk ujian (jam bergerak ke hadapan) |
 
-Gabungkan kedua-dua parameter: `?location=JHR01&testDate=2026-02-20`
+Gabungkan parameter: `?location=JHR01&testDate=2026-02-20&testTime=12:00`
 
 ## Halaman
 
@@ -61,6 +65,21 @@ Data waktu solat diperolehi dari [JAKIM](https://www.e-solat.gov.my/) melalui [W
 - MST SIRIM Widget (halaman info)
 
 ## Changelog
+
+### v1.4.1 (2026-02-19)
+- Betulkan animasi denyutan amaran tidak berfungsi pada mobile (tambah `background-color: transparent` pada kelas `.warning`)
+- Betulkan tempoh animasi kepada 1s (sebelumnya masih 1.5s)
+- Tambah `"version": "1.4.0"` dalam site.webmanifest (Android memaparkan "version: 1" tanpanya)
+
+### v1.4.0 (2026-02-19)
+- Tambah parameter URL `testTime` untuk simulasi masa tertentu (jam bergerak ke hadapan)
+- Tambah fungsi `getNow()` dan pembolehubah `timeOffset` untuk simulasi masa
+- Sorotan hijau pada kotak waktu seterusnya yang terhampir (Imsak → Subuh → Berbuka)
+- Amaran denyutan oren pada countdown dan kotak waktu 5 minit sebelum waktu tiba
+- Betulkan bug peralihan fasa countdown: tukar `>` kepada `>=` dalam `setupCountdown()`
+- Kemaskini data automatik pada tengah malam tanpa muat semula halaman
+- Garisbawahi pautan peringatan masa dalam bahagian countdown
+- Kemaskini info.html dengan penerangan ciri-ciri baharu
 
 ### v1.3.3 (2026-02-18)
 - Tambah bahagian "Pasang Sebagai Aplikasi (PWA)" dalam halaman maklumat
