@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.0
+**Version:** 1.5.1
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -96,6 +96,11 @@ async detectZoneByGPS()
 async triggerGPSDetection()
 // - Adds .loading (pulse) class to GPS button during detection
 // - Calls detectZoneByGPS(), saves zone, updates dropdown and reloads data
+// - Shows error toast via showSimpleToast() if detection fails
+
+// Show a self-dismissing toast (3s) for simple feedback
+showSimpleToast(message, type)
+// - type: 'error' (red). Appended to body, fades out and removes itself
 ```
 
 ### Share Functionality
@@ -243,7 +248,9 @@ index.html?testTime=18:30                               # Today + simulated time
 - `.time-reminder-link` - Link to time accuracy info (underlined)
 - `.countdown-section.warning` - Orange pulse animation (≤5 min)
 - `.gps-btn` - GPS detection button (pill shape)
-- `.gps-btn.loading` - Pulsing opacity animation while detecting
+- `.gps-btn.loading` - Pulsing opacity animation while detecting (background forced transparent)
+- `.simple-toast` - Auto-dismiss toast for simple feedback (e.g. GPS failure)
+- `.simple-toast.error` - Red background variant
 
 ### Time Boxes (INFO HARI INI)
 - `.time-box` - Individual prayer time card
@@ -264,6 +271,12 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.1 (2026-02-19)
+- Fixed GPS button turning fully green during loading — added `background-color: transparent` to `.gps-btn.loading` to override `:hover` state retained after click
+- Added `showSimpleToast()` helper — renders a self-dismissing red toast (3s) for error feedback
+- GPS detection failure now shows toast: "Lokasi tidak dapat dikesan. Sila pilih zon secara manual."
+- Bumped SW cache name to `v1.6.1`
 
 ### v1.5.0 (2026-02-19)
 - Added `detectZoneByGPS()` — auto-detects zone on first visit via `navigator.geolocation` + GPS API endpoint

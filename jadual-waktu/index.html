@@ -116,6 +116,7 @@ h3 {
     .gps-btn.loading {
       animation: gpsPulse 1s ease-in-out infinite;
       pointer-events: none;
+      background-color: transparent;
       border-color: #27ae60;
       color: #27ae60;
     }
@@ -1410,6 +1411,17 @@ mobileContainer.appendChild(mobileDay);
       });
     }
 
+    function showSimpleToast(message, type = 'error') {
+      const toast = document.createElement('div');
+      toast.className = `simple-toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 400);
+      }, 3000);
+    }
+
     // Manually trigger GPS detection from button click
     async function triggerGPSDetection() {
       const btn = document.getElementById('gps-btn');
@@ -1422,6 +1434,8 @@ mobileContainer.appendChild(mobileDay);
         select.value = detectedZone;
         updateZoneHeader(cachedZones.find(z => z.jakimCode === detectedZone));
         fetchData();
+      } else {
+        showSimpleToast('Lokasi tidak dapat dikesan. Sila pilih zon secara manual.');
       }
     }
 
@@ -1499,6 +1513,25 @@ mobileContainer.appendChild(mobileDay);
         color: #fff;
         border: 1px solid #fff;
       }
+      .simple-toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ffffff;
+        padding: 12px 18px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        z-index: 2001;
+        max-width: 360px;
+        width: 90%;
+        font-family: 'Google Sans', sans-serif;
+        font-size: 0.9rem;
+        text-align: center;
+        transition: opacity 0.4s ease;
+      }
+      .simple-toast.error { background-color: #e74c3c; }
+      .simple-toast.fade-out { opacity: 0; }
     `;
     document.head.appendChild(toastStyle);
 

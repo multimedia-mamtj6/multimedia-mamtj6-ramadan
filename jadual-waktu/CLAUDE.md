@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Version:** 1.5.0
+**Version:** 1.5.1
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -36,7 +36,8 @@ This is a static web project displaying Ramadan 2026 prayer times (waktu solat) 
 - `highlightNextPrayer()` - Highlights the next upcoming time box (Imsak/Subuh/Berbuka)
 - `shareLink()` - Share/copy URL with zone info (state, code, district) in share text
 - `detectZoneByGPS()` - Geolocation + GPS API to auto-detect zone; returns zone code or null
-- `triggerGPSDetection()` - GPS button click handler; re-detects zone, saves, and reloads data
+- `triggerGPSDetection()` - GPS button click handler; re-detects zone, saves, and reloads data; shows error toast on failure
+- `showSimpleToast(message, type)` - Self-dismissing toast (3s) for simple feedback; type 'error' = red
 
 **Data flow**:
 1. On load: fetch zones list, populate dropdown, restore saved zone from URL or localStorage
