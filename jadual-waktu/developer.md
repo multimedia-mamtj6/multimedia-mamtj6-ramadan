@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.4.1
+**Version:** 1.5.0
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -85,6 +85,17 @@ async loadZones()
 
 // Update header with zone info
 updateZoneHeader(zone)
+
+// Auto-detect zone via GPS (returns zone code or null)
+async detectZoneByGPS()
+// - Calls navigator.geolocation.getCurrentPosition()
+// - Fetches https://api.waktusolat.app/v2/solat/gps/{lat}/{long}
+// - Returns zone code string (e.g. "WLY01") or null on failure/denial
+
+// Triggered by GPS button click — re-detects and reloads data
+async triggerGPSDetection()
+// - Adds .loading (pulse) class to GPS button during detection
+// - Calls detectZoneByGPS(), saves zone, updates dropdown and reloads data
 ```
 
 ### Share Functionality
@@ -231,6 +242,8 @@ index.html?testTime=18:30                               # Today + simulated time
 - `#countdown-progress-bar` - Progress bar fill
 - `.time-reminder-link` - Link to time accuracy info (underlined)
 - `.countdown-section.warning` - Orange pulse animation (≤5 min)
+- `.gps-btn` - GPS detection button (pill shape)
+- `.gps-btn.loading` - Pulsing opacity animation while detecting
 
 ### Time Boxes (INFO HARI INI)
 - `.time-box` - Individual prayer time card
@@ -251,6 +264,14 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.0 (2026-02-19)
+- Added `detectZoneByGPS()` — auto-detects zone on first visit via `navigator.geolocation` + GPS API endpoint
+- Added `triggerGPSDetection()` — GPS button click handler, re-detects and reloads prayer data
+- Added GPS button (📍 GPS pill) next to zone dropdown; pulsing opacity animation while detecting
+- Mobile layout: share button moved to row 2 using `.zone-row` wrapper + `flex-direction: column` on mobile
+- Fixed SW fetch handler: added `.catch()` returning `503 Offline` response to prevent uncaught promise rejections for failed cross-origin requests (e.g. Google Fonts)
+- Bumped SW cache name to `v1.6.0`
 
 ### v1.4.1 (2026-02-19)
 - Fixed warning pulse animation not working on mobile — added `background-color: transparent` to `.countdown-section.warning` and `.time-box.active.warning` so the `@keyframes` animation is not overridden by static background-color

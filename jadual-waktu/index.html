@@ -87,15 +87,18 @@ h3 {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 36px;
+      gap: 4px;
       height: 36px;
+      padding: 0 10px;
       background-color: transparent;
       border: 1px solid #bdc3c7;
-      border-radius: 50%;
+      border-radius: 18px;
       color: #7f8c8d;
       cursor: pointer;
       transition: all 0.2s ease;
       flex-shrink: 0;
+      font-size: 13px;
+      font-family: inherit;
     }
 
     .gps-btn:hover {
@@ -111,15 +114,15 @@ h3 {
     }
 
     .gps-btn.loading {
-      animation: gpsSpin 1s linear infinite;
+      animation: gpsPulse 1s ease-in-out infinite;
       pointer-events: none;
       border-color: #27ae60;
       color: #27ae60;
     }
 
-    @keyframes gpsSpin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    @keyframes gpsPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     /* Share button */
@@ -659,6 +662,7 @@ h3 {
         </select>
         <button id="gps-btn" class="gps-btn" onclick="triggerGPSDetection()" title="Kesan lokasi automatik">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          GPS
         </button>
       </div>
       <button id="share-btn" class="share-btn" onclick="shareLink()">
