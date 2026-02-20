@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.3
+**Version:** 1.5.4
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -275,6 +275,10 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.4 (2026-02-21)
+- Fixed progress bar occasionally still calculating from midnight — added 24-hour validity check on `lastMaghrib` read from `localStorage`; stale values (>24h old) are discarded and `lastMaghrib` is re-populated fresh from the API via `isYesterday()` in the next `fetchData()` call
+- Bumped SW cache name to `v1.6.4`
 
 ### v1.5.3 (2026-02-21)
 - Fixed progress bar still calculating from midnight even after v1.5.2 — root cause was `lastMaghrib` being a JS variable lost on page reload; now fetched directly from API using new `isYesterday()` helper and persisted to `localStorage` on every `fetchData()` call

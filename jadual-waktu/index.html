@@ -756,7 +756,10 @@ h3 {
     };
 
     // Preserve yesterday's Maghrib across midnight and page reloads
-    let lastMaghrib = parseInt(localStorage.getItem('lastMaghrib')) || null;
+    // Only trust stored value if it's from within the last 24 hours (avoid stale data)
+    const _storedMaghrib = parseInt(localStorage.getItem('lastMaghrib'));
+    const _nowSec = Math.floor(Date.now() / 1000);
+    let lastMaghrib = (_storedMaghrib && (_nowSec - _storedMaghrib) < 86400) ? _storedMaghrib : null;
 
     // Store countdown timer ID for cleanup
     let countdownTimerId = null;
