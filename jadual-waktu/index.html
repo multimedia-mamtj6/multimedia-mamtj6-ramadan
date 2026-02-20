@@ -755,6 +755,9 @@ h3 {
       tomorrow: null
     };
 
+    // Preserve yesterday's Maghrib across the midnight data refresh
+    let lastMaghrib = null;
+
     // Store countdown timer ID for cleanup
     let countdownTimerId = null;
 
@@ -1139,10 +1142,15 @@ h3 {
       }
       // If before Subuh, countdown to today's Subuh
       else if (now < globalPrayerTimes.today.fajr) {
-        // We don't have yesterday's maghrib time, so use midnight as a fallback starting point
-        const midnightToday = new Date(getNow());
-        midnightToday.setHours(0, 0, 0, 0);
-        const startTime = Math.floor(midnightToday.getTime() / 1000);
+        // Use yesterday's Maghrib if saved, otherwise fall back to midnight
+        let startTime;
+        if (lastMaghrib) {
+          startTime = lastMaghrib;
+        } else {
+          const midnightToday = new Date(getNow());
+          midnightToday.setHours(0, 0, 0, 0);
+          startTime = Math.floor(midnightToday.getTime() / 1000);
+        }
         const targetTime = globalPrayerTimes.today.fajr;
         const totalDuration = targetTime - startTime;
         startCountdown(
@@ -1559,6 +1567,10 @@ mobileContainer.appendChild(mobileDay);
       midnight.setHours(0, 0, 5, 0); // 5 seconds past midnight to ensure date has changed
       const msUntilMidnight = midnight.getTime() - now.getTime();
       setTimeout(() => {
+        // Save tonight's Maghrib before data refreshes, so progress bar stays continuous after midnight
+        if (globalPrayerTimes.today) {
+          lastMaghrib = globalPrayerTimes.today.maghrib;
+        }
         initialDataLoaded = false;
         fetchData();
         scheduleMiddnightRefresh(); // schedule the next one

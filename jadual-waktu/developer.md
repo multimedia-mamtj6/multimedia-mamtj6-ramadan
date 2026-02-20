@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.1
+**Version:** 1.5.2
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -271,6 +271,10 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.2 (2026-02-20)
+- Fixed progress bar jumping to 0% after midnight data refresh — added `lastMaghrib` variable to preserve today's Maghrib timestamp before `fetchData()` runs; pre-Fajr branch now uses `lastMaghrib` as `startTime` instead of midnight, keeping progress continuous
+- Bumped SW cache name to `v1.6.2`
 
 ### v1.5.1 (2026-02-19)
 - Fixed GPS button turning fully green during loading — added `background-color: transparent` to `.gps-btn.loading` to override `:hover` state retained after click
