@@ -755,8 +755,8 @@ h3 {
       tomorrow: null
     };
 
-    // Preserve yesterday's Maghrib across the midnight data refresh
-    let lastMaghrib = null;
+    // Preserve yesterday's Maghrib across midnight and page reloads
+    let lastMaghrib = parseInt(localStorage.getItem('lastMaghrib')) || null;
 
     // Store countdown timer ID for cleanup
     let countdownTimerId = null;
@@ -985,6 +985,14 @@ h3 {
       return tomorrow.getDate() === day && tomorrow.getMonth() === (month - 1) && tomorrow.getFullYear() === 2026;
     }
 
+    // Check if a given date is yesterday
+    function isYesterday(day, month) {
+      const today = getTestDate();
+      const yesterday = new Date(today);
+      yesterday.setDate(today.getDate() - 1);
+      return yesterday.getDate() === day && yesterday.getMonth() === (month - 1) && yesterday.getFullYear() === 2026;
+    }
+
     // Function to process Hijri dates for Ramadan
     function formatHijriForRamadan(hijri) {
       const [year, month, day] = hijri.split('-');
@@ -1131,6 +1139,9 @@ h3 {
       else if (now >= globalPrayerTimes.today.maghrib && globalPrayerTimes.tomorrow) {
         // Countdown to tomorrow's Subuh
         const startTime = globalPrayerTimes.today.maghrib;
+        // Save Maghrib time so progress bar stays continuous after midnight/page reload
+        lastMaghrib = startTime;
+        localStorage.setItem('lastMaghrib', startTime);
         const targetTime = globalPrayerTimes.tomorrow.fajr;
         const totalDuration = targetTime - startTime;
         startCountdown(
@@ -1264,6 +1275,12 @@ h3 {
               fajr: fajrTimestamp,
               maghrib: maghribTimestamp
             };
+          }
+
+          // Check if this prayer time is for yesterday — save Maghrib for post-midnight progress bar
+          if (isYesterday(prayer.day, prayer.month)) {
+            lastMaghrib = prayer.maghrib;
+            localStorage.setItem('lastMaghrib', prayer.maghrib);
           }
 
           // Check if this prayer time is for tomorrow

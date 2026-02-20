@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.2
+**Version:** 1.5.3
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -101,6 +101,10 @@ async triggerGPSDetection()
 // Show a self-dismissing toast (3s) for simple feedback
 showSimpleToast(message, type)
 // - type: 'error' (red). Appended to body, fades out and removes itself
+
+// Check if a given day/month is yesterday (mirrors isTomorrow)
+isYesterday(day, month)
+// - Used in fetchData() prayer loop to detect and save yesterday's Maghrib to lastMaghrib + localStorage
 ```
 
 ### Share Functionality
@@ -271,6 +275,12 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.3 (2026-02-21)
+- Fixed progress bar still calculating from midnight even after v1.5.2 — root cause was `lastMaghrib` being a JS variable lost on page reload; now fetched directly from API using new `isYesterday()` helper and persisted to `localStorage` on every `fetchData()` call
+- Added `isYesterday(day, month)` helper (mirrors `isTomorrow()`) used in prayer loop to detect and save yesterday's Maghrib
+- Added "Atau gunakan GPS:" label next to GPS button in zone selector row
+- Bumped SW cache name to `v1.6.3`
 
 ### v1.5.2 (2026-02-20)
 - Fixed progress bar jumping to 0% after midnight data refresh — added `lastMaghrib` variable to preserve today's Maghrib timestamp before `fetchData()` runs; pre-Fajr branch now uses `lastMaghrib` as `startTime` instead of midnight, keeping progress continuous
