@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Version:** 1.4.1
+**Version:** 1.5.4
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -35,6 +35,9 @@ This is a static web project displaying Ramadan 2026 prayer times (waktu solat) 
 - `getNow()` - Returns offset-adjusted current time (supports `testTime` URL param)
 - `highlightNextPrayer()` - Highlights the next upcoming time box (Imsak/Subuh/Berbuka)
 - `shareLink()` - Share/copy URL with zone info (state, code, district) in share text
+- `detectZoneByGPS()` - Geolocation + GPS API to auto-detect zone; returns zone code or null
+- `triggerGPSDetection()` - GPS button click handler; re-detects zone, saves, and reloads data; shows error toast on failure
+- `showSimpleToast(message, type)` - Self-dismissing toast (3s) for simple feedback; type 'error' = red
 
 **Data flow**:
 1. On load: fetch zones list, populate dropdown, restore saved zone from URL or localStorage
@@ -72,6 +75,8 @@ Open `index.html` directly in a browser - no build step required.
 8. **Time Box Highlight**: Green-filled highlight on the next upcoming prayer time box
 9. **Warning Pulse**: Orange color pulse animation on countdown and time box 5 minutes before prayer time
 10. **Midnight Auto-Refresh**: Data automatically refreshes at midnight for the next day
-11. **Responsive Design**: Table view for desktop, card view for mobile
-9. **Contextual Messages**: Shows appropriate message before/after Ramadan period
-10. **Info Page**: Documentation with shareable anchor sections
+11. **Responsive Design**: Table view for desktop, card view for mobile (share button on row 2)
+12. **GPS Auto-Detection**: Detects user location on first visit, pre-selects zone automatically
+13. **GPS Button**: 📍 GPS pill button for manual re-detection at any time
+14. **Contextual Messages**: Shows appropriate message before/after Ramadan period
+15. **Info Page**: Documentation with shareable anchor sections

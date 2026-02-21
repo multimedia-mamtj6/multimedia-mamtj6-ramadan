@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.4.1
+**Version:** 1.5.4
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -85,6 +85,26 @@ async loadZones()
 
 // Update header with zone info
 updateZoneHeader(zone)
+
+// Auto-detect zone via GPS (returns zone code or null)
+async detectZoneByGPS()
+// - Calls navigator.geolocation.getCurrentPosition()
+// - Fetches https://api.waktusolat.app/v2/solat/gps/{lat}/{long}
+// - Returns zone code string (e.g. "WLY01") or null on failure/denial
+
+// Triggered by GPS button click — re-detects and reloads data
+async triggerGPSDetection()
+// - Adds .loading (pulse) class to GPS button during detection
+// - Calls detectZoneByGPS(), saves zone, updates dropdown and reloads data
+// - Shows error toast via showSimpleToast() if detection fails
+
+// Show a self-dismissing toast (3s) for simple feedback
+showSimpleToast(message, type)
+// - type: 'error' (red). Appended to body, fades out and removes itself
+
+// Check if a given day/month is yesterday (mirrors isTomorrow)
+isYesterday(day, month)
+// - Used in fetchData() prayer loop to detect and save yesterday's Maghrib to lastMaghrib + localStorage
 ```
 
 ### Share Functionality
@@ -231,6 +251,10 @@ index.html?testTime=18:30                               # Today + simulated time
 - `#countdown-progress-bar` - Progress bar fill
 - `.time-reminder-link` - Link to time accuracy info (underlined)
 - `.countdown-section.warning` - Orange pulse animation (≤5 min)
+- `.gps-btn` - GPS detection button (pill shape)
+- `.gps-btn.loading` - Pulsing opacity animation while detecting (background forced transparent)
+- `.simple-toast` - Auto-dismiss toast for simple feedback (e.g. GPS failure)
+- `.simple-toast.error` - Red background variant
 
 ### Time Boxes (INFO HARI INI)
 - `.time-box` - Individual prayer time card
@@ -251,6 +275,34 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.4 (2026-02-21)
+- Fixed progress bar occasionally still calculating from midnight — added 24-hour validity check on `lastMaghrib` read from `localStorage`; stale values (>24h old) are discarded and `lastMaghrib` is re-populated fresh from the API via `isYesterday()` in the next `fetchData()` call
+- Bumped SW cache name to `v1.6.4`
+
+### v1.5.3 (2026-02-21)
+- Fixed progress bar still calculating from midnight even after v1.5.2 — root cause was `lastMaghrib` being a JS variable lost on page reload; now fetched directly from API using new `isYesterday()` helper and persisted to `localStorage` on every `fetchData()` call
+- Added `isYesterday(day, month)` helper (mirrors `isTomorrow()`) used in prayer loop to detect and save yesterday's Maghrib
+- Added "Atau gunakan GPS:" label next to GPS button in zone selector row
+- Bumped SW cache name to `v1.6.3`
+
+### v1.5.2 (2026-02-20)
+- Fixed progress bar jumping to 0% after midnight data refresh — added `lastMaghrib` variable to preserve today's Maghrib timestamp before `fetchData()` runs; pre-Fajr branch now uses `lastMaghrib` as `startTime` instead of midnight, keeping progress continuous
+- Bumped SW cache name to `v1.6.2`
+
+### v1.5.1 (2026-02-19)
+- Fixed GPS button turning fully green during loading — added `background-color: transparent` to `.gps-btn.loading` to override `:hover` state retained after click
+- Added `showSimpleToast()` helper — renders a self-dismissing red toast (3s) for error feedback
+- GPS detection failure now shows toast: "Lokasi tidak dapat dikesan. Sila pilih zon secara manual."
+- Bumped SW cache name to `v1.6.1`
+
+### v1.5.0 (2026-02-19)
+- Added `detectZoneByGPS()` — auto-detects zone on first visit via `navigator.geolocation` + GPS API endpoint
+- Added `triggerGPSDetection()` — GPS button click handler, re-detects and reloads prayer data
+- Added GPS button (📍 GPS pill) next to zone dropdown; pulsing opacity animation while detecting
+- Mobile layout: share button moved to row 2 using `.zone-row` wrapper + `flex-direction: column` on mobile
+- Fixed SW fetch handler: added `.catch()` returning `503 Offline` response to prevent uncaught promise rejections for failed cross-origin requests (e.g. Google Fonts)
+- Bumped SW cache name to `v1.6.0`
 
 ### v1.4.1 (2026-02-19)
 - Fixed warning pulse animation not working on mobile — added `background-color: transparent` to `.countdown-section.warning` and `.time-box.active.warning` so the `@keyframes` animation is not overridden by static background-color

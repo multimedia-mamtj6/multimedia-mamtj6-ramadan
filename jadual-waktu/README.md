@@ -1,6 +1,6 @@
 # Jadual Waktu Ramadan 2026
 
-**Versi:** 1.4.1
+**Versi:** 1.5.4
 
 Aplikasi web untuk memaparkan jadual waktu Imsak, Subuh dan Berbuka sepanjang bulan Ramadan 1447H / 2026M untuk semua zon di Malaysia.
 
@@ -65,6 +65,27 @@ Data waktu solat diperolehi dari [JAKIM](https://www.e-solat.gov.my/) melalui [W
 - MST SIRIM Widget (halaman info)
 
 ## Changelog
+
+### v1.5.4 (2026-02-21)
+- Betulkan bar kemajuan kadangkala masih dikira dari tengah malam — tambah semakan kesahihan 24 jam pada nilai `lastMaghrib` dari `localStorage`; nilai lapuk (lebih dari 24 jam) dibuang dan dikira semula dari data API
+
+### v1.5.3 (2026-02-21)
+- Betulkan bar kemajuan selepas tengah malam masih dikira dari tengah malam — kini guna waktu Maghrib semalam dari data API secara terus melalui fungsi `isYesterday()`, disimpan dalam `localStorage` supaya kekal selepas muat semula halaman
+- Tambah label "Atau gunakan GPS:" di sebelah butang GPS
+
+### v1.5.2 (2026-02-20)
+- Betulkan bar kemajuan tiba-tiba kembali ke 0% selepas tengah malam — simpan `lastMaghrib` sebelum data dikemaskini dan guna sebagai titik mula sebenar countdown selepas tengah malam
+
+### v1.5.1 (2026-02-19)
+- Betulkan butang GPS bertukar hijau penuh semasa memuatkan (tambah `background-color: transparent` pada `.gps-btn.loading`)
+- Tambah toast ralat merah apabila pengesanan GPS gagal ("Lokasi tidak dapat dikesan. Sila pilih zon secara manual.")
+
+### v1.5.0 (2026-02-19)
+- Tambah pengesanan lokasi GPS automatik pada kunjungan pertama (tanpa zon tersimpan)
+- Tambah butang GPS (📍 GPS) di sebelah dropdown zon untuk kesan semula lokasi secara manual
+- Animasi denyutan pada butang GPS semasa mengesan lokasi
+- Paparan mobile: butang kongsi kini berada di baris kedua, di bawah pemilih zon
+- Betulkan ralat SW fetch: janji tidak ditangkap untuk permintaan rangkaian gagal kini dipulangkan sebagai 503
 
 ### v1.4.1 (2026-02-19)
 - Betulkan animasi denyutan amaran tidak berfungsi pada mobile (tambah `background-color: transparent` pada kelas `.warning`)
