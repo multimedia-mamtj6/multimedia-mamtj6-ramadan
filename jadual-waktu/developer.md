@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.6
+**Version:** 1.5.7
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -275,6 +275,11 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.7 (2026-02-21)
+- Added beta environment banner to `index.html` and `info.html` — inline `<script>` in `<head>` checks `window.location.hostname`; only renders on `beta.ramadan.mamtj6.com`, does nothing on production
+- Banner dynamically builds production URL using `window.location.pathname + window.location.search` so the link always points to the equivalent page on `ramadan.mamtj6.com`
+- Bumped SW cache name to `v1.6.7`
 
 ### v1.5.6 (2026-02-21)
 - Added Umami event tracking to zone selector change: fires `zone-select` event with `{ zone: zoneCode }` property
