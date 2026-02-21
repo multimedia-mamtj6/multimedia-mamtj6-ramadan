@@ -899,6 +899,7 @@ h3 {
           saveZone(this.value);
           updateZoneHeader(cachedZones.find(z => z.jakimCode === this.value));
           fetchData();
+          if (typeof umami !== 'undefined') umami.track('zone-select', { zone: this.value });
         });
 
         // On focus (dropdown opens): show full details for all options
@@ -1464,8 +1465,10 @@ mobileContainer.appendChild(mobileDay);
         select.value = detectedZone;
         updateZoneHeader(cachedZones.find(z => z.jakimCode === detectedZone));
         fetchData();
+        if (typeof umami !== 'undefined') umami.track('gps-detect-success', { zone: detectedZone });
       } else {
         showSimpleToast('Lokasi tidak dapat dikesan. Sila pilih zon secara manual.');
+        if (typeof umami !== 'undefined') umami.track('gps-detect-fail');
       }
     }
 

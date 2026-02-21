@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.5
+**Version:** 1.5.6
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -275,6 +275,12 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
+
+### v1.5.6 (2026-02-21)
+- Added Umami event tracking to zone selector change: fires `zone-select` event with `{ zone: zoneCode }` property
+- Added Umami event tracking to `triggerGPSDetection()`: fires `gps-detect-success` with `{ zone: detectedZone }` on success, `gps-detect-fail` on failure
+- All tracking calls guarded with `typeof umami !== 'undefined'` to prevent errors if script is blocked
+- Bumped SW cache name to `v1.6.6`
 
 ### v1.5.5 (2026-02-21)
 - Added Vercel Analytics script (`/_vercel/insights/script.js`) to `index.html` and `info.html`
