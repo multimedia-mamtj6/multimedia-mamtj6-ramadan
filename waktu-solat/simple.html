@@ -24,7 +24,7 @@
       border-radius: 20px;
       padding: 22px 20px 16px;
       width: 100%;
-      max-width: 400px;
+      max-width: 480px;
       color: #fff;
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
     }
@@ -50,7 +50,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 14px;
+      margin-top: 20px;
       padding: 0 2px;
       gap: 8px;
     }
@@ -148,6 +148,7 @@
     }
 
     .status-msg.error { color: rgba(255, 80, 80, 0.75); }
+
   </style>
 </head>
 <body>
@@ -202,16 +203,17 @@
     // produces y values that exactly match the SVG quadratic bezier path.
     // The two are the same formula only when this relationship holds.
     const ARC_W      = 360;
-    const ARC_PAD_X  = 5;    // arc left/right x endpoints
+    const ARC_PAD_X  = 20;   // arc left/right x endpoints
     const DOT_PAD_X  = ARC_PAD_X; // Subuh at arc left end, Isyak at arc right end
-    const ARC_TOP_Y  = 20;   // arc peak y (smaller = higher on screen)
-    const ARC_BOT_Y  = 100;  // arc endpoint y
-    const CTRL_Y     = 2 * ARC_TOP_Y - ARC_BOT_Y; // = -60  (bezier control point)
-    const VIEW_H     = 155;
+    const ARC_TOP_Y  = 14;   // arc peak y (smaller = higher on screen)
+    const ARC_BOT_Y  = 70;   // arc endpoint y
+    const CTRL_Y     = 2 * ARC_TOP_Y - ARC_BOT_Y; // = -42  (bezier control point)
+    const VIEW_H     = 120;
 
     let prayerList   = [];
     let tomorrowFajr = null;
     let countdownTimer = null;
+    let pulseAnimId  = null;
 
     // ── helpers ───────────────────────────────────────────────────────────────
     function svgEl(tag) { return document.createElementNS(SVG_NS, tag); }
@@ -238,6 +240,35 @@
       return ARC_BOT_Y - (ARC_BOT_Y - ARC_TOP_Y) * 4 * t * (1 - t);
     }
 
+    // Compute the SVG path for the elapsed portion of the arc using de Casteljau subdivision.
+    // progressT is clamped [0,1]: 0 = Subuh, 1 = Isyak.
+    function progressArcPath(progressT) {
+      const t  = Math.max(0, Math.min(1, progressT));
+      const P0 = { x: ARC_PAD_X,           y: ARC_BOT_Y };
+      const P1 = { x: ARC_W / 2,           y: CTRL_Y    };
+      const P2 = { x: ARC_W - ARC_PAD_X,   y: ARC_BOT_Y };
+      if (t === 0) return '';
+      if (t === 1) return `M ${P0.x},${P0.y} Q ${P1.x},${P1.y} ${P2.x},${P2.y}`;
+      const P01  = { x: P0.x + (P1.x - P0.x) * t, y: P0.y + (P1.y - P0.y) * t };
+      const P12  = { x: P1.x + (P2.x - P1.x) * t, y: P1.y + (P2.y - P1.y) * t };
+      const Pmid = { x: P01.x + (P12.x - P01.x) * t, y: P01.y + (P12.y - P01.y) * t };
+      return `M ${P0.x},${P0.y} Q ${P01.x.toFixed(2)},${P01.y.toFixed(2)} ${Pmid.x.toFixed(2)},${Pmid.y.toFixed(2)}`;
+    }
+
+    function startPulseAnimation() {
+      if (pulseAnimId) cancelAnimationFrame(pulseAnimId);
+      const BASE = 6, MAX = 17, DUR = 1800;
+      function frame(ts) {
+        const el = document.getElementById('pulseRing');
+        if (!el) { pulseAnimId = null; return; }
+        const t = (ts % DUR) / DUR;
+        el.setAttribute('r', (BASE + (MAX - BASE) * t).toFixed(1));
+        el.setAttribute('opacity', (0.7 * (1 - t)).toFixed(3));
+        pulseAnimId = requestAnimationFrame(frame);
+      }
+      pulseAnimId = requestAnimationFrame(frame);
+    }
+
     // ── SVG build ─────────────────────────────────────────────────────────────
     function buildArcSvg() {
       const now = Date.now();
@@ -245,31 +276,62 @@
       let currentIdx = -1;
       prayerList.forEach((p, i) => { if (now >= p.ts) currentIdx = i; });
       const nextIdx = currentIdx + 1;
+      // Post-midnight before Subuh: no prayer has passed today, but we're still in Isyak period
+      const displayCurrentIdx = currentIdx >= 0 ? currentIdx : prayerList.length - 1;
 
       const svg = svgEl('svg');
       svg.setAttribute('viewBox', `0 0 ${ARC_W} ${VIEW_H}`);
 
-      // Arc path — control point at CTRL_Y (may be negative / off-screen, that's fine)
-      const arcPath = svgEl('path');
-      arcPath.setAttribute('d',
+      // Background arc — full path, dim
+      const bgArc = svgEl('path');
+      bgArc.setAttribute('d',
         `M ${ARC_PAD_X},${ARC_BOT_Y} Q ${ARC_W / 2},${CTRL_Y} ${ARC_W - ARC_PAD_X},${ARC_BOT_Y}`);
-      arcPath.setAttribute('stroke', 'rgba(255,255,255,0.7)');
-      arcPath.setAttribute('fill', 'none');
-      arcPath.setAttribute('stroke-width', '2');
-      arcPath.setAttribute('stroke-linecap', 'round');
-      svg.appendChild(arcPath);
+      bgArc.setAttribute('stroke', 'rgba(255,255,255,0.15)');
+      bgArc.setAttribute('fill', 'none');
+      bgArc.setAttribute('stroke-width', '2');
+      bgArc.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(bgArc);
+
+      // Progress arc — elapsed portion, bright; updated every second by tick()
+      const fajrTs = prayerList[0].ts;
+      const ishaTs = prayerList[prayerList.length - 1].ts;
+      const rawInitT = (now - fajrTs) / (ishaTs - fajrTs);
+      // Post-midnight before Subuh: all prayers done, show full arc
+      const initT  = rawInitT < 0 ? 1 : rawInitT;
+      const progArc = svgEl('path');
+      progArc.setAttribute('id', 'progressArc');
+      progArc.setAttribute('d', progressArcPath(initT));
+      progArc.setAttribute('stroke', 'rgba(255,255,255,0.85)');
+      progArc.setAttribute('fill', 'none');
+      progArc.setAttribute('stroke-width', '4');
+      progArc.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(progArc);
 
       // Nodes
+      const xPositions = prayerList.map(p => timeToX(p.ts));
       prayerList.forEach((prayer, i) => {
         const x = timeToX(prayer.ts);
         const y = arcY(x);           // dot center sits exactly on the arc
 
-        const isCurrent = i === currentIdx;
-        const isNext    = i === nextIdx;
+        const isCurrent = i === displayCurrentIdx;
+        const isNext    = i === nextIdx && currentIdx >= 0;
         const isPast    = now >= prayer.ts;
         const isFirst   = i === 0;
         const isLast    = i === prayerList.length - 1;
-        const r         = isCurrent ? 8 : 5.5;
+        const r         = isCurrent ? 6 : 4;
+
+        // Pulse ring for current prayer — r and opacity driven by startPulseAnimation()
+        if (isCurrent) {
+          const ring = svgEl('circle');
+          ring.setAttribute('cx', x);
+          ring.setAttribute('cy', y);
+          ring.setAttribute('r', '6');
+          ring.setAttribute('id', 'pulseRing');
+          ring.setAttribute('fill', 'none');
+          ring.setAttribute('stroke', 'rgba(255,255,255,0.65)');
+          ring.setAttribute('stroke-width', '1.5');
+          svg.appendChild(ring);
+        }
 
         // Circle
         const circle = svgEl('circle');
@@ -296,18 +358,25 @@
         }
         svg.appendChild(circle);
 
-        // Labels
-        const anchor      = isFirst ? 'start' : isLast ? 'end' : 'middle';
+        // Labels — shift text-anchor horizontally for close pairs.
+        // Arc geometry naturally places endpoint dots (y=70) ~17px lower than nearby inner dots
+        // (y≈53), so no y-bump is needed — horizontal anchor divergence is enough.
+        const isCloseToPrev = i > 0 && (x - xPositions[i - 1]) < 50 && !isLast;
+        const isCloseToNext = i < prayerList.length - 1 && (xPositions[i + 1] - x) < 50 && !isFirst && !isLast;
+        const anchor = isFirst ? 'start' : isLast ? 'end' :
+                       isCloseToPrev ? 'start' : isCloseToNext ? 'end' : 'middle';
         const labelAlpha  = (isCurrent || isNext) ? '0.95' : isPast ? '0.35' : '0.55';
         const labelWeight = (isCurrent || isNext) ? '600' : '400';
-        const timeOffset  = r + 10;   // gap below circle bottom
-        const nameOffset  = timeOffset + 13;
+        const timeOffset  = r + 13;
+        const nameOffset  = timeOffset + 11;
+
+        const labelX = isFirst ? x - 10 : isLast ? x + 10 : x;
 
         const timeText = svgEl('text');
-        timeText.setAttribute('x', x);
+        timeText.setAttribute('x', labelX);
         timeText.setAttribute('y', y + timeOffset);
         timeText.setAttribute('text-anchor', anchor);
-        timeText.setAttribute('font-size', isCurrent ? '11' : '10');
+        timeText.setAttribute('font-size', isCurrent ? '10' : '9');
         timeText.setAttribute('font-weight', labelWeight);
         timeText.setAttribute('fill', `rgba(255,255,255,${labelAlpha})`);
         timeText.setAttribute('font-family', "'Inter',system-ui,sans-serif");
@@ -315,10 +384,10 @@
         svg.appendChild(timeText);
 
         const nameText = svgEl('text');
-        nameText.setAttribute('x', x);
+        nameText.setAttribute('x', labelX);
         nameText.setAttribute('y', y + nameOffset);
         nameText.setAttribute('text-anchor', anchor);
-        nameText.setAttribute('font-size', '9');
+        nameText.setAttribute('font-size', '8');
         nameText.setAttribute('font-weight', labelWeight);
         nameText.setAttribute('fill', `rgba(255,255,255,${isCurrent ? '0.75' : '0.3'})`);
         nameText.setAttribute('font-family', "'Inter',system-ui,sans-serif");
@@ -326,15 +395,17 @@
         svg.appendChild(nameText);
       });
 
-      return { svg, currentIdx, nextIdx };
+      return { svg, currentIdx, displayCurrentIdx, nextIdx };
     }
 
     // ── render ────────────────────────────────────────────────────────────────
     function renderArc() {
-      const { svg, currentIdx, nextIdx } = buildArcSvg();
+      const { svg, currentIdx, displayCurrentIdx, nextIdx } = buildArcSvg();
 
+      if (pulseAnimId) { cancelAnimationFrame(pulseAnimId); pulseAnimId = null; }
       document.getElementById('arcContainer').innerHTML = '';
       document.getElementById('arcContainer').appendChild(svg);
+      startPulseAnimation();
 
       const currentName = currentIdx >= 0 ? prayerList[currentIdx].name : 'Isyak';
       let nextName, nextTs;
@@ -357,11 +428,22 @@
       if (countdownTimer) clearInterval(countdownTimer);
 
       function tick() {
-        const diff = Math.max(0, (nextTs || 0) - Date.now());
+        const nowMs = Date.now();
+        const diff  = Math.max(0, (nextTs || 0) - nowMs);
         const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
         const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
         const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
         document.getElementById('countdown').textContent = `${hh}:${mm}:${ss}`;
+
+        // Advance progress arc
+        const progEl = document.getElementById('progressArc');
+        if (progEl && prayerList.length >= 2) {
+          const fajr = prayerList[0].ts;
+          const isha = prayerList[prayerList.length - 1].ts;
+          const rawT = (nowMs - fajr) / (isha - fajr);
+          progEl.setAttribute('d', progressArcPath(rawT < 0 ? 1 : rawT));
+        }
+
         if (diff === 0) {
           clearInterval(countdownTimer);
           setTimeout(renderArc, 1000); // re-render after prayer transition
