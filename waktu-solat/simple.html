@@ -36,6 +36,7 @@
       margin-bottom: 14px;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 4px;
     }
 
@@ -133,7 +134,7 @@
 
     .footer-bar {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       font-size: 11px;
       color: rgba(255, 255, 255, 0.3);
       margin-top: 12px;
@@ -149,13 +150,33 @@
 
     .status-msg.error { color: rgba(255, 80, 80, 0.75); }
 
+    #zoneSelect {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 11px;
+      font-family: 'Inter', system-ui, sans-serif;
+      letter-spacing: 0.4px;
+      cursor: pointer;
+      outline: none;
+      padding: 0;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    #zoneSelect option,
+    #zoneSelect optgroup {
+      background: #1c2128;
+      color: #e6edf3;
+    }
+
   </style>
 </head>
 <body>
   <div class="widget">
     <div class="location-bar">
       <span>📍</span>
-      <span id="locationDetail">Memuat...</span>
+      <select id="zoneSelect"><option value="">Memuat zon...</option></select>
     </div>
 
     <div id="arcContainer">
@@ -190,9 +211,118 @@
   </div>
 
   <script>
-    const ZONE = 'PHG03';
-    const LOCATION_NAME = 'Pahang · Temerloh';
     const SVG_NS = 'http://www.w3.org/2000/svg';
+
+    let currentZone = 'PHG03';
+    let cachedZones = [];
+    let timeOffset  = 0;
+
+    (function initTestTime() {
+      const params = new URLSearchParams(window.location.search);
+      const testTime = params.get('testTime');
+      if (!testTime) return;
+      const today = new Date();
+      const [h, m] = testTime.split(':').map(Number);
+      today.setHours(h, m, 0, 0);
+      timeOffset = today.getTime() - Date.now();
+    })();
+
+    function getNow() { return Date.now() + timeOffset; }
+
+    const _sizeCanvas = document.createElement('canvas');
+    const _sizeCtx    = _sizeCanvas.getContext('2d');
+    function sizeSelect() {
+      const sel = document.getElementById('zoneSelect');
+      if (!sel) return;
+      const text = sel.options[sel.selectedIndex]?.textContent || '';
+      _sizeCtx.font = '11px Inter, system-ui, sans-serif';
+      sel.style.width = (Math.ceil(_sizeCtx.measureText(text).width) + 32) + 'px';
+    }
+
+    function getSavedZone() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('zone') || localStorage.getItem('selectedZone') || 'PHG03';
+    }
+
+    function saveZone(code) {
+      localStorage.setItem('selectedZone', code);
+      const url = new URL(window.location.href);
+      url.searchParams.set('zone', code);
+      window.history.replaceState(null, '', url);
+    }
+
+    async function loadZones() {
+      const select = document.getElementById('zoneSelect');
+      try {
+        const res = await fetch('https://api.waktusolat.app/zones');
+        cachedZones = await res.json();
+
+        const grouped = {};
+        cachedZones.forEach(z => {
+          if (!grouped[z.negeri]) grouped[z.negeri] = [];
+          grouped[z.negeri].push(z);
+        });
+
+        select.innerHTML = '';
+        const saved = getSavedZone();
+
+        Object.keys(grouped).sort().forEach(state => {
+          const og = document.createElement('optgroup');
+          og.label = state;
+          grouped[state].forEach(z => {
+            const opt = document.createElement('option');
+            opt.value = z.jakimCode;
+            opt.dataset.compact = `${z.negeri} - ${z.jakimCode}`;
+            opt.dataset.full    = `${z.jakimCode} — ${z.daerah}`;
+            opt.textContent     = opt.dataset.full;
+            if (z.jakimCode === saved) opt.selected = true;
+            og.appendChild(opt);
+          });
+          select.appendChild(og);
+        });
+
+        const selectedOpt = select.options[select.selectedIndex];
+        if (selectedOpt && selectedOpt.dataset.compact) {
+          selectedOpt.textContent = selectedOpt.dataset.compact;
+        }
+        sizeSelect();
+
+        select.addEventListener('focus', function () {
+          Array.from(this.options).forEach(opt => {
+            if (opt.dataset.full) opt.textContent = opt.dataset.full;
+          });
+        });
+
+        select.addEventListener('blur', function () {
+          Array.from(this.options).forEach(opt => {
+            if (opt.dataset.compact)
+              opt.textContent = opt.selected ? opt.dataset.compact : opt.dataset.full;
+          });
+          sizeSelect();
+        });
+
+        select.addEventListener('change', function () {
+          currentZone = this.value;
+          saveZone(currentZone);
+          Array.from(this.options).forEach(opt => {
+            if (opt.dataset.compact)
+              opt.textContent = opt.selected ? opt.dataset.compact : opt.dataset.full;
+          });
+          sizeSelect();
+          prayerList = [];
+          tomorrowFajr = null;
+          document.getElementById('arcContainer').innerHTML =
+            '<div class="status-msg">Memuat waktu solat...</div>';
+          document.getElementById('infoBar').style.display = 'none';
+          document.getElementById('footerBar').style.display = 'none';
+          fetchPrayerTimes();
+        });
+
+      } catch (err) {
+        console.error('Gagal memuat senarai zon:', err);
+        select.innerHTML = `<option value="${currentZone}">${currentZone}</option>`;
+      }
+    }
 
     // ── Arc geometry ──────────────────────────────────────────────────────────
     // Arc path spans ARC_PAD_X … ARC_W-ARC_PAD_X (wider than the dot range).
@@ -271,7 +401,7 @@
 
     // ── SVG build ─────────────────────────────────────────────────────────────
     function buildArcSvg() {
-      const now = Date.now();
+      const now = getNow();
 
       let currentIdx = -1;
       prayerList.forEach((p, i) => { if (now >= p.ts) currentIdx = i; });
@@ -428,7 +558,7 @@
       if (countdownTimer) clearInterval(countdownTimer);
 
       function tick() {
-        const nowMs = Date.now();
+        const nowMs = getNow();
         const diff  = Math.max(0, (nextTs || 0) - nowMs);
         const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
         const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
@@ -455,7 +585,7 @@
 
     // ── data fetch ────────────────────────────────────────────────────────────
     async function fetchPrayerTimes() {
-      const now   = new Date();
+      const now   = new Date(getNow());
       const year  = now.getFullYear();
       const month = now.getMonth() + 1;
       const day   = now.getDate();
@@ -465,8 +595,8 @@
 
       try {
         const [res, resNext] = await Promise.all([
-          fetch(`https://api.waktusolat.app/v2/solat/${ZONE}?year=${year}&month=${month}`),
-          fetch(`https://api.waktusolat.app/v2/solat/${ZONE}?year=${nextYear}&month=${nextMonth}`)
+          fetch(`https://api.waktusolat.app/v2/solat/${currentZone}?year=${year}&month=${month}`),
+          fetch(`https://api.waktusolat.app/v2/solat/${currentZone}?year=${nextYear}&month=${nextMonth}`)
         ]);
         const data     = await res.json();
         const dataNext = await resNext.json();
@@ -503,7 +633,6 @@
         const months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogs','Sep','Okt','Nov','Dis'];
         document.getElementById('dateText').textContent =
           `${days[now.getDay()]}, ${day} ${months[month - 1]} ${year}`;
-        document.getElementById('locationDetail').textContent = LOCATION_NAME;
 
         renderArc();
       } catch (err) {
@@ -517,7 +646,8 @@
         `<div class="status-msg error">${msg}</div>`;
     }
 
-    fetchPrayerTimes();
+    currentZone = getSavedZone();
+    Promise.all([loadZones(), fetchPrayerTimes()]);
   </script>
 </body>
 </html>
