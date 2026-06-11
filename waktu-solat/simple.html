@@ -6,6 +6,7 @@
   <title>Waktu Solat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0&display=block" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -29,14 +30,20 @@
       box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
     }
 
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
     .location-bar {
       font-size: 11px;
       color: rgba(255, 255, 255, 0.4);
       letter-spacing: 0.4px;
-      margin-bottom: 14px;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 4px;
     }
 
@@ -95,13 +102,23 @@
       letter-spacing: 0.2px;
     }
 
+    .info-side.right .side-label {
+      width: 100%;
+      text-align: right;
+    }
+
     .info-side .prayer-label {
       font-weight: 600;
       font-size: 13px;
       color: rgba(255, 255, 255, 0.85);
     }
 
-    .info-side .icon { font-size: 1.1rem; line-height: 1; }
+    .info-side .icon {
+      font-family: 'Material Symbols Rounded';
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      font-size: 1.2rem;
+      line-height: 1;
+    }
 
     .countdown-block {
       display: flex;
@@ -133,12 +150,8 @@
     }
 
     .footer-bar {
-      display: flex;
-      justify-content: center;
       font-size: 11px;
       color: rgba(255, 255, 255, 0.3);
-      margin-top: 12px;
-      padding: 0 2px;
     }
 
     .status-msg {
@@ -174,9 +187,14 @@
 </head>
 <body>
   <div class="widget">
-    <div class="location-bar">
-      <span>📍</span>
-      <select id="zoneSelect"><option value="">Memuat zon...</option></select>
+    <div class="top-bar">
+      <div class="location-bar">
+        <span>📍</span>
+        <select id="zoneSelect"><option value="">Memuat zon...</option></select>
+      </div>
+      <div class="footer-bar" id="footerBar" style="display:none">
+        <span id="dateText">—</span>
+      </div>
     </div>
 
     <div id="arcContainer">
@@ -185,28 +203,25 @@
 
     <div class="info-bar" id="infoBar" style="display:none">
       <div class="info-side left">
-        <span class="side-label">waktu sekarang:</span>
+        <span class="side-label">Waktu Sekarang:</span>
         <div class="side-row">
-          <span class="icon">☽</span>
+          <span class="icon" id="currentPrayerIcon">bedtime</span>
           <span class="prayer-label" id="currentPrayerLabel">—</span>
         </div>
+        <span class="side-time" id="currentPrayerTime">—</span>
       </div>
       <div class="countdown-block">
-        <span class="countdown-label">masa berbaki</span>
+        <span class="countdown-label">Masa Berbaki</span>
         <div class="countdown-display" id="countdown">00:00:00</div>
       </div>
       <div class="info-side right">
-        <span class="side-label">waktu seterusnya:</span>
+        <span class="side-label">Waktu Seterusnya:</span>
         <div class="side-row">
           <span class="prayer-label" id="nextPrayerLabel">—</span>
-          <span class="icon">☀</span>
+          <span class="icon" id="nextPrayerIcon">sunny</span>
         </div>
         <span class="side-time" id="nextPrayerTime">—</span>
       </div>
-    </div>
-
-    <div class="footer-bar" id="footerBar" style="display:none">
-      <span id="dateText">—</span>
     </div>
   </div>
 
@@ -340,8 +355,35 @@
     const CTRL_Y     = 2 * ARC_TOP_Y - ARC_BOT_Y; // = -42  (bezier control point)
     const VIEW_H     = 120;
 
+    const PRAYER_ICONS = {
+      Subuh:   'wb_twilight',
+      Syuruk:  'wb_twilight',
+      Duha:    'wb_twilight',
+      Zohor:   'sunny',
+      Asar:    'partly_cloudy_day',
+      Maghrib: 'wb_twilight',
+      Isyak:   'bedtime',
+    };
+
+    const HIJRI_MONTH_NAMES = {
+      '01': 'Muharram',
+      '02': 'Safar',
+      '03': "Rabi'ul Awwal",
+      '04': "Rabi'ul Akhir",
+      '05': 'Jumadil Awwal',
+      '06': 'Jumadil Akhir',
+      '07': 'Rejab',
+      '08': 'Syaaban',
+      '09': 'Ramadan',
+      '10': 'Syawal',
+      '11': 'Zulkaedah',
+      '12': 'Zulhijjah',
+    };
+
     let prayerList   = [];
     let tomorrowFajr = null;
+    let duhaStart    = null;
+    let duhaEnd      = null;
     let countdownTimer = null;
     let pulseAnimId  = null;
 
@@ -443,7 +485,7 @@
         const x = timeToX(prayer.ts);
         const y = arcY(x);           // dot center sits exactly on the arc
 
-        const isCurrent = i === displayCurrentIdx;
+        const isCurrent = i === displayCurrentIdx && prayer.name !== 'Syuruk';
         const isNext    = i === nextIdx && currentIdx >= 0;
         const isPast    = now >= prayer.ts;
         const isFirst   = i === 0;
@@ -537,7 +579,9 @@
       document.getElementById('arcContainer').appendChild(svg);
       startPulseAnimation();
 
-      const currentName = currentIdx >= 0 ? prayerList[currentIdx].name : 'Isyak';
+      const now = getNow();
+      const inDuha = duhaStart && duhaEnd && now >= duhaStart && now < duhaEnd;
+      const currentName = inDuha ? 'Duha' : (currentIdx >= 0 ? prayerList[currentIdx].name : 'Isyak');
       let nextName, nextTs;
       if (nextIdx < prayerList.length) {
         nextName = prayerList[nextIdx].name;
@@ -547,8 +591,20 @@
         nextTs   = tomorrowFajr;
       }
 
+      let currentTimeText;
+      if (inDuha) {
+        currentTimeText = `${fmt24(duhaStart)}-${fmt24(duhaEnd)}`;
+      } else if (currentIdx >= 0) {
+        currentTimeText = fmt24(prayerList[currentIdx].ts);
+      } else {
+        currentTimeText = fmt24(prayerList[prayerList.length - 1].ts);
+      }
+
       document.getElementById('currentPrayerLabel').textContent = currentName;
+      document.getElementById('currentPrayerIcon').textContent  = PRAYER_ICONS[currentName] || 'bedtime';
+      document.getElementById('currentPrayerTime').textContent  = currentTimeText;
       document.getElementById('nextPrayerLabel').textContent    = nextName;
+      document.getElementById('nextPrayerIcon').textContent     = PRAYER_ICONS[nextName.replace(' esok', '')] || 'sunny';
       document.getElementById('nextPrayerTime').textContent     =
         nextTs ? fmt24(nextTs) : '—';
 
@@ -627,12 +683,18 @@
         ];
         prayerList = raw.filter(p => p.ts).map(p => ({ name: p.name, ts: p.ts * 1000 }));
 
+        duhaStart = todayPrayer.syuruk ? (todayPrayer.syuruk + 28 * 60) * 1000 : null;
+        duhaEnd   = todayPrayer.dhuhr  ? (todayPrayer.dhuhr  - 10 * 60) * 1000 : null;
+
         if (prayerList.length < 2) { showError('Data waktu solat tidak lengkap.'); return; }
 
         const days   = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
         const months = ['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogs','Sep','Okt','Nov','Dis'];
+        const [hijriYear, hijriMonth, hijriDay] = todayPrayer.hijri.split('-');
+        const hijriMonthName = HIJRI_MONTH_NAMES[hijriMonth];
+
         document.getElementById('dateText').textContent =
-          `${days[now.getDay()]}, ${day} ${months[month - 1]} ${year}`;
+          `${days[now.getDay()]}, ${day} ${months[month - 1]} ${year} / ${parseInt(hijriDay, 10)} ${hijriMonthName} ${hijriYear}H`;
 
         renderArc();
       } catch (err) {
