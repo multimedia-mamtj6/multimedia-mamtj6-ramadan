@@ -1,6 +1,6 @@
 # Jadual Waktu Ramadan 2026
 
-**Versi:** 1.5.7
+**Versi:** 1.5.4
 
 Aplikasi web untuk memaparkan jadual waktu Imsak, Subuh dan Berbuka sepanjang bulan Ramadan 1447H / 2026M untuk semua zon di Malaysia.
 
@@ -65,16 +65,6 @@ Data waktu solat diperolehi dari [JAKIM](https://www.e-solat.gov.my/) melalui [W
 - MST SIRIM Widget (halaman info)
 
 ## Changelog
-
-### v1.5.7 (2026-02-21)
-- Tambah banner beta di bahagian atas `index.html` dan `info.html` — hanya dipaparkan pada `beta.ramadan.mamtj6.com`, pautan secara dinamik ke halaman yang sama di `ramadan.mamtj6.com` menggunakan `window.location.pathname`
-
-### v1.5.6 (2026-02-21)
-- Tambah penjejakan klik Umami: pilihan zon (`zone-select` dengan kod zon), kejayaan GPS (`gps-detect-success` dengan kod zon), kegagalan GPS (`gps-detect-fail`)
-
-### v1.5.5 (2026-02-21)
-- Tambah skrip Vercel Analytics (`/_vercel/insights/script.js`) ke `index.html` dan `info.html`
-- Tambah skrip Umami Analytics (`cloud.umami.is/script.js`) ke `index.html` dan `info.html`
 
 ### v1.5.4 (2026-02-21)
 - Betulkan bar kemajuan kadangkala masih dikira dari tengah malam — tambah semakan kesahihan 24 jam pada nilai `lastMaghrib` dari `localStorage`; nilai lapuk (lebih dari 24 jam) dibuang dan dikira semula dari data API

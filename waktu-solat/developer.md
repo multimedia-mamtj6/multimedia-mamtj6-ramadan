@@ -1,6 +1,6 @@
 # Developer Guide
 
-**Version:** 1.5.7
+**Version:** 1.5.4
 
 Technical documentation for the Jadual Waktu Ramadan 2026 application.
 
@@ -275,22 +275,6 @@ index.html?testTime=18:30                               # Today + simulated time
 - **Eid**: 21 March 2026 (1 Syawal 1447H)
 
 ## Changelog
-
-### v1.5.7 (2026-02-21)
-- Added beta environment banner to `index.html` and `info.html` — inline `<script>` in `<head>` checks `window.location.hostname`; only renders on `beta.ramadan.mamtj6.com`, does nothing on production
-- Banner dynamically builds production URL using `window.location.pathname + window.location.search` so the link always points to the equivalent page on `ramadan.mamtj6.com`
-- Bumped SW cache name to `v1.6.7`
-
-### v1.5.6 (2026-02-21)
-- Added Umami event tracking to zone selector change: fires `zone-select` event with `{ zone: zoneCode }` property
-- Added Umami event tracking to `triggerGPSDetection()`: fires `gps-detect-success` with `{ zone: detectedZone }` on success, `gps-detect-fail` on failure
-- All tracking calls guarded with `typeof umami !== 'undefined'` to prevent errors if script is blocked
-- Bumped SW cache name to `v1.6.6`
-
-### v1.5.5 (2026-02-21)
-- Added Vercel Analytics script (`/_vercel/insights/script.js`) to `index.html` and `info.html`
-- Added Umami Analytics script (`cloud.umami.is/script.js`) to `index.html` and `info.html`
-- Bumped SW cache name to `v1.6.5`
 
 ### v1.5.4 (2026-02-21)
 - Fixed progress bar occasionally still calculating from midnight — added 24-hour validity check on `lastMaghrib` read from `localStorage`; stale values (>24h old) are discarded and `lastMaghrib` is re-populated fresh from the API via `isYesterday()` in the next `fetchData()` call
