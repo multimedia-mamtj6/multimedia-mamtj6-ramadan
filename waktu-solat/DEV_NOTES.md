@@ -305,6 +305,7 @@ simple.html?testTime=09:30          → in Duha window (after Syuruk+28min, befo
 simple.html?testTime=13:00          → Zohor time
 simple.html?testTime=18:30          → near Maghrib
 simple.html?zone=JHR01&testTime=18:30
+simple.html?embed=1                 → strips page chrome (transparent bg, no card/shadow) for iframe embedding
 ```
 
 ---
@@ -366,20 +367,9 @@ Label: `timeOffset = r + 13`, `nameOffset = timeOffset + 11`
 
 ## Known issues / things NOT yet done
 
-1. **Top-bar layout (Session 3)** — just implemented, not visually verified yet.
-   Check spacing/alignment on desktop and mobile, especially with longer Hijri date
-   strings (e.g. "Rabi'ul Awwal" is long).
-2. **Syuruk highlight exclusion edge case** — verify no dot ends up un-highlighted
-   when Syuruk is the current/displayCurrent period (see note above).
-3. **wb_twilight vs "Wb Twilight 2"** — user's icon spec distinguished Subuh from
-   Syuruk/Duha/Maghrib but Material Symbols has only one `wb_twilight` ligature; all
-   four currently map to the same icon. Revisit if user wants visual distinction.
-4. **Progress arc tip indicator** — a small glowing dot at the current time position
-   (playhead) not added yet.
-5. **Color theming** — arc is all white on dark; warm gold/amber for progress arc
+1. **Color theming** — arc is all white on dark; warm gold/amber for progress arc
    might look better.
-6. **Responsive / embed mode** — not yet done; could iframe into other pages.
-7. **GPS auto-detection** — not implemented in this widget (the main `jadual-waktu/`
+2. **GPS auto-detection** — not implemented in this widget (the main `jadual-waktu/`
    app has it). Could be added.
 
 ---

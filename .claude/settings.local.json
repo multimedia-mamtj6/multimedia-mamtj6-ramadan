@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:api.waktusolat.app)"
+      "WebFetch(domain:api.waktusolat.app)",
+      "Bash(npx --yes chromium-cli --help)",
+      "Bash(npm ls *)",
+      "Read(//c/Users/EYM LAPPY/AppData/Local/ms-playwright/**)",
+      "Bash(node -e \"require\\('playwright'\\)\")",
+      "Bash(mkdir -p /tmp/pwtest)",
+      "Read(//tmp/**)",
+      "Bash(npm install *)",
+      "Bash(node test.js)",
+      "Bash(rm -rf \"d:/tmp/pwtest\")",
+      "Bash(rm -rf \"/c/Users/EYM LAPPY/AppData/Local/Temp/pwtest\")",
+      "Bash(pkill -f \"http.server 8123\")"
     ]
   }
 }
