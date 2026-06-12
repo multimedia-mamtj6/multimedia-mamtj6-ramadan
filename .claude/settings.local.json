@@ -12,7 +12,8 @@
       "Bash(node test.js)",
       "Bash(rm -rf \"d:/tmp/pwtest\")",
       "Bash(rm -rf \"/c/Users/EYM LAPPY/AppData/Local/Temp/pwtest\")",
-      "Bash(pkill -f \"http.server 8123\")"
+      "Bash(pkill -f \"http.server 8123\")",
+      "Bash(node -e \"const p = new URLSearchParams\\('zone=PHG03&?embed=1'\\); console.log\\('embed=', p.get\\('embed'\\)\\); console.log\\('?embed=', p.get\\('?embed'\\)\\);\")"
     ]
   }
 }
