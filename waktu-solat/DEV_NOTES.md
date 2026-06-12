@@ -1,39 +1,66 @@
 # Session Handoff — waktu-solat/simple.html
 
-**Last updated:** 2026-06-11 (Session 3)
+**Last updated:** 2026-06-13 (Session 4)
 **File being worked on:** `waktu-solat/simple.html` — a self-contained dark-mode prayer times widget (single HTML file, no build step, vanilla JS + SVG).
 
 ---
 
 ## Vibe / dynamic check for next session
 
-This has been a smooth, fast, iterative session — no errors, no re-reads needed, no
-file-state mismatches (unlike Session 2 which had recurring stale-state issues).
-The user works in tight, low-friction loops:
+Short, punchy session — three asks, each smaller/different in shape than the last,
+all landed clean. Same low-ceremony energy as Session 3, plus one good "look at the
+screenshot, find the REAL bug" moment.
 
-- They throw a small, concrete request at you ("i want to use google font for icon...",
-  "disable the highlight on syuruk time only", "put the zone selector and date on
-  same line").
-- For anything with layout/UX ambiguity, they'll ask you to pick — answer in
-  2-3 sentences, recommend one option with the tradeoff, and let them confirm or
-  redirect. They DID redirect once (zone name length concern) by pointing out a fact
-  you didn't know (closed selector is already short) — when that happens, just drop
-  the now-irrelevant tradeoff and proceed, don't re-litigate.
-- For anything bigger/structural (Hijri date), they explicitly asked for clarifying
-  questions FIRST and a confirmed plan before any code — respect that pattern if a
-  similarly "structural" change comes up again. Small/cosmetic changes → just do it.
-- Once a plan/approach is confirmed (even via a short "yep" or an implied-OK
-  clarification), proceed directly to implementation without further check-ins.
-- They test live in browser with `?testTime=`/`?testDate=` params — be ready for
-  "i want to test" follow-ups meaning they're about to load the page, not that they
-  want you to write tests.
-- Communication is terse, lowercase, sometimes informal/shorthand ("yep", "ok good").
-  Mirror that energy — don't over-explain finished work, just state what changed and
-  invite testing feedback.
+**Opened with closure**: user said "both are working now" (re: Session 3's two open
+items — top-bar layout and the Syuruk-highlight edge case). Both verified live by
+user, no further action — just removed from the known-issues list. Good reminder:
+when the user confirms something works, trust it and move the known-issue off the
+list immediately, don't ask "are you sure" or re-verify yourself.
 
-Overall mood: productive polish session, mosque widget steadily getting more
-"complete" (icons, Hijri date, layout). No drama, no blockers. Next session will
-likely continue in this same polish/refinement vein — small, scoped, visual/UX tweaks.
+**Then escalating asks**:
+1. "explain" (selected the "progress arc tip indicator" known-issue line) → gave a
+   plain-language explanation of what a "playhead" dot is (a glowing dot tracking
+   "now" along the arc, distinct from the fixed prayer-time dots). User: "ok add it" —
+   implemented immediately, zero further discussion.
+2. "make the halo smaller" → one-line tweak (`r="7"` → `r="5"`), done in seconds.
+3. "Responsive / embed mode" (the last known-issue item) — user explicitly invoked
+   **plan mode** for this one (first time on this project). Went through full
+   Explore → AskUserQuestion (clarified scope: BOTH `?embed=1` chrome-strip AND
+   320px-width responsiveness; target 320px not 280px) → Plan agent → approved
+   plan → implementation. Plan mode earned its keep here because the ask had real
+   unresolved design questions ("what does 'embed' even mean for THIS widget?").
+   Contrast with asks #1-2 above, which needed zero ceremony — match the ceremony
+   to the ambiguity, not to the size of the diff.
+
+**Then a live bug, handled well**: user pasted a real `ramadan.mamtj6.com` URL with
+`?zone=PHG03&?embed=1` (note the double `?`) and said "the embeded still not work".
+First instinct was the malformed URL — and that WAS technically broken (`?embed`
+becomes a literal param key, not `embed`, so `params.get('embed')` returned null).
+But the user then sent a **screenshot** showing the real problem: with the correct
+param, embed mode kicked in but the ENTIRE widget went invisible except a pink pin
+emoji and one black-filled dot, floating on white. Root cause: embed mode had set
+`.widget`'s background to `transparent`, but every label/stroke/icon in this widget
+is white-on-`#161b22` — on a white host page that's white-on-white. Fixed by keeping
+`.widget`'s own dark card background in embed mode; only the page-level chrome
+(shadow/radius/max-width/centering) gets stripped, not the card's own background.
+
+**Key lesson for next-you**: this widget's entire visual language assumes a dark
+card. "Transparent embed" for a white-on-dark widget means "transparent PAGE,
+opaque CARD" — not "transparent everything". If known-issue #1 (color theming /
+light variant) ever gets picked up, that's the moment to revisit whether embed mode
+should offer a true transparent/light option too — right now it can't, by design.
+
+**Process note**: for the screenshot bug, the fix was verified by actually
+re-screenshotting via a throwaway Playwright script (launched a local http.server,
+loaded `?embed=1&testTime=18:30` at 400x400, screenshotted on a white page) before
+declaring it fixed — don't skip the "look at a fresh screenshot" step for visual bugs,
+a code-level "this should work now" isn't enough when the bug WAS visual.
+
+**Energy**: terse, confirmatory, low-ceremony — same as Session 3. State what changed,
+invite testing, don't over-explain. Known issues list is down to just 2 items now
+(color theming, GPS auto-detection) — this widget is close to "done" for now; next
+session is more likely to be a fresh visual nitpick or the color-theming item than
+a big structural ask, but don't assume — just read what they throw at you.
 
 ---
 
@@ -201,9 +228,75 @@ on a non-flex-parent context is harmless).
 Decision: zone selector LEFT, date info RIGHT — confirmed by user (closed zone
 selector shows only "State - ZONE", so it's short; no overflow concern).
 
-**STATUS: Just implemented, NOT yet visually tested by user.** If next session opens
-with feedback about this layout (spacing, alignment, mobile wrap), that's the
-follow-up.
+**STATUS: confirmed working by user in Session 4** — no further action needed.
+
+---
+
+## Session 4 changes (this session)
+
+### 1. Progress arc "tip" indicator (playhead dot)
+New helper near `progressArcPath`:
+```js
+// Point on the arc at progress t (clamped [0,1]) — used to place the progress tip indicator.
+function arcPointAtT(rawT) {
+  const t = Math.max(0, Math.min(1, rawT));
+  const x = ARC_PAD_X + (ARC_W - 2 * ARC_PAD_X) * t;
+  return { x, y: arcY(x) };
+}
+```
+In `buildArcSvg()`, two circles added right after `#progressArc`:
+- `#progressTipGlow` — halo, `r="5"` (started at `7`, user asked to shrink), `fill="rgba(255,255,255,0.25)"`
+- `#progressTip` — dot, `r="3"`, `fill="#ffffff"`
+
+Both positioned via `arcPointAtT(initT)` on initial build. In `tick()`, both are
+re-positioned every second alongside `#progressArc`, using
+`arcPointAtT(rawT < 0 ? 1 : rawT)` (same clamping as `progressArcPath`).
+
+### 2. Embed mode (`?embed=1`) + 320px responsive breakpoint
+New IIFE after `initTestTime`:
+```js
+(function initEmbedMode() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('embed') === '1') {
+    document.body.classList.add('embed-mode');
+  }
+})();
+```
+
+CSS:
+```css
+body.embed-mode {
+  background: transparent;
+  display: block;
+  justify-content: initial;
+  align-items: initial;
+  min-height: 0;
+  padding: 0;
+}
+
+body.embed-mode .widget {
+  /* deliberately NO background override — widget keeps its #161b22 card bg.
+     Every label/icon/stroke is white-on-dark; a transparent card on a white
+     host page becomes invisible. "Embed" = transparent PAGE, opaque CARD. */
+  border-radius: 0;
+  box-shadow: none;
+  max-width: 100%;
+  width: 100%;
+  min-height: 100%;
+}
+```
+
+Plus a `@media (max-width: 360px)` block: shrinks `.widget` padding (22/20/16 →
+16/12/12), reduces `.top-bar`/`.info-bar` gaps and font-sizes, and removes
+`.info-side { min-width: 60px }` so `.countdown-block` (flex:1) keeps display
+priority. The SVG arc itself needed NO changes — `viewBox="0 0 360 120"` scaling
+means geometry, label offsets, and the `< 50`-unit collision thresholds are all
+scale-invariant.
+
+**Usage**: `simple.html?embed=1`, or combined e.g.
+`simple.html?zone=JHR01&embed=1&testTime=18:30`.
+**Gotcha**: correct syntax is `&embed=1` — NOT `&?embed=1` (a stray second `?`
+makes `?embed` part of the param NAME, so `params.get('embed')` returns `null`).
 
 ---
 
