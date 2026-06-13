@@ -139,7 +139,7 @@ Icon spans now hold ligature text (`bedtime`, `sunny`, etc.) instead of Unicode 
 `PRAYER_ICONS` map (around line 358):
 ```js
 const PRAYER_ICONS = {
-  Subuh:   'wb_twilight',
+  Subuh:   'wb_twilight_2',
   Syuruk:  'wb_twilight',
   Duha:    'wb_twilight',
   Zohor:   'sunny',
@@ -148,10 +148,6 @@ const PRAYER_ICONS = {
   Isyak:   'bedtime',
 };
 ```
-Note: user's spec literally said "Wb Twilight 2" for Subuh but Material Symbols only
-has one `wb_twilight` ligature — used that for both Subuh/Syuruk/Duha/Maghrib (all
-"twilight"-ish periods). If user complains about visual distinction between these
-later, that's the likely cause — there's no separate "wb_twilight_2" icon to map to.
 
 ### 2. Syuruk never gets "current" highlight on arc
 Single-line change in `buildArcSvg()` (~line 488):

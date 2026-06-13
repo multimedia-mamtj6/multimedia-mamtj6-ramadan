@@ -207,6 +207,7 @@
       max-width: 100%;
       width: 100%;
       min-height: 100%;
+      transform-origin: top center;
     }
 
     @media (max-width: 360px) {
@@ -332,8 +333,22 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('embed') === '1') {
         document.body.classList.add('embed-mode');
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+        window.addEventListener('resize', scaleEmbedToFit);
       }
     })();
+
+    // Shrinks .widget (via transform: scale) so its full height fits the iframe
+    // viewport with no scroll — mirrors test_file.html's scaleToFit() approach.
+    function scaleEmbedToFit() {
+      if (!document.body.classList.contains('embed-mode')) return;
+      const widget = document.querySelector('.widget');
+      widget.style.transform = 'none';
+      const naturalHeight = widget.offsetHeight;
+      const scale = Math.min(1, window.innerHeight / naturalHeight);
+      widget.style.transform = `scale(${scale})`;
+    }
 
     function getNow() { return Date.now() + timeOffset; }
 
@@ -728,6 +743,7 @@
 
       document.getElementById('infoBar').style.display = 'flex';
       document.getElementById('footerBar').style.display = 'flex';
+      scaleEmbedToFit();
 
       if (countdownTimer) clearInterval(countdownTimer);
 
