@@ -94,6 +94,14 @@
       gap: 4px;
     }
 
+    body.hide-selector .location-bar {
+      display: none;
+    }
+
+    body.hide-selector .top-bar {
+      justify-content: center;
+    }
+
     #arcContainer svg {
       width: 100%;
       height: auto;
@@ -393,6 +401,13 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('mode') === 'dark') {
         document.body.classList.add('dark-mode');
+      }
+    })();
+
+    (function initSelectorMode() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('selector') === 'hide') {
+        document.body.classList.add('hide-selector');
       }
     })();
 
