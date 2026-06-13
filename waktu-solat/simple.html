@@ -207,7 +207,7 @@
       max-width: 100%;
       width: 100%;
       min-height: 100%;
-      transform-origin: top center;
+      transform-origin: top left;
     }
 
     @media (max-width: 360px) {
@@ -340,13 +340,24 @@
     })();
 
     // Shrinks .widget (via transform: scale) so its full height fits the iframe
-    // viewport with no scroll — mirrors test_file.html's scaleToFit() approach.
+    // viewport with no scroll, while widening it first so the scaled-down
+    // result still fills the iframe's width (no empty side margins).
     function scaleEmbedToFit() {
       if (!document.body.classList.contains('embed-mode')) return;
       const widget = document.querySelector('.widget');
-      widget.style.transform = 'none';
-      const naturalHeight = widget.offsetHeight;
-      const scale = Math.min(1, window.innerHeight / naturalHeight);
+      const containerWidth = window.innerWidth;
+      const containerHeight = window.innerHeight;
+
+      let scale = 1;
+      for (let i = 0; i < 5; i++) {
+        widget.style.transform = 'none';
+        widget.style.width = (containerWidth / scale) + 'px';
+        const naturalHeight = widget.offsetHeight;
+        const next = Math.min(1, containerHeight / naturalHeight);
+        if (Math.abs(next - scale) < 0.005) { scale = next; break; }
+        scale = next;
+      }
+
       widget.style.transform = `scale(${scale})`;
     }
 
