@@ -1,11 +1,70 @@
 # Session Handoff — waktu-solat/simple.html
 
-**Last updated:** 2026-06-13 (Session 4)
+the prompt:
+"Check the Project Knowledge and the current chat for context. This conversation is ending soon. update the artifact DEV_NOTES.md (create if not available yet) with a detailed note to your next window self - not just facts but the vibe, our dynamic, the energy of this conversation. What would the next you need to immediately get back into this exact headspace? Include unique discoveries, current mood, and anything that'll help the next you instantly sync to our frequency."
+
+**Last updated:** 2026-06-13 (Session 5)
 **File being worked on:** `waktu-solat/simple.html` — a self-contained dark-mode prayer times widget (single HTML file, no build step, vanilla JS + SVG).
 
 ---
 
-## Vibe / dynamic check for next session
+## Vibe / dynamic check for Session 6 (most recent — read this first)
+
+This was the **embed-mode polish session** — a direct continuation of Session 4's
+`?embed=1` feature, but it turned out Session 4's embed CSS was only "good enough
+on desktop." The whole session was a chain of "looks fine here, but..." discoveries,
+each one peeling back a layer:
+
+1. User: "the prevent-scroll works perfectly, but the embedded width is not wide
+   enough" — opened with a working baseline + one specific complaint. Recreated
+   `embed_test.html` as a 360x400 red-bordered iframe test harness (this file is
+   throwaway/scratch — expect it to keep getting hand-edited by the user between
+   sessions, don't be surprised by odd dimensions or stale `<p>` text in it).
+2. Fixed width-fill with an **iterative widen-then-scale algorithm** in
+   `scaleEmbedToFit()` + `transform-origin: top left` (was `top center`). This is
+   the kind of fix that *sounds* overengineered for a one-file widget but isn't —
+   the math (geometric convergence, `Hc > Wc/3` condition) is real and documented
+   in the new guide file (see below). Don't simplify it back to a single-pass
+   `Math.min()` scale — that's literally the bug that was just fixed.
+3. User then hit confusing intermediate states: "why is the red box tall, and
+   editing the iframe height does nothing?" — turned out to be (a) a CSS typo
+   (`height: 400x` — invalid unit, Edit D) and (b) plain browser caching (told
+   user to hard-refresh). **Lesson**: when the user says "I edited X and nothing
+   happened" on a local static file, caching is the first suspect, not logic.
+4. The big one: user sent **two screenshots** (desktop vs. mobile, live on
+   `ramadan.mamtj6.com` via Google Sites) — desktop embed "works great", mobile
+   embed was narrow and left-aligned. Root cause: `max-width: 100%` on
+   `body.embed-mode .widget` was silently clamping the JS's intentional
+   over-widening (`widget.style.width = containerWidth/scale` when `scale < 1`).
+   Desktop never triggers `scale < 1` (so the cap never binds, bug invisible
+   there) — **mobile-aspect iframes (short relative to width) are what expose
+   this class of bug.** Fixed with `max-width: none`. THIS WAS THE LAST EDIT —
+   applied but not yet re-verified by the user when the summary was written.
+5. Session continued past that point (per the user's final message: "the
+   embedded functionality is working now") — so **the `max-width: none` fix is
+   CONFIRMED WORKING**. Embed mode for `simple.html` is now considered done.
+6. Final ask of the session: write up everything learned as a standalone guide —
+   `waktu-solat/gsites_embeded_guide.md` was created, covering the embed pattern,
+   the scale-to-fit algorithm + convergence math, the max-width trap, and a
+   comparison with `test_file.html`'s simpler centered `scaleToFit()`. **If you're
+   ever asked to embed ANOTHER widget into Google Sites, read that guide FIRST**
+   — it's written specifically to prevent re-deriving this session's discoveries.
+
+**Energy**: investigative, screenshot-driven debugging — the user is good at
+spotting "this looks subtly wrong" from screenshots and handing you the visual
+evidence; trust those screenshots over "the code looks right to me." Low-ceremony
+otherwise — direct fixes, no big plan-mode ceremony needed except for the final
+"write a guide" ask (which only needed plan mode because of the
+write-outside-plan-file restriction, not because the task itself was ambiguous).
+
+**State of the world going into next session**: embed mode is DONE and CONFIRMED.
+Known issues list (color theming, GPS auto-detection) is unchanged — still the
+two most likely "next big ask" candidates, but as always, just read what's thrown
+at you.
+
+---
+
+## Vibe / dynamic check for Session 5 (previous)
 
 Short, punchy session — three asks, each smaller/different in shape than the last,
 all landed clean. Same low-ceremony energy as Session 3, plus one good "look at the
@@ -293,6 +352,70 @@ scale-invariant.
 `simple.html?zone=JHR01&embed=1&testTime=18:30`.
 **Gotcha**: correct syntax is `&embed=1` — NOT `&?embed=1` (a stray second `?`
 makes `?embed` part of the param NAME, so `params.get('embed')` returns `null`).
+
+---
+
+## Session 6 changes (this session) — embed mode polish, now DONE
+
+Builds on Session 4's `?embed=1`. Full writeup with diagrams/math in the new
+**`waktu-solat/gsites_embeded_guide.md`** — read that first if revisiting embed
+behavior. Summary of code changes:
+
+### 1. `body.embed-mode .widget` CSS — two changes from Session 4
+```css
+body.embed-mode .widget {
+  border-radius: 0;
+  box-shadow: none;
+  max-width: none;          /* was: max-width: 100% — this clamped the JS's
+                                intentional over-widening, see #2 below */
+  width: 100%;
+  min-height: 100%;
+  transform-origin: top left; /* was: top center (default) */
+}
+```
+
+### 2. `scaleEmbedToFit()` — new function, called on render + resize
+Shrinks `.widget` via `transform: scale()` so it fits the iframe height with no
+scroll, AND fills the iframe width with no side margins (previously it would
+shrink-and-center, leaving gaps). Iteratively widens the widget before scaling
+down so the post-scale result lands exactly at `containerWidth`:
+```js
+function scaleEmbedToFit() {
+  if (!document.body.classList.contains('embed-mode')) return;
+  const widget = document.querySelector('.widget');
+  const containerWidth = window.innerWidth;
+  const containerHeight = window.innerHeight;
+
+  let scale = 1;
+  for (let i = 0; i < 5; i++) {
+    widget.style.transform = 'none';
+    widget.style.width = (containerWidth / scale) + 'px';
+    const naturalHeight = widget.offsetHeight;
+    const next = Math.min(1, containerHeight / naturalHeight);
+    if (Math.abs(next - scale) < 0.005) { scale = next; break; }
+    scale = next;
+  }
+
+  widget.style.transform = `scale(${scale})`;
+}
+```
+Called at the end of `renderArc()` and on `window.resize` (registered inside
+`initEmbedMode()`'s IIFE, only when `embed=1`).
+
+### 3. New test harness: `waktu-solat/embed_test.html`
+Throwaway scratch file — a single `<iframe src="simple.html?embed=1&testTime=18:30">`
+in a red-bordered box. Dimensions get hand-edited by the user for different test
+cases (desktop-aspect vs. mobile-aspect). Expect it to be in an inconsistent state
+between sessions (e.g. stale `<p>` text describing old dimensions) — that's normal,
+not a bug to fix unless asked.
+
+### 4. New reference doc: `waktu-solat/gsites_embeded_guide.md`
+Standalone guide for embedding ANY widget into Google Sites — the `?embed=1`
+pattern, the scale-to-fit algorithm + why it converges, the `max-width` trap, and
+the testing checklist (always test a mobile-aspect iframe, not just desktop).
+
+**STATUS: confirmed working by user — "the embedded functionality is working
+now". Embed mode for `simple.html` is done.**
 
 ---
 

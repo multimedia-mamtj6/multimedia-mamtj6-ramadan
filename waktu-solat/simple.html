@@ -197,7 +197,7 @@
       display: block;
       justify-content: initial;
       align-items: initial;
-      min-height: 0;
+      height: 100vh;
       padding: 0;
     }
 
@@ -206,8 +206,19 @@
       box-shadow: none;
       max-width: none;
       width: 100%;
-      min-height: 100%;
       transform-origin: top left;
+    }
+
+    /* Large viewport (desktop browser, or 1920x1080 signage) — allow the
+       widget to scale UP via scaleWidgetToFit(), anchored centered so
+       leftover space is distributed evenly. Excludes embed-mode: there,
+       `top left` (set above) already works correctly for scale-up too —
+       the box grows from (0,0) and stays within the iframe by construction,
+       whereas `center center` there would push half the content off-screen
+       and get clipped by `overflow: hidden`. */
+    body.large-viewport:not(.embed-mode) .widget {
+      max-width: none;
+      transform-origin: center center;
     }
 
     @media (max-width: 360px) {
@@ -335,31 +346,62 @@
         document.body.classList.add('embed-mode');
         document.documentElement.style.overflow = 'hidden';
         document.body.style.overflow = 'hidden';
-        window.addEventListener('resize', scaleEmbedToFit);
       }
     })();
 
-    // Shrinks .widget (via transform: scale) so its full height fits the iframe
-    // viewport with no scroll, while widening it first so the scaled-down
-    // result still fills the iframe's width (no empty side margins).
-    function scaleEmbedToFit() {
-      if (!document.body.classList.contains('embed-mode')) return;
+    // Above this viewport size, the widget is allowed to scale UP (desktop
+    // browser, large desktop embed area, or 1920x1080 signage) rather than
+    // sitting at its small base size. Below it, behavior is unchanged.
+    const LARGE_VIEWPORT_MIN_W = 768;
+    const LARGE_VIEWPORT_MIN_H = 480;
+    const MAX_SCALE = 3; // upper bound for scale-up; tune against 1920x1080 testing
+
+    function updateViewportMode() {
+      const isLarge = window.innerWidth >= LARGE_VIEWPORT_MIN_W && window.innerHeight >= LARGE_VIEWPORT_MIN_H;
+      document.body.classList.toggle('large-viewport', isLarge);
+    }
+
+    // Shrinks OR grows .widget (via transform: scale) so its full height fits
+    // the viewport with no scroll, while widening/narrowing it first so the
+    // scaled result still fills the container's width (no empty side margins).
+    // - embed mode (small viewport): shrink-only, scale <= 1 (Session 6 behavior).
+    // - embed mode or standalone (large viewport): scale-up allowed, capped at MAX_SCALE.
+    // - standalone (small viewport): no scaling — natural centered card.
+    function scaleWidgetToFit() {
+      updateViewportMode();
+      const embed = document.body.classList.contains('embed-mode');
+      const large = document.body.classList.contains('large-viewport');
       const widget = document.querySelector('.widget');
-      const containerWidth = window.innerWidth;
-      const containerHeight = window.innerHeight;
+
+      if (!embed && !large) {
+        widget.style.transform = '';
+        widget.style.width = '';
+        return;
+      }
+
+      const pad = embed ? 0 : 32; // account for body padding (16px each side) in standalone mode
+      const containerWidth = window.innerWidth - pad;
+      const containerHeight = window.innerHeight - pad;
+      const upperBound = large ? MAX_SCALE : 1;
 
       let scale = 1;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 8; i++) {
         widget.style.transform = 'none';
         widget.style.width = (containerWidth / scale) + 'px';
         const naturalHeight = widget.offsetHeight;
-        const next = Math.min(1, containerHeight / naturalHeight);
+        const next = Math.min(upperBound, containerHeight / naturalHeight);
         if (Math.abs(next - scale) < 0.005) { scale = next; break; }
         scale = next;
       }
 
+      // Re-apply width for the final scale so the rendered width is exactly
+      // containerWidth even if the loop above exited without converging.
+      widget.style.transform = 'none';
+      widget.style.width = (containerWidth / scale) + 'px';
       widget.style.transform = `scale(${scale})`;
     }
+
+    window.addEventListener('resize', scaleWidgetToFit);
 
     function getNow() { return Date.now() + timeOffset; }
 
@@ -754,7 +796,7 @@
 
       document.getElementById('infoBar').style.display = 'flex';
       document.getElementById('footerBar').style.display = 'flex';
-      scaleEmbedToFit();
+      scaleWidgetToFit();
 
       if (countdownTimer) clearInterval(countdownTimer);
 
