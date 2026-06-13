@@ -17,9 +17,49 @@
       padding: 0;
     }
 
+    :root {
+      --bg: #f3f7f5;
+      --card-bg: #ffffff;
+      --ink: 16, 61, 41;
+      --error: #dc2626;
+      --dropdown-bg: #ffffff;
+      --dropdown-text: #103d29;
+      --card-shadow: 0 8px 40px rgba(16, 61, 41, 0.08);
+      --a15: 0.18;
+      --a30: 0.55;
+      --a35: 0.6;
+      --a40: 0.6;
+      --a50: 0.7;
+      --a55: 0.72;
+      --a65: 0.8;
+      --a75: 0.85;
+      --a85: 0.9;
+      --a95: 1;
+    }
+
+    body.dark-mode {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --ink: 255, 255, 255;
+      --error: rgba(255, 80, 80, 0.75);
+      --dropdown-bg: #1c2128;
+      --dropdown-text: #e6edf3;
+      --card-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      --a15: 0.15;
+      --a30: 0.3;
+      --a35: 0.35;
+      --a40: 0.4;
+      --a50: 0.5;
+      --a55: 0.55;
+      --a65: 0.65;
+      --a75: 0.75;
+      --a85: 0.85;
+      --a95: 0.95;
+    }
+
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background: #0d1117;
+      background: var(--bg);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -28,13 +68,13 @@
     }
 
     .widget {
-      background: #161b22;
+      background: var(--card-bg);
       border-radius: 20px;
       padding: 22px 20px 16px;
       width: 100%;
       max-width: 480px;
-      color: #fff;
-      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      color: rgba(var(--ink), 1);
+      box-shadow: var(--card-shadow);
     }
 
     .top-bar {
@@ -47,7 +87,7 @@
 
     .location-bar {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(var(--ink), var(--a40));
       letter-spacing: 0.4px;
       display: flex;
       align-items: center;
@@ -75,7 +115,7 @@
       align-items: center;
       gap: 5px;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.55);
+      color: rgba(var(--ink), var(--a55));
       min-width: 60px;
     }
 
@@ -105,7 +145,7 @@
 
     .side-label {
       font-size: 10px;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(var(--ink), var(--a35));
       letter-spacing: 0.2px;
     }
 
@@ -117,7 +157,7 @@
     .info-side .prayer-label {
       font-weight: 600;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(var(--ink), var(--a85));
     }
 
     .info-side .icon {
@@ -137,7 +177,7 @@
 
     .countdown-label {
       font-size: 10px;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(var(--ink), var(--a35));
       letter-spacing: 0.2px;
     }
 
@@ -146,36 +186,36 @@
       font-weight: 700;
       letter-spacing: 2px;
       font-variant-numeric: tabular-nums;
-      color: #fff;
+      color: rgba(var(--ink), 1);
       text-align: center;
     }
 
     .side-time {
       font-size: 11px;
       font-variant-numeric: tabular-nums;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(var(--ink), var(--a50));
     }
 
     .footer-bar {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.3);
+      color: rgba(var(--ink), var(--a30));
     }
 
     .status-msg {
       text-align: center;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(var(--ink), var(--a35));
       font-size: 13px;
       padding: 48px 0;
     }
 
     .status-msg.error {
-      color: rgba(255, 80, 80, 0.75);
+      color: var(--error);
     }
 
     #zoneSelect {
       background: transparent;
       border: none;
-      color: rgba(255, 255, 255, 0.55);
+      color: rgba(var(--ink), var(--a55));
       font-size: 11px;
       font-family: 'Inter', system-ui, sans-serif;
       letter-spacing: 0.4px;
@@ -188,8 +228,8 @@
 
     #zoneSelect option,
     #zoneSelect optgroup {
-      background: #1c2128;
-      color: #e6edf3;
+      background: var(--dropdown-bg);
+      color: var(--dropdown-text);
     }
 
     body.embed-mode {
@@ -348,6 +388,32 @@
         document.body.style.overflow = 'hidden';
       }
     })();
+
+    (function initThemeMode() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'dark') {
+        document.body.classList.add('dark-mode');
+      }
+    })();
+
+    // Palette for inline SVG colors (CSS handles page/card/text via custom
+    // properties; the SVG arc is built/updated imperatively, so it needs its
+    // own lookup). Gold/amber is the "active/now" accent in both themes.
+    const THEME = document.body.classList.contains('dark-mode')
+      ? { ink: '255,255,255', gold: '245,166,35', cardBg: '#161b22' }
+      : { ink: '16,61,41', gold: '245,166,35', cardBg: '#ffffff' };
+
+    function themeColor(triplet, alpha) { return `rgba(${triplet},${alpha})`; }
+
+    // Per-theme alpha tiers for "muted ink" text/nodes in the SVG arc. The same
+    // alpha value reads very differently against a near-black card (dark mode)
+    // vs. a white card (light mode), so light mode uses higher alphas to keep
+    // equivalent contrast. Keys are named after the original (dark-mode) alpha.
+    const ALPHA = document.body.classList.contains('dark-mode')
+      ? { a15: 0.15, a30: 0.3, a35: 0.35, a40: 0.4, a50: 0.5, a55: 0.55, a65: 0.65, a75: 0.75, a95: 0.95 }
+      : { a15: 0.18, a30: 0.55, a35: 0.6, a40: 0.6, a50: 0.7, a55: 0.72, a65: 0.8, a75: 0.85, a95: 1 };
+
+    function inkAlpha(key) { return themeColor(THEME.ink, ALPHA[key]); }
 
     // Above this viewport size, the widget is allowed to scale UP (desktop
     // browser, large desktop embed area, or 1920x1080 signage) rather than
@@ -626,7 +692,7 @@
       const bgArc = svgEl('path');
       bgArc.setAttribute('d',
         `M ${ARC_PAD_X},${ARC_BOT_Y} Q ${ARC_W / 2},${CTRL_Y} ${ARC_W - ARC_PAD_X},${ARC_BOT_Y}`);
-      bgArc.setAttribute('stroke', 'rgba(255,255,255,0.15)');
+      bgArc.setAttribute('stroke', inkAlpha('a15'));
       bgArc.setAttribute('fill', 'none');
       bgArc.setAttribute('stroke-width', '2');
       bgArc.setAttribute('stroke-linecap', 'round');
@@ -641,7 +707,7 @@
       const progArc = svgEl('path');
       progArc.setAttribute('id', 'progressArc');
       progArc.setAttribute('d', progressArcPath(initT));
-      progArc.setAttribute('stroke', 'rgba(255,255,255,0.85)');
+      progArc.setAttribute('stroke', themeColor(THEME.gold, 0.85));
       progArc.setAttribute('fill', 'none');
       progArc.setAttribute('stroke-width', '4');
       progArc.setAttribute('stroke-linecap', 'round');
@@ -654,7 +720,7 @@
       tipGlow.setAttribute('cx', tipPos.x);
       tipGlow.setAttribute('cy', tipPos.y);
       tipGlow.setAttribute('r', '5');
-      tipGlow.setAttribute('fill', 'rgba(255,255,255,0.25)');
+      tipGlow.setAttribute('fill', themeColor(THEME.gold, 0.25));
       svg.appendChild(tipGlow);
 
       const tip = svgEl('circle');
@@ -662,7 +728,7 @@
       tip.setAttribute('cx', tipPos.x);
       tip.setAttribute('cy', tipPos.y);
       tip.setAttribute('r', '3');
-      tip.setAttribute('fill', '#ffffff');
+      tip.setAttribute('fill', themeColor(THEME.gold, 1));
       svg.appendChild(tip);
 
       // Nodes
@@ -686,7 +752,7 @@
           ring.setAttribute('r', '6');
           ring.setAttribute('id', 'pulseRing');
           ring.setAttribute('fill', 'none');
-          ring.setAttribute('stroke', 'rgba(255,255,255,0.65)');
+          ring.setAttribute('stroke', themeColor(THEME.gold, 0.65));
           ring.setAttribute('stroke-width', '1.5');
           svg.appendChild(ring);
         }
@@ -698,20 +764,20 @@
         circle.setAttribute('r', r);
 
         if (isCurrent) {
-          circle.setAttribute('fill', '#161b22');
-          circle.setAttribute('stroke', '#ffffff');
+          circle.setAttribute('fill', THEME.cardBg);
+          circle.setAttribute('stroke', themeColor(THEME.gold, 1));
           circle.setAttribute('stroke-width', '2.5');
         } else if (isPast) {
-          circle.setAttribute('fill', 'rgba(255,255,255,0.15)');
-          circle.setAttribute('stroke', 'rgba(255,255,255,0.4)');
+          circle.setAttribute('fill', inkAlpha('a15'));
+          circle.setAttribute('stroke', inkAlpha('a40'));
           circle.setAttribute('stroke-width', '1.5');
         } else if (isNext) {
-          circle.setAttribute('fill', 'rgba(255,255,255,0.95)');
-          circle.setAttribute('stroke', '#ffffff');
+          circle.setAttribute('fill', inkAlpha('a95'));
+          circle.setAttribute('stroke', themeColor(THEME.ink, 1));
           circle.setAttribute('stroke-width', '1.5');
         } else {
-          circle.setAttribute('fill', 'rgba(255,255,255,0.5)');
-          circle.setAttribute('stroke', 'rgba(255,255,255,0.65)');
+          circle.setAttribute('fill', inkAlpha('a50'));
+          circle.setAttribute('stroke', inkAlpha('a65'));
           circle.setAttribute('stroke-width', '1.5');
         }
         svg.appendChild(circle);
@@ -723,7 +789,7 @@
         const isCloseToNext = i < prayerList.length - 1 && (xPositions[i + 1] - x) < 50 && !isFirst && !isLast;
         const anchor = isFirst ? 'start' : isLast ? 'end' :
           isCloseToPrev ? 'start' : isCloseToNext ? 'end' : 'middle';
-        const labelAlpha = (isCurrent || isNext) ? '0.95' : isPast ? '0.35' : '0.55';
+        const labelAlphaKey = (isCurrent || isNext) ? 'a95' : isPast ? 'a35' : 'a55';
         const labelWeight = (isCurrent || isNext) ? '600' : '400';
         const timeOffset = r + 13;
         const nameOffset = timeOffset + 11;
@@ -736,7 +802,7 @@
         timeText.setAttribute('text-anchor', anchor);
         timeText.setAttribute('font-size', isCurrent ? '10' : '9');
         timeText.setAttribute('font-weight', labelWeight);
-        timeText.setAttribute('fill', `rgba(255,255,255,${labelAlpha})`);
+        timeText.setAttribute('fill', inkAlpha(labelAlphaKey));
         timeText.setAttribute('font-family', "'Inter',system-ui,sans-serif");
         timeText.textContent = fmt24(prayer.ts);
         svg.appendChild(timeText);
@@ -747,7 +813,7 @@
         nameText.setAttribute('text-anchor', anchor);
         nameText.setAttribute('font-size', '8');
         nameText.setAttribute('font-weight', labelWeight);
-        nameText.setAttribute('fill', `rgba(255,255,255,${isCurrent ? '0.75' : '0.3'})`);
+        nameText.setAttribute('fill', inkAlpha(isCurrent ? 'a75' : 'a30'));
         nameText.setAttribute('font-family', "'Inter',system-ui,sans-serif");
         nameText.textContent = prayer.name;
         svg.appendChild(nameText);
