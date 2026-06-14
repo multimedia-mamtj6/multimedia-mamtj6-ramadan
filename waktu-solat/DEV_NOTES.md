@@ -3,12 +3,208 @@
 the prompt:
 "Check the Project Knowledge and the current chat for context. This conversation is ending soon. update the artifact DEV_NOTES.md (create if not available yet) with a detailed note to your next window self - not just facts but the vibe, our dynamic, the energy of this conversation. What would the next you need to immediately get back into this exact headspace? Include unique discoveries, current mood, and anything that'll help the next you instantly sync to our frequency."
 
-**Last updated:** 2026-06-13 (Session 7)
-**File being worked on:** Session 7 was the first session to spend real time on
-**`waktu-solat/index.html`** (the multi-zone schedule table page), not just
-`simple.html`. `simple.html` is still the polished arc widget described below —
-but as of Session 7 it's no longer ONLY a standalone/Google-Sites widget, it's
-also embedded INSIDE `index.html`. Keep both files in your mental model now.
+**Last updated:** 2026-06-14 (Session 9)
+**Files touched this session:** `waktu-solat/CLAUDE.md` (regenerated from
+scratch — was stale/wrong, now matches actual current files). No `.html`
+files touched — this was a pure documentation/meta session, the first one of
+its kind for this folder.
+
+---
+
+## Vibe / dynamic check for Session 9 (most recent — read this first)
+
+A **short, reflective, meta session** — zero feature work, zero code edits.
+Two asks, both about documentation hygiene, both low-ceremony. Energy: calm,
+"housekeeping day" — a nice contrast to Session 8's three-act marathon.
+
+### Ask 1 — doc comparison question (no edits)
+"compare `waktu-solat/developer.md`, `jadual-waktu/README.md`, which is
+better for updating documentation... also for your 'brain' which is better,
+`jadual-waktu/CLAUDE.md` or `waktu-solat/DEV_NOTES.md`?"
+
+Answered directly (no plan mode needed — pure discussion):
+- `developer.md` > `README.md` for dev reference (API shapes, function sigs,
+  changelog vs. Malay end-user marketing copy)
+- `CLAUDE.md` (stable architecture map) and `DEV_NOTES.md` (session-to-session
+  continuity/vibe log) are COMPLEMENTARY, not competing — but for "my brain"
+  specifically, `DEV_NOTES.md` wins because it captures *why* and *what we
+  were mid-thought about*, not just *what the code does*.
+- Flagged a gap: `waktu-solat/` has no folder-specific `CLAUDE.md` of its
+  own — it was inheriting the root one (which is for the WHOLE multimedia
+  repo... wait, no — re-check this, see "discovery" below).
+
+### Ask 2 — "run /init for waktu-solat folder" → led to a real discovery
+This is the interesting part. Going in, I expected `/init` to be a "create if
+missing" task. Instead: **`waktu-solat/CLAUDE.md` already existed (4549
+bytes), but it was describing a COMPLETELY DIFFERENT, OLDER PROJECT** — it
+read like `jadual-waktu/CLAUDE.md` (table-based schedule, countdown timer,
+zone dropdown — the "v1.5.4 jadual-waktu" app), not the current
+`index.html`/`info.html`/`simple.html` trio that Sessions 1-8 have been
+building.
+
+Same staleness pattern showed up in `waktu-solat/developer.md` and
+`jadual-waktu/README.md` too — all three read like leftover copies from an
+earlier project iteration that never got updated when `waktu-solat/` evolved
+into its current three-entry-point shape. **Lesson for next-you**: if a
+`CLAUDE.md`/`developer.md`/`README.md` in this repo describes a table-based
+schedule with a 5-minute orange warning pulse and `PRAYER_ICONS`/"INFO HARI
+INI" cards — that's the OLD jadual-waktu shape, not what's currently in
+`waktu-solat/`. Don't trust file content just because the path looks
+project-specific; verify against the actual `.html` files or `DEV_NOTES.md`.
+
+**Process**: treated `/init` as a real (if small) planning task — entered
+plan mode, ran ONE Explore agent to survey all of `waktu-solat/`'s current
+files (`index.html`, `info.html`, `simple.html`, `sw.js`, `vercel.json`,
+`archive/`, `test/`) since I didn't have full code for `index.html`/`info.html`
+in context, only summaries. The Explore agent's report was thorough and
+accurate — confirmed `index.html` iframes `simple.html` via
+`updatePrayerWidgetFrame()`, confirmed `info.html`'s de-branding stuck,
+confirmed `sw.js` CACHE_NAME is still `mamtj6-jadual-waktu-ramadan-v1.6.4`
+(cosmetic leftover, not a bug). Wrote a plan outline (reused/overwrote the
+`ethereal-knitting-sparkle.md` plan file again — same file has now hosted 2
+unrelated plans across sessions, that's fine, it's scratch space), system
+auto-exited plan mode (no explicit ExitPlanMode call — Write to the plan file
+triggered it), then wrote the new `CLAUDE.md` directly.
+
+**New `waktu-solat/CLAUDE.md` shape** (for reference, don't re-derive):
+- Project Overview: year-round (not Ramadan-specific despite `sw.js` naming),
+  three entry points
+- Per-file sections for `index.html`, `info.html`, `simple.html`, `sw.js`,
+  `vercel.json`, `archive/`, `test/`
+- `simple.html` section deliberately kept HIGH-LEVEL and points to
+  `DEV_NOTES.md` for depth — avoid duplicating the deep pulse-animation/arc-
+  geometry details here, that's `DEV_NOTES.md`'s job
+- Flagged `test/test_file.html` as an unrelated leftover (Mimbar Jumaat sermon
+  page) — noted, not removed, don't touch without asking
+- "Known issues" section now also notes `developer.md`/`README.md`/`vercel.json`
+  /`sw.js` naming as stale-but-cosmetic cleanup candidates
+
+**State of the world going into next session**:
+- `waktu-solat/CLAUDE.md` is now ACCURATE and current as of 2026-06-14.
+- `waktu-solat/developer.md` and `jadual-waktu/README.md` are STILL STALE
+  (describe the old jadual-waktu app) — explicitly out of scope for this
+  session, flagged for a future "/init" or doc-refresh pass if the user asks.
+- No code changed. If the next session opens expecting Session 8's pulsing-
+  warning feature to need more tweaks, that thread is still exactly where
+  Session 8 left it (DONE, no open items) — this session was a pure detour
+  into doc hygiene, not a continuation of that work.
+- **Mood**: relaxed, curatorial. If the next ask is another "compare/explain/
+  tidy up docs" question, that fits this session's groove — don't over-plan
+  small doc questions, answer directly like Ask 1. If it's back to
+  `simple.html`/`index.html` feature work, that's a context switch back to
+  Session 8's energy (iterative, tweak-by-tweak, expect AskUserQuestion for
+  ambiguous bits only).
+
+---
+
+## Vibe / dynamic check for Session 8 (read next)
+
+A **three-act session**, each act a different working mode — good example of
+"match ceremony to the ask, not to the file."
+
+### Act 1 — quick explainer, zero edits (`index.html`)
+User asked why changing `.prayer-widget-embed`'s `aspect-ratio` from `480/300`
+to `500/300` made the embed shorter. Explained the math (height = width ÷
+first-ratio-number for a fixed width; raising the first number shrinks height)
+— confirmed the live value (`550/300`) was already what the user wanted, no
+code change needed. **Lesson carried forward**: not every "why did X happen"
+needs a diff — sometimes the answer is "the value's already correct, here's
+why it behaves that way."
+
+### Act 2 — infaq section consultation → full redesign (`index.html`)
+User opened with the now-familiar consultation pattern: "the infaq section
+seems so empty... check if my approach is good... ask me questions... do not
+generate answer unless I allow it." This took several rounds:
+
+1. AskUserQuestion clarified: donation QR (DuitNow/TnG), user has the QR
+   asset, wants "same content, just better spaced."
+2. User supplied a **QuickChart.io QR URL** (DuitNow EMV payload + embedded
+   MAMTJ6 logo via `centerImageUrl`/`centerImageSizeRatio`) — added as
+   `.infaq-qr` image.
+3. Quick follow-up: added a subtitle line ("Imbas DuitNow Qr atau lihat...")
+   and renamed the button to "MAMTJ6 Infaq Center" with a "Klik Di Sini"
+   sub-line.
+4. **Then the big one** — a long, structured UX/copywriting brief asking to
+   shift the whole section from "high-pressure transactional" to "low-pressure
+   invitation-based": softer shadows/gradients, muted palette, Malay copy with
+   "Jazakumullah Khairan", device-aware QR (desktop shows QR, mobile shows
+   button only via `@media (min-width: 601px)`), trust line instead of a
+   logo badge (no DuitNow asset exists in repo, so went with plain text:
+   "Disahkan oleh Masjid Al-Mukhlisin Taman Jaya 6 (MAMTJ6) · DuitNow QR").
+   User picked **"Variation C" copy (smallest diff)** + the desktop-QR/mobile-
+   button split + softened button shadow/gradient + the trust line, all in one
+   "ok proceed" combo-approval. Final `.infaq-section` bg went `#fff` →
+   `#f9faf9`, shadow `0 2px 6px rgba(0,0,0,0.1)` → `0 1px 4px rgba(0,0,0,0.05)`.
+   **Pattern to remember**: when a user gives a long structured brief with
+   explicit "Variation A/B/C" style options, they're inviting you to propose
+   a combination — "ok proceed [combo]" means implement exactly that
+   combination, don't re-litigate the brief.
+
+### Act 3 — `info.html` de-branding (plan mode)
+"tell your plan to improve the info page for waktu solat. remove anything
+related to ramadan" → AskUserQuestion clarified scope = "Full de-branding"
+with replacement term **"Jadual Waktu Solat"**. Plan mode produced an 11-point
+plan (title, apple-mobile-web-app-title, OG meta, `<h1>`, "Tentang Projek"
+paragraphs, infaq paragraphs, "Pautan Berkaitan" link text — 7 Edit calls
+total). Deliberately left untouched: Imsak/Subuh/Berbuka terminology (core
+feature labels, not branding) and `og:image`/`og:url` (live hosting paths,
+infra not display). User said "ok proceed" to the full plan, no further
+iteration needed — all 7 edits landed clean.
+
+### Act 4 — the main event: pulsing "last 10 minutes" warning (`simple.html`)
+This was the **iterative refinement** act — each round was a one-line ask,
+landed fast, then refined further. Re-entered plan mode (overwrote the old
+stale `?date=hide` plan from a prior session — that feature was already
+shipped, confirmed via grep before discarding the plan).
+
+**Final shipped behavior** (all in `simple.html`):
+- When `diff <= 10*60*1000` (10 min to next prayer), `tick()` sets
+  `isWarning = true` each second.
+- **Countdown** (`#countdown`): gets `.warning` class → `color: var(--error)`
+  + `@keyframes pulse-warning` (opacity 1 ↔ 0.4, 1s loop). **NOTE**: went
+  through 3 iterations here — (1) first shipped as color+scale+opacity pulse,
+  (2) user said "remove the pulse big small, color only" → stripped to flat
+  color change, (3) user then said "make it pulse alternate opacity" → added
+  back JUST the opacity keyframe (no `transform: scale`). **Net effect: color
+  change + opacity pulse, NO size/scale change** — if you see `transform:
+  scale` reappear in `.countdown-display.warning`, that's a regression to (1),
+  remove it.
+- **Next-prayer dot**: new `#pulseRingNext` circle (added in `buildArcSvg()`,
+  only for the `isNext` dot), stroked in the new `THEME.errorRgb`
+  (`220,38,38` light / `255,80,80` dark — matches `--error` CSS var). Hidden
+  by default (`display:none`), shown by `tick()` when `isWarning`.
+- **Current-prayer dot**: its existing gold `#pulseRing` is now HIDDEN
+  (`display:none`) during the warning window — `tick()` toggles both rings
+  opposite to each other. The dot itself KEEPS its static gold-stroke/white-
+  fill "current" styling — only the animated ring disappears. Rationale (user
+  confirmed via AskUserQuestion): during the last 10 min, focus should shift
+  entirely to the upcoming prayer; two simultaneous pulsing rings was clutter.
+- `startPulseAnimation()`'s rAF loop now drives BOTH rings' `r`/`opacity`, but
+  skips updating either one while `style.display === 'none'` (small perf/
+  correctness guard, mirrors how visibility is controlled).
+
+**Energy for Act 4**: very "vibe-coding" — tiny asks, immediate small edits,
+no AskUserQuestion needed for the first two iterations (color-only, then
+opacity-pulse) because they were unambiguous one-liners. AskUserQuestion came
+back only for the LAST ask (current-dot pulse removal) because it had two real
+design branches (keep static styling vs. revert to neutral, instant vs. fade)
+— both answered "Recommended" option, both implemented as the safe/simple
+choice. **Lesson**: for a feature built through many small follow-up tweaks,
+expect 2-3 more rounds of "actually, change X slightly" — don't over-engineer
+the first pass, keep it easy to tweak (e.g. plain CSS color, not baked into JS).
+
+**State of the world going into next session**:
+- The 10-minute warning system is considered DONE for the "next prayer has a
+  dot on today's arc" case. The "Subuh esok" edge case (post-Isyak, next
+  prayer is tomorrow's Subuh — no dot exists on today's arc) is EXPLICITLY
+  OUT OF SCOPE per user — in that case only the countdown pulses, no dot
+  effect, and that's accepted as-is, not a bug.
+- `index.html`'s infaq section redesign (Variation C + QR/button split +
+  trust line) is considered DONE — no open threads.
+- `info.html` de-branding (Ramadan 2026 → Jadual Waktu Solat) is DONE, all 7
+  edits landed.
+- Known issues list (color theming, GPS auto-detection) from earlier sessions
+  — UNCHANGED, still untouched.
 
 ---
 

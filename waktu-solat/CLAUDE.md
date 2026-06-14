@@ -1,82 +1,159 @@
 # CLAUDE.md
 
-**Version:** 1.5.4
-
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-This is a static web project displaying Ramadan 2026 prayer times (waktu solat) for all zones in Malaysia. It shows Imsak, Subuh, and Berbuka times with a live countdown feature and zone selection.
+This is a static, year-round prayer times (waktu solat) suite for Malaysian
+zones, sourced from JAKIM via the Waktu Solat API. Despite the `sw.js`
+`CACHE_NAME` still saying `mamtj6-jadual-waktu-ramadan-v1.6.4` (a historical
+artifact from when this was Ramadan-specific), the app is no longer tied to
+Ramadan — `info.html` was de-branded to "Jadual Waktu Solat" in Session 8.
+
+No build step — pure HTML5/CSS3/vanilla JS, Malay (`lang="ms"`).
 
 ## Architecture
 
-**Main application** (`index.html`):
-- Self-contained HTML with embedded CSS and JavaScript
-- Fetches prayer data from `https://api.waktusolat.app/v2/solat/{zone}`
-- Fetches zone list from `https://api.waktusolat.app/zones`
-- Responsive design with separate desktop (table) and mobile (card) views
-- Real-time countdown timer to next prayer time
-- Zone selector dropdown with localStorage and URL persistence
+Three entry points:
 
-**Info page** (`info.html`):
-- Project information and documentation
-- Sections with anchor links for sharing (e.g., `info.html#waktu`)
-- MST SIRIM widget for time verification
-- Infaq section with donation link
+```
+index.html    ← main schedule + infaq page (entry point)
+info.html     ← documentation / info page
+simple.html   ← embeddable SVG-arc countdown widget
+```
 
-**Key JavaScript functions**:
-- `loadZones()` - Fetches and populates zone dropdown, grouped by state
-- `fetchData()` - Fetches prayer data for Feb & Mar 2026, renders both views
-- `setupCountdown()` - Determines countdown target (berbuka or next day's imsak)
-- `startCountdown()` - Manages the countdown timer with progress bar
-- `updateZoneHeader(zone)` - Updates header with state name, zone number, and district
-- `getSavedZone()` / `saveZone()` - localStorage and URL helpers for zone persistence
-- `getTestDate()` - Returns test date/time from URL parameters or current date
-- `getNow()` - Returns offset-adjusted current time (supports `testTime` URL param)
-- `highlightNextPrayer()` - Highlights the next upcoming time box (Imsak/Subuh/Berbuka)
-- `shareLink()` - Share/copy URL with zone info (state, code, district) in share text
-- `detectZoneByGPS()` - Geolocation + GPS API to auto-detect zone; returns zone code or null
-- `triggerGPSDetection()` - GPS button click handler; re-detects zone, saves, and reloads data; shows error toast on failure
-- `showSimpleToast(message, type)` - Self-dismissing toast (3s) for simple feedback; type 'error' = red
+### `index.html` — main schedule + infaq page
 
-**Data flow**:
-1. On load: fetch zones list, populate dropdown, restore saved zone from URL or localStorage
-2. Fetch Feb 2026 and Mar 2026 prayer data in parallel
-3. Filter to Ramadan period (Feb 19 - Mar 20, 2026)
-4. Format times to 12-hour format, render desktop table and mobile cards
-5. Store today's times in `globalPrayerTimes` for countdown logic
-6. Start countdown timer to next prayer event
-7. Update URL with `?location={zoneCode}` when zone changes
+- **Zone selector**: 61 zones grouped by state, compact text when closed,
+  full detail (zone code + daerah) on focus
+- **GPS detection**: auto-runs on first visit (no saved zone), plus a manual
+  📍 GPS button
+- **Share button**: copies/shares `?location={zone}` URL with zone info
+- **"Info Hari Ini"**: iframes `simple.html` via `updatePrayerWidgetFrame()`
+  with `?embed=1&selector=hide&date=hide&zone={zone}` (+ `testTime` passthrough)
+  — the countdown/progress-bar UI itself lives entirely in `simple.html`, not here
+- **Infaq & Wakaf**: DuitNow QR (QuickChart.io, desktop) / button (mobile) —
+  "Variation C" low-pressure redesign from Session 8, `@media (min-width: 601px)` split
+- **Schedule tables**: desktop table + mobile cards, today-row highlight,
+  midnight auto-refresh
+
+Key functions: `getSavedZone()` / `saveZone()`, `loadZones()`, `fetchData()`,
+`shareLink()`, `detectZoneByGPS()` / `triggerGPSDetection()`,
+`updatePrayerWidgetFrame(zoneCode)`, `showSimpleToast(message, type)`
+
+URL params: `?location={zoneCode}`, `?testDate=YYYY-MM-DD`, `?testTime=HH:MM`
+(combine: `?location=JHR01&testDate=2026-02-20&testTime=12:00`)
+
+### `info.html` — documentation page
+
+De-branded (Session 8) from "Ramadan 2026" to generic "Jadual Waktu Solat".
+Sections with shareable anchors (`info.html#section`):
+
+- **Tentang Projek** — overview, CSR designation, feature list
+- **Sumber Data** — JAKIM / Waktu Solat API credits
+- **Ketepatan Data** — accuracy disclaimers
+- **Peringatan Ketepatan Waktu** — MST SIRIM widget (`mst.sirim.my/widget`, iframe)
+- **Pasang Sebagai Aplikasi (PWA)** — install guides (Android/iOS/Desktop)
+- **Infaq & Wakaf** — link to `https://infaq.mamtj6.com/`
+- **Pautan Berkaitan** — external links + contact
+
+Deliberately untouched during de-branding: Imsak/Subuh/Berbuka terminology
+(core feature labels, not branding) and `og:image`/`og:url` (live hosting paths).
+
+### `simple.html` — embeddable SVG-arc widget
+
+The most actively developed file. For implementation detail, animation
+internals, and session-by-session decision history, **read `DEV_NOTES.md`
+first** — this section only covers the high-level shape.
+
+- SVG quadratic-bezier arc spanning Subuh → Isyak, 6 prayer dots (Subuh,
+  Syuruk, Zohor, Asar, Maghrib, Isyak) + a label-only "Waktu Duha" virtual period
+- Arc geometry constants: `ARC_W=360`, `ARC_PAD_X=20`, `ARC_TOP_Y=14`,
+  `ARC_BOT_Y=70`, `CTRL_Y = 2*ARC_TOP_Y - ARC_BOT_Y`
+- Live countdown + info bar (current/next prayer with Material Symbols icons)
+- Pulse animations: current-prayer dot gets a gold ripple ring;
+  next-prayer dot gets a red/`--error` ripple ring + countdown text turns
+  red and opacity-pulses during the last 10 minutes before that prayer
+- Progress arc grows from Subuh to "now", with a glowing progress-tip dot
+- Zone selector (same grouped-dropdown pattern as `index.html`)
+
+URL params: `?zone={code}`, `?embed=1` (transparent bg, scale-to-fit for
+iframes), `?selector=hide` (hide zone dropdown, independent of embed),
+`?date=hide` (hide date footer), `?testTime=HH:MM`, `?testDate=YYYY-MM-DD`,
+`?mode=dark` (force dark theme)
+
+Relationship to `index.html`: iframed by it (see above), but also designed
+to be embedded standalone elsewhere (e.g. Google Sites — see
+`gsites_embeded_guide.md`).
+
+### `sw.js` — service worker
+
+Cache-first strategy. Current `CACHE_NAME`:
+`mamtj6-jadual-waktu-ramadan-v1.6.4`. Caches the app shell (`index.html`,
+`info.html`, favicons, logo assets) only — prayer data from the API is never
+cached, always fetched fresh. Old caches matching the
+`mamtj6-jadual-waktu-ramadan-` prefix are purged on activate.
+
+**When changing any cached file, bump `CACHE_NAME`** and hard-refresh
+(`Ctrl+Shift+R`) to verify.
+
+### `vercel.json`
+
+Rewrites `/` → `/api/og` when `?location=` is present, in preparation for
+dynamic OG-image generation (backend not yet implemented).
+
+### `archive/`
+
+`widget.html` — old pre-SVG-arc version of the prayer widget. Historical
+only, not in use.
+
+### `test/`
+
+`embed_test.html` — legitimate iframe-embed test harness for `simple.html`
+(deliberately small iframe to verify scale-to-fit). `test_file.html` is an
+unrelated leftover (a "Mimbar Jumaat" sermon display page) — flag as
+out-of-place but don't remove without asking.
 
 ## Development
 
-Open `index.html` directly in a browser - no build step required.
+No build step. Serve locally:
 
-**URL Parameters**:
-- `?location={zoneCode}` - Load specific zone (e.g., `?location=JHR01`)
-- `?testDate=YYYY-MM-DD` - Simulate specific date (e.g., `?testDate=2026-02-20`)
-- `?testTime=HH:MM` - Simulate specific time, ticks forward (e.g., `?testTime=18:30`)
-- Combine: `?location=JHR01&testDate=2026-02-20&testTime=12:00`
+```bash
+python -m http.server
+```
 
-**External dependencies** (loaded via CDN):
-- Google Fonts: Google Sans
-- API: waktusolat.app (JAKIM data source)
-- MST SIRIM widget (info.html only)
+JSON fetches require an HTTP server (CORS) — `file://` won't work.
 
-## Key Features
+**Test parameters** (work across `index.html` and `simple.html`):
+- `?location=` / `?zone=` — specific zone
+- `?testDate=YYYY-MM-DD` — simulate date
+- `?testTime=HH:MM` — simulate time (ticks forward live)
 
-1. **Zone Selection**: 61 zones across Malaysia, grouped by state
-2. **Zone Persistence**: Selected zone saved to localStorage and reflected in URL
-3. **Shareable URLs**: URL auto-updates with `?location=` parameter for easy sharing
-4. **Share Button**: Quick share/copy link button next to zone selector
-5. **Compact Dropdown**: Shows zone code only when closed, full details when opened
-6. **Dynamic Header**: Shows "Negeri {State} (Zon {Number})" and district name
-7. **Countdown Timer**: Auto-switches between berbuka and next day's imsak with seamless phase transitions
-8. **Time Box Highlight**: Green-filled highlight on the next upcoming prayer time box
-9. **Warning Pulse**: Orange color pulse animation on countdown and time box 5 minutes before prayer time
-10. **Midnight Auto-Refresh**: Data automatically refreshes at midnight for the next day
-11. **Responsive Design**: Table view for desktop, card view for mobile (share button on row 2)
-12. **GPS Auto-Detection**: Detects user location on first visit, pre-selects zone automatically
-13. **GPS Button**: 📍 GPS pill button for manual re-detection at any time
-14. **Contextual Messages**: Shows appropriate message before/after Ramadan period
-15. **Info Page**: Documentation with shareable anchor sections
+## External APIs
+
+| Service | URL | Used by |
+|---|---|---|
+| Zones list | `api.waktusolat.app/zones` | `index.html`, `simple.html` |
+| Prayer times | `api.waktusolat.app/v2/solat/{zone}?year=&month=` | `index.html`, `simple.html` |
+| GPS zone lookup | `api.waktusolat.app/v2/solat/gps/{lat}/{long}` | `index.html` |
+| DuitNow QR | `quickchart.io/qr` | `index.html` (infaq) |
+| MST SIRIM | `mst.sirim.my/widget` | `info.html` |
+| Infaq portal | `infaq.mamtj6.com` | `index.html`, `info.html` |
+
+## Other docs in this folder
+
+- **`DEV_NOTES.md`** — session handoff log for `simple.html` (the "read this
+  first" doc for picking up `simple.html` work)
+- **`gsites_embeded_guide.md`** — embed-mode reference for `simple.html`
+  (scale-to-fit algorithm, Google Sites pattern)
+- **`developer.md`** / **`README.md`** — currently describe the OLD
+  jadual-waktu-era app and are stale (same issue this CLAUDE.md just had).
+  Not refreshed in this pass — flag if/when they need updating too.
+
+## Known issues
+
+- Color theming — arc is white-on-dark only; no light variant
+- GPS auto-detection in `simple.html` not implemented (only in `index.html`)
+- `sw.js` `CACHE_NAME` and `vercel.json`/`developer.md`/`README.md` still
+  carry "ramadan"/jadual-waktu naming from before the de-branding pass —
+  cosmetic, not functional, but worth cleaning up eventually

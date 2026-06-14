@@ -206,6 +206,16 @@
       text-align: center;
     }
 
+    @keyframes pulse-warning {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .countdown-display.warning {
+      color: var(--error);
+      animation: pulse-warning 1s ease-in-out infinite;
+    }
+
     .side-time {
       font-size: 11px;
       font-variant-numeric: tabular-nums;
@@ -430,8 +440,8 @@
     // properties; the SVG arc is built/updated imperatively, so it needs its
     // own lookup). Gold/amber is the "active/now" accent in both themes.
     const THEME = document.body.classList.contains('dark-mode')
-      ? { ink: '255,255,255', gold: '245,166,35', cardBg: '#161b22' }
-      : { ink: '16,61,41', gold: '245,166,35', cardBg: '#ffffff' };
+      ? { ink: '255,255,255', gold: '245,166,35', cardBg: '#161b22', errorRgb: '255,80,80' }
+      : { ink: '16,61,41', gold: '245,166,35', cardBg: '#ffffff', errorRgb: '220,38,38' };
 
     function themeColor(triplet, alpha) { return `rgba(${triplet},${alpha})`; }
 
@@ -696,10 +706,19 @@
       const BASE = 6, MAX = 17, DUR = 1800;
       function frame(ts) {
         const el = document.getElementById('pulseRing');
-        if (!el) { pulseAnimId = null; return; }
+        const nextEl = document.getElementById('pulseRingNext');
+        if (!el && !nextEl) { pulseAnimId = null; return; }
         const t = (ts % DUR) / DUR;
-        el.setAttribute('r', (BASE + (MAX - BASE) * t).toFixed(1));
-        el.setAttribute('opacity', (0.7 * (1 - t)).toFixed(3));
+        const r = (BASE + (MAX - BASE) * t).toFixed(1);
+        const opacity = (0.7 * (1 - t)).toFixed(3);
+        if (el && el.style.display !== 'none') {
+          el.setAttribute('r', r);
+          el.setAttribute('opacity', opacity);
+        }
+        if (nextEl && nextEl.style.display !== 'none') {
+          nextEl.setAttribute('r', r);
+          nextEl.setAttribute('opacity', opacity);
+        }
         pulseAnimId = requestAnimationFrame(frame);
       }
       pulseAnimId = requestAnimationFrame(frame);
@@ -785,6 +804,21 @@
           ring.setAttribute('stroke', themeColor(THEME.gold, 0.65));
           ring.setAttribute('stroke-width', '1.5');
           svg.appendChild(ring);
+        }
+
+        // Warning pulse ring for next prayer — shown only in its last 10 minutes,
+        // toggled by tick(); r/opacity driven by startPulseAnimation()
+        if (isNext) {
+          const warnRing = svgEl('circle');
+          warnRing.setAttribute('cx', x);
+          warnRing.setAttribute('cy', y);
+          warnRing.setAttribute('r', '6');
+          warnRing.setAttribute('id', 'pulseRingNext');
+          warnRing.setAttribute('fill', 'none');
+          warnRing.setAttribute('stroke', themeColor(THEME.errorRgb, 0.65));
+          warnRing.setAttribute('stroke-width', '1.5');
+          warnRing.style.display = 'none';
+          svg.appendChild(warnRing);
         }
 
         // Circle
@@ -902,7 +936,17 @@
         const hh = String(Math.floor(diff / 3600000)).padStart(2, '0');
         const mm = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
         const ss = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-        document.getElementById('countdown').textContent = `${hh}:${mm}:${ss}`;
+        const countdownEl = document.getElementById('countdown');
+        countdownEl.textContent = `${hh}:${mm}:${ss}`;
+
+        // Last-10-minute warning: pulse the countdown and the next-prayer dot,
+        // and drop the current-prayer dot's pulse so focus shifts to the next prayer
+        const isWarning = diff > 0 && diff <= 10 * 60 * 1000;
+        countdownEl.classList.toggle('warning', isWarning);
+        const nextRing = document.getElementById('pulseRingNext');
+        if (nextRing) nextRing.style.display = isWarning ? '' : 'none';
+        const currentRing = document.getElementById('pulseRing');
+        if (currentRing) currentRing.style.display = isWarning ? 'none' : '';
 
         // Advance progress arc
         const progEl = document.getElementById('progressArc');
