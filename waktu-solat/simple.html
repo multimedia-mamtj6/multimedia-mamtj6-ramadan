@@ -102,6 +102,14 @@
       justify-content: center;
     }
 
+    body.hide-date .footer-bar {
+      display: none !important;
+    }
+
+    body.hide-date .top-bar {
+      justify-content: center;
+    }
+
     #arcContainer svg {
       width: 100%;
       height: auto;
@@ -408,6 +416,13 @@
       const params = new URLSearchParams(window.location.search);
       if (params.get('selector') === 'hide') {
         document.body.classList.add('hide-selector');
+      }
+    })();
+
+    (function initDateMode() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('date') === 'hide') {
+        document.body.classList.add('hide-date');
       }
     })();
 

@@ -1,39 +1,42 @@
 <!DOCTYPE html>
 <html lang="ms">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jadual Waktu Solat</title>
- <!-- Favicon -->
-    <!-- 1. Modern Browsers: Try the SVG first -->
-    <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg" sizes="any">
+  <!-- Favicon -->
+  <!-- 1. Modern Browsers: Try the SVG first -->
+  <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg"
+    sizes="any">
 
-    <!-- 2. Recent Browsers: Try the PNG if SVG fails -->
-    <link rel="icon" type="image/png" href="/jadual-waktu/favicon/favicon-96x96.png" sizes="96x96">
+  <!-- 2. Recent Browsers: Try the PNG if SVG fails -->
+  <link rel="icon" type="image/png" href="/jadual-waktu/favicon/favicon-96x96.png" sizes="96x96">
 
-    <!-- 3. Apple: Specific requirements for iOS -->
-    <link rel="apple-touch-icon" sizes="180x180" href="/jadual-waktu/favicon/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="WAKTU SOLAT" />
-    <meta name="theme-color" content="#ffffff" />
+  <!-- 3. Apple: Specific requirements for iOS -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/jadual-waktu/favicon/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-title" content="WAKTU SOLAT" />
+  <meta name="theme-color" content="#ffffff" />
 
-    <!-- 4. PWA: The manifest handles the installed app icon -->
-    <link rel="manifest" href="/jadual-waktu/favicon/site.webmanifest" />
+  <!-- 4. PWA: The manifest handles the installed app icon -->
+  <link rel="manifest" href="/jadual-waktu/favicon/site.webmanifest" />
 
-    <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
+  <!-- Open Graph Meta Tags (for Facebook, LinkedIn, etc.) -->
   <meta property="og:title" content="Jadual Waktu Solat" />
   <meta property="og:description" content="Jadual waktu solat lengkap bagi semua zon di Malaysia" />
   <meta property="og:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
   <meta property="og:url" content="https://ramadan.mamtj6.com/jadual-waktu" />
   <meta property="og:type" content="website" />
 
-    <!-- Twitter Card (for Twitter link preview) -->
-    <meta name="twitter:card" content="Jadual Waktu Solat" />
-    <meta name="twitter:title" content="Jadual Waktu Solat" />
-    <meta name="twitter:description" content="Jadual waktu solat lengkap bagi semua zon di Malaysia" />
-    <meta name="twitter:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
+  <!-- Twitter Card (for Twitter link preview) -->
+  <meta name="twitter:card" content="Jadual Waktu Solat" />
+  <meta name="twitter:title" content="Jadual Waktu Solat" />
+  <meta name="twitter:description" content="Jadual waktu solat lengkap bagi semua zon di Malaysia" />
+  <meta name="twitter:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
 
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <style>
     /* Custom CSS */
     body {
@@ -58,29 +61,39 @@
     }
 
     h1 {
-  font-family: 'Google Sans', sans-serif;
-  font-weight: 700; /* Google Sans Bold */
-  font-size: 32px; /* Biggest size for desktop */
-  margin: 0;
-  padding: 0 20px; /* Add padding for mobile */
-}
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 700;
+      /* Google Sans Bold */
+      font-size: 32px;
+      /* Biggest size for desktop */
+      margin: 0;
+      padding: 0 20px;
+      /* Add padding for mobile */
+    }
 
-h2 {
-  font-family: 'Google Sans', sans-serif;
-  font-weight: 600; /* Google Sans SemiBold */
-  font-size: 24px; /* 2nd biggest size for desktop */
-  margin: 0;
-  padding: 20px 0px 0px 0px; /* Add padding for mobile */
-}
+    h2 {
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 600;
+      /* Google Sans SemiBold */
+      font-size: 24px;
+      /* 2nd biggest size for desktop */
+      margin: 0;
+      padding: 20px 0px 0px 0px;
+      /* Add padding for mobile */
+    }
 
-h3 {
-  font-family: 'Google Sans', sans-serif;
-  font-weight: 400; /* Google Sans Regular */
-  font-style: italic; /* Italic */
-  font-size: 18px; /* Small size for desktop */
-  margin: 0;
-  padding: 0 20px; /* Add padding for mobile */
-}
+    h3 {
+      font-family: 'Google Sans', sans-serif;
+      font-weight: 400;
+      /* Google Sans Regular */
+      font-style: italic;
+      /* Italic */
+      font-size: 18px;
+      /* Small size for desktop */
+      margin: 0;
+      padding: 0 20px;
+      /* Add padding for mobile */
+    }
 
     /* GPS button */
     .gps-btn {
@@ -122,8 +135,15 @@ h3 {
     }
 
     @keyframes gpsPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
     }
 
     /* Share button */
@@ -207,16 +227,37 @@ h3 {
     .today-container {
       background: #fff;
       margin: 20px auto;
-      max-width: 1200px;
+      max-width: 650px;
       border-radius: 15px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      padding: 10px;
+    }
+
+    .today-container-title {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .today-date-display {
+      text-align: center;
+      font-size: 15px;
+      color: #7f8c8d;
+      margin-bottom: 10px;
     }
 
     .prayer-widget-embed {
       max-width: 480px;
       margin: 0 auto;
-      aspect-ratio: 480 / 300;
+      aspect-ratio: 550 / 300;
+    }
+
+    @media (min-width: 601px) {
+      .prayer-widget-embed {
+        max-width: 600px;
+      }
     }
 
     .prayer-widget-embed iframe {
@@ -231,9 +272,9 @@ h3 {
     .infaq-section {
       text-align: center;
       padding: 20px;
-      background-color: #fff;
+      background-color: #f9faf9;
       border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
       margin: 20px auto;
       max-width: 600px;
     }
@@ -245,30 +286,85 @@ h3 {
       line-height: 1.5;
     }
 
+    .infaq-qr {
+      display: none;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 15px;
+      border-radius: 10px;
+      border: 1px solid #eee;
+    }
+
     .infaq-button {
       display: inline-block;
       padding: 12px 25px;
-      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
       color: white;
       border-radius: 30px;
       font-weight: 600;
       text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(46, 204, 113, 0.25);
       border: none;
       cursor: pointer;
       font-size: 16px;
     }
 
+    .infaq-button-subtitle {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
     .infaq-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
-      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(46, 204, 113, 0.35);
     }
 
     .infaq-button:active {
       transform: translateY(1px);
-      box-shadow: 0 2px 10px rgba(46, 204, 113, 0.4);
+      box-shadow: 0 2px 6px rgba(46, 204, 113, 0.25);
+    }
+
+    .infaq-trust {
+      font-size: 12px;
+      color: #999;
+      margin-top: 12px;
+    }
+
+    /* Desktop: reveal QR code for scanning */
+    @media (min-width: 601px) {
+      .infaq-qr {
+        display: block;
+      }
+    }
+
+    /* Desktop: place infaq box to the right of the prayer widget */
+    @media (min-width: 601px) {
+      .today-row {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        gap: 20px;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      .today-row .today-container {
+        flex: 1 1 600px;
+        margin: 20px 0;
+      }
+
+      .today-row .infaq-section {
+        flex: 1 1 300px;
+        max-width: 320px;
+        margin: 20px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
     }
 
     /* Schedule section title */
@@ -290,7 +386,8 @@ h3 {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    th, td {
+    th,
+    td {
       padding: 12px;
       text-align: center;
       border: 1px solid #ddd;
@@ -340,11 +437,11 @@ h3 {
     }
 
     .mobile-day-header {
-  padding: 10px;
-  background-color: #e6ffe1;
-  border-bottom: 1px solid #eee;
-  text-align: center;
-}
+      padding: 10px;
+      background-color: #e6ffe1;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+    }
 
     .mobile-day-today {
       background-color: #27ae60;
@@ -355,16 +452,21 @@ h3 {
     }
 
     .mobile-day-date {
-  font-weight: 700;
-  font-size: 16px; /* Adjust font size as needed */
-  color: #2c3e50; /* Dark color for better readability */
-}
+      font-weight: 700;
+      font-size: 16px;
+      /* Adjust font size as needed */
+      color: #2c3e50;
+      /* Dark color for better readability */
+    }
 
     .mobile-day-gregorian {
-  font-size: 14px; /* Slightly smaller than the Hijri date */
-  color: #777; /* Lighter color for the Gregorian date */
-  margin-top: 3px; /* Add some spacing between the two lines */
-}
+      font-size: 14px;
+      /* Slightly smaller than the Hijri date */
+      color: #777;
+      /* Lighter color for the Gregorian date */
+      margin-top: 3px;
+      /* Add some spacing between the two lines */
+    }
 
     .mobile-day-times {
       display: grid;
@@ -392,20 +494,26 @@ h3 {
     }
 
     @media (max-width: 600px) {
-     h1 {
-    font-size: 25px; /* Slightly smaller for mobile */
-    padding: 0 15px; /* Adjust padding for mobile */
-  }
+      h1 {
+        font-size: 25px;
+        /* Slightly smaller for mobile */
+        padding: 0 15px;
+        /* Adjust padding for mobile */
+      }
 
-  h2 {
-    font-size: 20px; /* Slightly smaller for mobile */
-    padding: 20px 0px 0px 0px; /* Adjust padding for mobile */
-  }
+      h2 {
+        font-size: 20px;
+        /* Slightly smaller for mobile */
+        padding: 20px 0px 0px 0px;
+        /* Adjust padding for mobile */
+      }
 
-  h3 {
-    font-size: 16px; /* Slightly smaller for mobile */
-    padding: 0 15px; /* Adjust padding for mobile */
-  }
+      h3 {
+        font-size: 16px;
+        /* Slightly smaller for mobile */
+        padding: 0 15px;
+        /* Adjust padding for mobile */
+      }
 
       .infaq-button {
         padding: 10px 20px;
@@ -417,7 +525,8 @@ h3 {
         margin: 20px auto;
       }
 
-      th, td {
+      th,
+      td {
         padding: 8px 5px;
         font-size: 14px;
       }
@@ -439,6 +548,7 @@ h3 {
     }
   </style>
 </head>
+
 <body>
   <header>
     <!-- Logo -->
@@ -453,32 +563,47 @@ h3 {
           <option value="">Memuat...</option>
         </select>
         <button id="gps-btn" class="gps-btn" onclick="triggerGPSDetection()" title="Kesan lokasi automatik">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+          </svg>
           GPS
         </button>
       </div>
       <button id="share-btn" class="share-btn" onclick="shareLink()">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path
+            d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
+        </svg>
         Share info lokasi ini
       </button>
     </div>
   </header>
 
-  <!-- New container for the embedded prayer widget -->
-  <div class="today-container">
-    <div class="prayer-widget-embed">
-      <iframe id="prayerWidgetFrame" title="Waktu Solat" loading="lazy"></iframe>
+  <div class="today-row">
+    <!-- New container for the embedded prayer widget -->
+    <div class="today-container">
+      <div class="today-container-title">Info Hari Ini</div>
+      <div id="today-date-display" class="today-date-display"></div>
+      <div class="prayer-widget-embed">
+        <iframe id="prayerWidgetFrame" title="Waktu Solat" loading="lazy"></iframe>
+      </div>
     </div>
-  </div>
 
-  <!-- Infaq & Wakaf Section -->
-  <div class="infaq-section">
-    <div class="infaq-description">
-      Jom berinfaq untuk Masjid Al-Mukhlisin, Taman Jaya 6 (MAMTJ6), Temerloh, Pahang Darul Makmur.
+    <!-- Infaq & Wakaf Section -->
+    <div class="infaq-section">
+      <div class="infaq-description">
+        Ingin menyumbang kepada masjid? Imbas QR atau lawati Infaq Center kami.
+      </div>
+      <img class="infaq-qr" src="https://quickchart.io/qr?size=600&dark=ee3167&ecLevel=H&centerImageSizeRatio=0.15&text=00020201021126580014A000000615000101065887340212MBBQR1865093031000000000005204000053034585802MY5920MASJID%20AL-MUKHLISIN%206006PAHANG6304F062&centerImageUrl=https://dev.mamtj6.com/media/logo-mamtj6/PNG/mamtj6_single.png" alt="QR Kod DuitNow Infaq MAMTJ6" loading="lazy">
+      <a href="https://infaq.mamtj6.com/" class="infaq-button">
+        MAMTJ6 Infaq Center
+        <span class="infaq-button-subtitle">Klik Di Sini &middot; Jazakumullah Khairan</span>
+      </a>
+      <div class="infaq-trust">
+        Disahkan oleh Masjid Al-Mukhlisin Taman Jaya 6 (MAMTJ6) &middot; DuitNow QR
+      </div>
     </div>
-    <a href="https://infaq.mamtj6.com/" class="infaq-button">
-      Jom Berinfaq
-    </a>
   </div>
 
   <!-- Schedule Section Title -->
@@ -508,8 +633,10 @@ h3 {
   </div>
 
   <footer>
-    <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> melalui <a href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
-    <p>&copy; 2026 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="info.html">Maklumat</a> | <a href="https://wa.me/601156828198">Hubungi Kami</a></p>
+    <p>Data dalam jadual ini diperolehi dari <a href="https://www.e-solat.gov.my/">JAKIM</a> melalui <a
+        href="https://api.waktusolat.app/">Waktu Solat API</a> </p>
+    <p>&copy; 2026 <a href="https://mamtj6.com">MAMTJ6</a> | <a href="info.html">Maklumat</a> | <a
+        href="https://wa.me/601156828198">Hubungi Kami</a></p>
   </footer>
 
   <script>
@@ -642,7 +769,7 @@ h3 {
         updatePrayerWidgetFrame(savedZone);
 
         // Add change event listener
-        select.addEventListener('change', function() {
+        select.addEventListener('change', function () {
           saveZone(this.value);
           updateZoneHeader(cachedZones.find(z => z.jakimCode === this.value));
           updatePrayerWidgetFrame(this.value);
@@ -650,7 +777,7 @@ h3 {
         });
 
         // On focus (dropdown opens): show full details for all options
-        select.addEventListener('focus', function() {
+        select.addEventListener('focus', function () {
           Array.from(this.options).forEach(opt => {
             if (opt.dataset.full) {
               opt.textContent = opt.dataset.full;
@@ -659,7 +786,7 @@ h3 {
         });
 
         // On blur (dropdown closes): compact the selected option
-        select.addEventListener('blur', function() {
+        select.addEventListener('blur', function () {
           Array.from(this.options).forEach(opt => {
             if (opt.dataset.full) {
               opt.textContent = opt.selected ? opt.value : opt.dataset.full;
@@ -681,6 +808,7 @@ h3 {
       const url = new URL('simple.html', window.location.href);
       url.searchParams.set('embed', '1');
       url.searchParams.set('selector', 'hide');
+      url.searchParams.set('date', 'hide');
       url.searchParams.set('zone', zoneCode);
       const testTime = params.get('testTime');
       if (testTime) url.searchParams.set('testTime', testTime);
@@ -751,6 +879,11 @@ h3 {
       return `${parseInt(dayStr)} ${hijriMonths[monthIndex] || monthStr}`;
     }
 
+    // Get the Hijri year from a "YYYY-MM-DD" string
+    function getHijriYear(hijri) {
+      return parseInt(hijri.split('-')[0]);
+    }
+
     // Fetch data from API and populate the table
     async function fetchData() {
       const zone = getSavedZone();
@@ -770,7 +903,7 @@ h3 {
         const currentData = await currentResponse.json();
 
         // Tag each prayer with its month and year for date comparisons
-        const currentPrayers = currentData.prayers.map(p => ({...p, month, year}));
+        const currentPrayers = currentData.prayers.map(p => ({ ...p, month, year }));
 
         if (currentPrayers.length === 0) {
           throw new Error("Prayer data not found");
@@ -817,7 +950,13 @@ h3 {
           const isCurrentDay = isToday(prayer.day, prayer.month, prayer.year);
 
           const tr = document.createElement("tr");
-          if (isCurrentDay) tr.classList.add("today");
+          if (isCurrentDay) {
+            tr.classList.add("today");
+            const todayDateDisplay = document.getElementById('today-date-display');
+            if (todayDateDisplay) {
+              todayDateDisplay.textContent = `${dayOfWeek}, ${gregorianDate} ${prayer.year} / ${hijriFormatted} ${getHijriYear(prayer.hijri)}H`;
+            }
+          }
 
           tr.innerHTML = `
             <td>${hijriFormatted} / ${gregorianDate} (${dayOfWeek})</td>

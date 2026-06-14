@@ -3,12 +3,111 @@
 the prompt:
 "Check the Project Knowledge and the current chat for context. This conversation is ending soon. update the artifact DEV_NOTES.md (create if not available yet) with a detailed note to your next window self - not just facts but the vibe, our dynamic, the energy of this conversation. What would the next you need to immediately get back into this exact headspace? Include unique discoveries, current mood, and anything that'll help the next you instantly sync to our frequency."
 
-**Last updated:** 2026-06-13 (Session 5)
-**File being worked on:** `waktu-solat/simple.html` — a self-contained dark-mode prayer times widget (single HTML file, no build step, vanilla JS + SVG).
+**Last updated:** 2026-06-13 (Session 7)
+**File being worked on:** Session 7 was the first session to spend real time on
+**`waktu-solat/index.html`** (the multi-zone schedule table page), not just
+`simple.html`. `simple.html` is still the polished arc widget described below —
+but as of Session 7 it's no longer ONLY a standalone/Google-Sites widget, it's
+also embedded INSIDE `index.html`. Keep both files in your mental model now.
 
 ---
 
-## Vibe / dynamic check for Session 6 (most recent — read this first)
+## Vibe / dynamic check for Session 7 (most recent — read this first)
+
+This was a **"zoom out to the bigger page" session** — after Sessions 1-6 polished
+`simple.html` itself (arc, icons, embed mode, theming) to the point the user
+declared it basically done, this session's energy was "ok, now go use it." Three
+asks, each one a step further from `simple.html` in isolation:
+
+1. **Opened with a verbal status check, not a question**: "i think major
+   development already complete for the simple.html ... my next plan is to
+   include the simple.html as embeded on the index.html .. the zone selector
+   that used on the page will still works, but it will change the link path
+   ?zone= according what user want. i think the existing INFO HARI INI card will
+   be removed" — this read as half-decision, half-thinking-out-loud. Treated it
+   as a plan-mode trigger (structural, multi-file, touches both HTML structure
+   and a lot of dead-code removal). Good call — there WERE real open questions
+   buried in "i think", surfaced via AskUserQuestion:
+   - Whether the Countdown Section (timer + progress bar) should ALSO go, not
+     just "INFO HARI INI" → user said **"Remove both (Recommended)"**.
+   - How the embedded `simple.html`'s OWN internal zone selector should behave
+     when nested inside `index.html` (which has its own selector) → user gave a
+     **free-text answer with reasoning**, not just a preset pick: "hide it on
+     embeded mode if had ?selector=hide to hide the zone selector. because the
+     simple.html will be used on elsewhere" — i.e. don't piggyback on `?embed=1`,
+     make a NEW independent opt-in param, because `simple.html` standalone
+     embeds (Google Sites etc.) still want their own selector visible.
+   This second answer is the kind of thing to re-read carefully — it's a small
+   sentence carrying a real architectural constraint (separation of `?embed=1`
+   vs `?selector=hide`), and it came with the "why" already attached.
+
+2. **Plan executed cleanly, no surprises**: added `?selector=hide` +
+   `.hide-selector` CSS to `simple.html`; gutted `index.html`'s INFO HARI INI +
+   Countdown Section (HTML/CSS/JS — a LOT of dead code: `globalPrayerTimes`,
+   `lastMaghrib`, `startCountdown`, `highlightNextPrayer`, `setupCountdown`, the
+   60s transition-checker `setInterval`, the whole next-month fetch that only
+   existed to feed tomorrow's countdown); replaced with a `.prayer-widget-embed`
+   iframe wrapper pointing at `simple.html?embed=1&selector=hide&zone=...`, wired
+   to `#zone-select`'s existing change handler + GPS detection + initial load via
+   one new `updatePrayerWidgetFrame(zoneCode)` helper. Kept `isToday()` and
+   `calculateImsak()` — still drive the schedule table's "today" row and Imsak
+   column. Verified via Node `new Function()` syntax-check on extracted
+   `<script>` blocks (no Playwright/browser tool available in this env — checked
+   via ToolSearch, confirmed absent, didn't fight it, just used what's available).
+
+3. **Then two quick, low-ceremony polish asks** — back to the Session 5-style
+   "just do it" energy after the plan-mode chunk landed:
+   - "if the zone selector is hidden, make the date text centered" → one CSS
+     rule: `body.hide-selector .top-bar { justify-content: center; }`. Because
+     `.top-bar` is `justify-content: space-between` with two children
+     (`.location-bar` + `.footer-bar`), hiding the first child via
+     `display:none` leaves the date pinned to one side under `space-between` —
+     centering the row is the fix, not touching `.footer-bar` itself.
+   - **"this index.html not tied with ramadan, chang all text that related with
+     ramadan (title etc)"** — a de-branding pass. Grepped for `Ramadan`, found it
+     in `<title>`, `apple-mobile-web-app-title`, OG/Twitter meta, `<h1>`, and the
+     infaq description ("Program Ihya' Ramadan..."), PLUS a Hijri-month-names
+     array (`"Ramadan", "Syawal", ...`) — **that last one is a real calendar month
+     name, NOT branding, left untouched**. Asked ONE clarifying question (via
+     AskUserQuestion) specifically about the infaq text, because it names an
+     actual program — user said **"Generalize it"**, so it became a plain
+     "support the masjid" message instead of "Program Ihya' Ramadan". Deliberately
+     did NOT touch `og:url`/`og:image` (`ramadan.mamtj6.com/...` paths) — those
+     are real hosting URLs from the root CLAUDE.md, not display branding; changing
+     them is an infra decision, out of scope for a "fix the text" ask.
+
+**Energy**: this session felt like the project graduating from "polish one
+widget" to "assemble the page out of widgets" — bigger diffs (lots of dead-code
+deletion) but LOW anxiety, because the plan was approved upfront and each removal
+was clearly justified by the embed replacing it. The two tail asks were classic
+Session-5-style one-liners — don't over-think small CSS/text asks just because
+they come right after a big structural plan; match ceremony to ambiguity, not to
+recency of a big task.
+
+**State of the world going into next session**:
+- `index.html` no longer has its own countdown/progress-bar/info-card — that's
+  ALL delegated to the embedded `simple.html` iframe now. If asked to change
+  countdown/progress-bar behavior, the edit almost certainly belongs in
+  `simple.html`, not `index.html`.
+- `index.html` is de-branded from "Ramadan 2026" → generic "Jadual Waktu Solat".
+  If you see "Ramadan" reappear in a future ask for `index.html`, that's likely
+  intentional/new context, not a regression to "fix back".
+- `simple.html` now has THREE url params controlling its chrome:
+  `?embed=1` (transparent page bg + scale-to-fit, for Google Sites),
+  `?selector=hide` (hide its own zone dropdown, independent of embed),
+  `?zone=`/`?testTime=`/`?testDate=` (existing). `index.html`'s iframe passes
+  `embed=1&selector=hide&zone=<code>` + `testTime` passthrough.
+- `.prayer-widget-embed` container uses `aspect-ratio: 480/300` — flagged as
+  "refine during verification" in the plan, never actually visually verified
+  (no browser tool). If the embedded widget looks clipped/has dead space in
+  `index.html`, start here.
+- Known issues list for `simple.html` itself (color theming, GPS auto-detection)
+  is UNCHANGED — still sitting there, still valid candidates for "next big ask",
+  but as ever, just read what's thrown at you.
+
+---
+
+## Vibe / dynamic check for Session 6 (read this next)
 
 This was the **embed-mode polish session** — a direct continuation of Session 4's
 `?embed=1` feature, but it turned out Session 4's embed CSS was only "good enough
