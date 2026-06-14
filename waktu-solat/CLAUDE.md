@@ -19,7 +19,7 @@ Three entry points:
 ```
 index.html    ← main schedule + infaq page (entry point)
 info.html     ← documentation / info page
-simple.html   ← embeddable SVG-arc countdown widget
+widget.html   ← embeddable SVG-arc countdown widget
 ```
 
 ### `index.html` — main schedule + infaq page
@@ -29,9 +29,9 @@ simple.html   ← embeddable SVG-arc countdown widget
 - **GPS detection**: auto-runs on first visit (no saved zone), plus a manual
   📍 GPS button
 - **Share button**: copies/shares `?location={zone}` URL with zone info
-- **"Info Hari Ini"**: iframes `simple.html` via `updatePrayerWidgetFrame()`
+- **"Info Hari Ini"**: iframes `widget.html` via `updatePrayerWidgetFrame()`
   with `?embed=1&selector=hide&date=hide&zone={zone}` (+ `testTime` passthrough)
-  — the countdown/progress-bar UI itself lives entirely in `simple.html`, not here
+  — the countdown/progress-bar UI itself lives entirely in `widget.html`, not here
 - **Infaq & Wakaf**: DuitNow QR (QuickChart.io, desktop) / button (mobile) —
   "Variation C" low-pressure redesign from Session 8, `@media (min-width: 601px)` split
 - **Schedule tables**: desktop table + mobile cards, today-row highlight,
@@ -60,7 +60,7 @@ Sections with shareable anchors (`info.html#section`):
 Deliberately untouched during de-branding: Imsak/Subuh/Berbuka terminology
 (core feature labels, not branding) and `og:image`/`og:url` (live hosting paths).
 
-### `simple.html` — embeddable SVG-arc widget
+### `widget.html` — embeddable SVG-arc widget
 
 The most actively developed file. For implementation detail, animation
 internals, and session-by-session decision history, **read `DEV_NOTES.md`
@@ -109,7 +109,7 @@ only, not in use.
 
 ### `test/`
 
-`embed_test.html` — legitimate iframe-embed test harness for `simple.html`
+`embed_test.html` — legitimate iframe-embed test harness for `widget.html`
 (deliberately small iframe to verify scale-to-fit). `test_file.html` is an
 unrelated leftover (a "Mimbar Jumaat" sermon display page) — flag as
 out-of-place but don't remove without asking.
@@ -124,7 +124,7 @@ python -m http.server
 
 JSON fetches require an HTTP server (CORS) — `file://` won't work.
 
-**Test parameters** (work across `index.html` and `simple.html`):
+**Test parameters** (work across `index.html` and `widget.html`):
 - `?location=` / `?zone=` — specific zone
 - `?testDate=YYYY-MM-DD` — simulate date
 - `?testTime=HH:MM` — simulate time (ticks forward live)
@@ -133,8 +133,8 @@ JSON fetches require an HTTP server (CORS) — `file://` won't work.
 
 | Service | URL | Used by |
 |---|---|---|
-| Zones list | `api.waktusolat.app/zones` | `index.html`, `simple.html` |
-| Prayer times | `api.waktusolat.app/v2/solat/{zone}?year=&month=` | `index.html`, `simple.html` |
+| Zones list | `api.waktusolat.app/zones` | `index.html`, `widget.html` |
+| Prayer times | `api.waktusolat.app/v2/solat/{zone}?year=&month=` | `index.html`, `widget.html` |
 | GPS zone lookup | `api.waktusolat.app/v2/solat/gps/{lat}/{long}` | `index.html` |
 | DuitNow QR | `quickchart.io/qr` | `index.html` (infaq) |
 | MST SIRIM | `mst.sirim.my/widget` | `info.html` |
@@ -142,9 +142,9 @@ JSON fetches require an HTTP server (CORS) — `file://` won't work.
 
 ## Other docs in this folder
 
-- **`DEV_NOTES.md`** — session handoff log for `simple.html` (the "read this
-  first" doc for picking up `simple.html` work)
-- **`gsites_embeded_guide.md`** — embed-mode reference for `simple.html`
+- **`DEV_NOTES.md`** — session handoff log for `widget.html` (the "read this
+  first" doc for picking up `widget.html` work)
+- **`gsites_embeded_guide.md`** — embed-mode reference for `widget.html`
   (scale-to-fit algorithm, Google Sites pattern)
 - **`developer.md`** / **`README.md`** — currently describe the OLD
   jadual-waktu-era app and are stale (same issue this CLAUDE.md just had).
@@ -153,7 +153,7 @@ JSON fetches require an HTTP server (CORS) — `file://` won't work.
 ## Known issues
 
 - Color theming — arc is white-on-dark only; no light variant
-- GPS auto-detection in `simple.html` not implemented (only in `index.html`)
+- GPS auto-detection in `widget.html` not implemented (only in `index.html`)
 - `sw.js` `CACHE_NAME` and `vercel.json`/`developer.md`/`README.md` still
   carry "ramadan"/jadual-waktu naming from before the de-branding pass —
   cosmetic, not functional, but worth cleaning up eventually

@@ -800,12 +800,12 @@
       }
     }
 
-    // Build/update the embedded simple.html widget's iframe src for the given zone
+    // Build/update the embedded widget.html widget's iframe src for the given zone
     function updatePrayerWidgetFrame(zoneCode) {
       const frame = document.getElementById('prayerWidgetFrame');
       if (!frame) return;
       const params = new URLSearchParams(window.location.search);
-      const url = new URL('simple.html', window.location.href);
+      const url = new URL('widget.html', window.location.href);
       url.searchParams.set('embed', '1');
       url.searchParams.set('selector', 'hide');
       url.searchParams.set('date', 'hide');

@@ -1,6 +1,6 @@
 # Embedding widgets into Google Sites (iframe) — Guide
 
-Notes from getting `simple.html`'s `?embed=1` mode to work correctly inside a Google
+Notes from getting `widget.html`'s `?embed=1` mode to work correctly inside a Google
 Sites embed (`<iframe>`), referencing the existing pattern in `test_file.html`.
 
 ## 1. Why Google Sites embedding is tricky
@@ -148,7 +148,7 @@ This works there because:
 - `transform-origin: center center` + `body { display:flex; justify-content:center; align-items:center; }`
   is the *desired* look — a centered poster on a signage display.
 
-`simple.html`'s widget instead needs to **fill** the iframe width responsively
+`widget.html`'s widget instead needs to **fill** the iframe width responsively
 (it's a content widget, not a fixed poster), which is why it needs the more
 involved iterative widen-then-scale + top-left-anchor approach.
 

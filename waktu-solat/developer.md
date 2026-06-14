@@ -1,383 +1,414 @@
-# Developer Guide
+# Developer Guide — waktu-solat
 
-**Version:** 1.5.4
+Technical reference for the `waktu-solat/` prayer times suite. Year-round
+(not Ramadan-specific), three static entry points, no build step.
 
-Technical documentation for the Jadual Waktu Ramadan 2026 application.
+For session-by-session implementation history of `widget.html` (arc
+geometry decisions, animation iterations, embed-mode debugging), see
+`DEV_NOTES.md`. For the high-level architecture map, see `CLAUDE.md`. This
+file is the function/API/CSS reference for all three pages.
 
 ## File Structure
 
 ```
-jadual-waktu/
-├── index.html     # Main application (single-file)
-├── info.html      # Information/documentation page
-├── CLAUDE.md      # Claude Code instructions
-├── README.md      # User documentation (Malay)
-└── developer.md   # This file
+waktu-solat/
+├── index.html               # Main schedule + infaq page (entry point)
+├── info.html                # Documentation / info page
+├── widget.html               # Embeddable SVG-arc countdown widget
+├── sw.js                     # Service worker (cache-first)
+├── vercel.json                # Deployment rewrites
+├── site.webmanifest           # PWA manifest
+├── archive/
+│   └── widget.html          # Old pre-SVG-arc widget (historical, unused)
+├── test/
+│   ├── embed_test.html      # Iframe embed test harness for widget.html
+│   └── test_file.html       # Unrelated "Mimbar Jumaat" leftover
+├── CLAUDE.md                  # Architecture map (Claude Code instructions)
+├── DEV_NOTES.md               # Session handoff log for widget.html
+├── gsites_embeded_guide.md    # Embed-mode / Google Sites reference
+├── README.md                  # User-facing documentation (Malay)
+└── developer.md               # This file
 ```
 
 ## Pages
 
-### index.html (Main Application)
-- Prayer times display with countdown
-- Zone selector with 61 zones
-- Desktop table and mobile card views
-- Share functionality
+### `index.html` — main schedule + infaq page
 
-### info.html (Information Page)
-- Project information and CSR details
-- Data source documentation
-- Time accuracy reminder with MST SIRIM widget
-- Infaq & Wakaf section
-- Anchor links for sharing specific sections
+- **Zone selector** (`#zone-select`) — 61 zones grouped by state, compact
+  text when closed (`Negeri - KOD`), full detail (`KOD — daerah`) on focus
+- **GPS detection** — auto-runs on first visit when no zone is saved, plus
+  a manual 📍 GPS button (`#gps-btn`)
+- **Share button** (`#share-btn`) — shares/copies `?location={zone}` URL
+  with zone info (state, zone code, district)
+- **"Info Hari Ini"** (`.today-container`) — embeds `widget.html` via an
+  iframe (`#prayerWidgetFrame`), built by `updatePrayerWidgetFrame()`. All
+  countdown/progress-arc UI lives in `widget.html`, not here
+- **Infaq & Wakaf** (`.infaq-section`) — DuitNow QR (QuickChart.io, desktop
+  only via `@media (min-width: 601px)`) + donation button linking to
+  `infaq.mamtj6.com`
+- **Schedule tables** — desktop table (`#desktop-schedule-table`) + mobile
+  cards (`#mobile-schedule-table`), today-row highlight, midnight
+  auto-refresh via `scheduleMiddnightRefresh()`
+- **PWA** — registers `/jadual-waktu/sw.js`, shows an update toast on new
+  service-worker versions
+
+~1240 lines.
+
+### `info.html` — documentation page
+
+De-branded (Session 8) from "Ramadan 2026" to generic "Jadual Waktu Solat".
+Sections with shareable anchors (`info.html#section`):
+
+| Anchor | Section | Summary |
+|---|---|---|
+| `#tentang` | Tentang Projek | CSR project overview, feature list |
+| `#sumber` | Sumber Data | JAKIM / Waktu Solat API credits |
+| `#data` | Ketepatan Data | Accuracy disclaimers, verify with local mosque |
+| `#waktu` | Peringatan Ketepatan Waktu | MST SIRIM widget (iframe), device time-sync tips |
+| `#pwa` | Pasang Sebagai Aplikasi (PWA) | Android/iOS/Desktop install guides, offline app-shell note |
+| `#infaq` | Infaq & Wakaf | Link to `infaq.mamtj6.com` |
+| `#berkaitan` | Pautan Berkaitan | External links + contact |
+
+Deliberately untouched during de-branding: Imsak/Subuh/Berbuka terminology
+(core feature labels, not branding), and `og:image`/`og:url` (live hosting
+paths under `/info/jadual/`, infra not display).
+
+~526 lines.
+
+### `widget.html` — embeddable SVG-arc widget
+
+The most actively developed file — see `DEV_NOTES.md` for deep
+implementation history. Functional summary:
+
+- SVG quadratic-bezier arc spanning Subuh → Isyak, with 6 prayer dots
+  (Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak) plus a label-only "Waktu
+  Duha" virtual period (28 min after Syuruk to 10 min before Zohor)
+- Top bar: zone selector (left, same grouped-dropdown pattern as
+  `index.html`) + Gregorian/Hijri date (right)
+- Live countdown + info bar (current/next prayer, each with a Material
+  Symbols icon from `PRAYER_ICONS`)
+- Progress arc grows from Subuh to "now", with a glowing progress-tip dot
+- Pulse animations: current-prayer dot gets a gold ripple ring
+  (`#pulseRing`); in the last 10 minutes before the next prayer, the
+  countdown turns `--error` red and opacity-pulses (`.warning` /
+  `pulse-warning` keyframes), and the next-prayer dot gets a red ripple
+  ring (`#pulseRingNext`) while the current dot's gold ring hides
+- Responsive: `@media (max-width: 360px)` compact layout, plus
+  `body.large-viewport` (≥768×480) for scale-up on desktop/signage
+- Light/dark theming via CSS variables, `?mode=dark` forces dark
+
+~1047 lines. No OG tags (not a share target — used in iframes/embeds).
 
 ## API Endpoints
 
-### Zones List
-```
-GET https://api.waktusolat.app/zones
-```
+| Service | URL | Used by |
+|---|---|---|
+| Zones list | `https://api.waktusolat.app/zones` | `index.html`, `widget.html` |
+| Prayer times | `https://api.waktusolat.app/v2/solat/{zone}?year={year}&month={month}` | `index.html`, `widget.html` |
+| GPS zone lookup | `https://api.waktusolat.app/v2/solat/gps/{lat}/{long}` | `index.html` |
+| DuitNow QR | `https://quickchart.io/qr/...` | `index.html` (infaq) |
+| MST SIRIM widget | `https://mst.sirim.my/widget` | `info.html` |
+| Infaq portal | `https://infaq.mamtj6.com/` | `index.html`, `info.html` |
 
-Response structure:
+### Zones list response
+
 ```json
 [
-  {
-    "jakimCode": "PHG03",
-    "negeri": "Pahang",
-    "daerah": "Jerantut, Temerloh, Maran..."
-  }
+  { "jakimCode": "PHG03", "negeri": "Pahang", "daerah": "Jerantut, Temerloh, Maran..." }
 ]
 ```
 
-### Prayer Times
-```
-GET https://api.waktusolat.app/v2/solat/{zone}?year={year}&month={month}
-```
+Field names are `jakimCode` / `negeri` / `daerah` — **not** `state` or
+`zone` (those return `undefined`).
 
-Example: `https://api.waktusolat.app/v2/solat/PHG03?year=2026&month=2`
+### Prayer times response
 
-Response structure:
 ```json
 {
   "prayers": [
+    { "day": 19, "hijri": "1447-09-01", "fajr": 1740009600, "syuruk": ..., "dhuhr": ..., "asr": ..., "maghrib": 1740052800, "isha": ... }
+  ]
+}
+```
+
+`hijri` is `"YYYY-MM-DD"` — used directly for Hijri date display (see
+"Arc Geometry & Widget Internals" below), no extra fetch needed.
+
+Example: `https://api.waktusolat.app/v2/solat/PHG03?year=2026&month=2`
+
+## Key Functions — `index.html`
+
+| Function | Purpose |
+|---|---|
+| `getSavedZone()` | Reads `?location=` → `localStorage('selectedZone')` → defaults `PHG03` |
+| `saveZone(zoneCode)` | Saves to localStorage, updates URL via `history.replaceState()` |
+| `loadZones()` | Fetches zones API, groups by state, populates dropdown (focus/blur compact-full swap) |
+| `fetchData()` | Fetches current month's prayer times, renders desktop table + mobile cards |
+| `shareLink()` | `navigator.share()` on mobile / clipboard fallback on desktop; includes zone info |
+| `detectZoneByGPS()` | `navigator.geolocation` → GPS zone-lookup API, returns zone code or null |
+| `triggerGPSDetection()` | Manual GPS button handler — `.loading` pulse, re-detects, reloads data |
+| `updatePrayerWidgetFrame(zoneCode)` | Builds `#prayerWidgetFrame` iframe `src`: `widget.html?embed=1&selector=hide&date=hide&zone={zone}` (+ `testTime` passthrough) |
+| `showSimpleToast(message, type)` | Self-dismissing (3s) toast; `type='error'` → red |
+| `isToday(day, month, year)` | Checks date against `getTestDate()` |
+| `calculateImsak(fajrTimestamp)` | Returns `fajrTimestamp - 600` (10 min before Subuh) |
+| `getDayOfWeek(timestamp)` | Malay day name |
+| `formatTime(timestamp)` | 12-hour AM/PM format |
+| `formatMalayDate(day, month)` | e.g. `"19 Feb"` |
+| `formatHijri(hijri)` | Parses `"YYYY-MM-DD"` → `"DD MonthName"` |
+| `getHijriYear(hijri)` | Extracts Hijri year |
+| `getTestDate()` | Reads `?testDate=`/`?testTime=`, returns `Date` |
+| `getNow()` | `Date.now() + timeOffset` |
+| `scheduleMiddnightRefresh()` | Auto-calls `fetchData()` at 00:00:05, reschedules recursively |
+
+## Arc Geometry & Widget Internals — `widget.html`
+
+### Arc geometry constants
+
+```js
+const ARC_W      = 360;      // SVG coordinate width
+const ARC_PAD_X  = 20;
+const DOT_PAD_X  = ARC_PAD_X; // = 20
+const ARC_TOP_Y  = 14;
+const ARC_BOT_Y  = 70;
+const CTRL_Y     = 2 * ARC_TOP_Y - ARC_BOT_Y; // = -42
+const VIEW_H     = 120;
+```
+
+Arc path: `M 20,70 Q 180,-42 340,70`.
+
+**Critical invariant:** `CTRL_Y = 2*ARC_TOP_Y - ARC_BOT_Y` must hold so
+`arcY(x)` matches the actual bezier path.
+
+### PRAYER_ICONS (Material Symbols Rounded)
+
+```js
+const PRAYER_ICONS = {
+  Subuh:   'wb_twilight_2',
+  Syuruk:  'wb_twilight',
+  Duha:    'wb_twilight',
+  Zohor:   'sunny',
+  Asar:    'partly_cloudy_day',
+  Maghrib: 'wb_twilight',
+  Isyak:   'bedtime',
+};
+```
+
+### HIJRI_MONTH_NAMES
+
+Lookup keyed `'01'`–`'12'` (Muharram…Zulhijjah). Combined with the API's
+`todayPrayer.hijri` field to render e.g. `"Khamis, 11 Jun 2026 / 15
+Zulhijjah 1447H"` — no extra API call needed.
+
+### 10-minute warning system
+
+When `diff <= 10*60*1000` (10 min to next prayer), `tick()` sets
+`isWarning = true` each second:
+
+- `#countdown` gets `.warning` → `color: var(--error)` +
+  `@keyframes pulse-warning` (opacity 1 ↔ 0.4, 1s loop). No size/scale
+  change.
+- `#pulseRingNext` (next-prayer dot, red/`--error` ripple) becomes visible.
+- `#pulseRing` (current-prayer dot, gold ripple) hides — focus shifts to
+  the upcoming prayer.
+
+### Key functions
+
+| Function | Purpose |
+|---|---|
+| `timeToX(tsMs)` | Maps prayer Unix-ms timestamp → SVG x |
+| `arcY(x)` | Maps SVG x → y on the bezier arc |
+| `arcPointAtT(rawT)` | Returns `{x, y}` on the arc at progress `t ∈ [0,1]` |
+| `progressArcPath(t)` | de Casteljau bezier split; SVG path for elapsed portion |
+| `buildArcSvg()` | Builds the full SVG; returns `{ svg, currentIdx, displayCurrentIdx, nextIdx }` |
+| `renderArc()` | Inserts SVG, starts pulse + countdown `tick()`, sets icons/labels |
+| `tick()` | Per-second: updates countdown, warning flags, progress arc + tip |
+| `startPulseAnimation()` | rAF loop animating `#pulseRing`/`#pulseRingNext` `r`/`opacity` |
+| `getNow()` | `Date.now() + timeOffset` |
+| `fmt24(tsMs)` | Formats Unix ms → `HH:MM` (24h) |
+| `sizeSelect()` | Canvas-measures dropdown text, resizes `#zoneSelect` (+32px padding) |
+| `loadZones()` | Fetches zones API, builds grouped dropdown (same pattern as `index.html`) |
+| `getSavedZone()` | Reads `?zone=` → `localStorage('selectedZone')` → `PHG03` |
+| `saveZone(code)` | Saves to localStorage + updates `?zone=` in URL (no reload) |
+| `fetchPrayerTimes()` | Fetches API data, computes `duhaStart`/`duhaEnd`, builds date text |
+| `scaleWidgetToFit()` | Scales `.widget` via `transform: scale()` to fit viewport — shrink (embed) or grow up to `MAX_SCALE=3` (large viewport) |
+| `updateViewportMode()` | Toggles `body.large-viewport` when width ≥768px and height ≥480px |
+| `initEmbedMode()` | Sets `body.embed-mode` if `?embed=1` |
+| `initSelectorMode()` | Sets `body.hide-selector` if `?selector=hide` |
+| `initDateMode()` | Sets `body.hide-date` if `?date=hide` |
+| `initThemeMode()` | Sets `body.dark-mode` if `?mode=dark` |
+| `initTestTime()` | Reads `?testTime=`/`?testDate=`, sets `timeOffset` |
+| `svgEl(tag)` | `document.createElementNS(SVG_NS, tag)` helper |
+| `themeColor(triplet, alpha)` | `rgba(triplet, alpha)` helper |
+
+### Data structures
+
+```js
+prayerList = []        // [{ name, ts }] for Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak (Unix ms)
+tomorrowFajr           // Unix ms — tomorrow's Subuh, used post-Isyak
+duhaStart, duhaEnd      // Unix ms — Syuruk+28min to Dhuhr-10min, label-only
+```
+
+### Current visual spec
+
+| Layer | stroke | stroke-width | opacity |
+|---|---|---|---|
+| Background arc (full) | white | 2 | 0.15 |
+| Progress arc (elapsed) | white | 4 | 0.85 |
+| Current dot | white | 2.5 | fill = card bg |
+| Pulse ring (current) | gold | 1.5 | 0.7→0 animated |
+| Pulse ring (next, warning) | error red | 1.5 | 0.7→0 animated |
+| Past dot | white | 1.5 | fill 0.15, stroke 0.4 |
+| Next dot | white | 1.5 | fill 0.95 |
+| Future dot | white | 1.5 | fill 0.5 |
+
+Label offsets: `timeOffset = r + 13`, `nameOffset = timeOffset + 11`.
+
+### Color theme variables
+
+- Light (default): `--bg: #f3f7f5`, `--card-bg: #ffffff`, `--ink: 16,61,41`
+- Dark (`?mode=dark` or `prefers-color-scheme`): `--bg: #0d1117`,
+  `--card-bg: #161b22`, `--ink: 255,255,255`
+- Accent gold: `245,166,35`; `--error`: `220,38,38` (light) /
+  `255,80,80` (dark)
+- Alpha tiers: `a15`…`a95` (per-theme contrast adjustments)
+
+## URL Parameters
+
+### `index.html`
+
+| Parameter | Example | Description |
+|---|---|---|
+| `location` | `?location=JHR01` | Load specific zone |
+| `testDate` | `?testDate=2026-02-20` | Simulate date |
+| `testTime` | `?testTime=18:30` | Simulate time (ticks forward live) |
+
+Combine: `?location=JHR01&testDate=2026-02-20&testTime=12:00`
+
+### `widget.html`
+
+| Parameter | Example | Description |
+|---|---|---|
+| `zone` | `?zone=JHR01` | Zone code (checked before localStorage) |
+| `embed` | `?embed=1` | Transparent page bg, scale-to-fit for iframes |
+| `selector` | `?selector=hide` | Hide zone dropdown (independent of `embed`) |
+| `date` | `?date=hide` | Hide footer date bar |
+| `mode` | `?mode=dark` | Force dark theme |
+| `testDate` | `?testDate=2026-02-20` | Simulate date |
+| `testTime` | `?testTime=18:30` | Simulate time |
+
+`index.html` builds its embed iframe `src` as:
+`widget.html?embed=1&selector=hide&date=hide&zone={zone}` (+ `testTime`
+passthrough).
+
+**Gotcha**: `&embed=1`, not `&?embed=1` — a stray second `?` makes `?embed`
+part of the param name, so `params.get('embed')` returns `null`.
+
+For standalone embedding (Google Sites etc.), see
+`gsites_embeded_guide.md`.
+
+## localStorage Keys
+
+| Key | Value | Used by |
+|---|---|---|
+| `selectedZone` | Zone code, e.g. `"PHG03"` | `index.html`, `widget.html` |
+
+## Service Worker (`sw.js`)
+
+- `CACHE_NAME = mamtj6-jadual-waktu-ramadan-v1.6.4` (legacy naming, see
+  Known Issues)
+- Cache-first strategy; old caches matching the
+  `mamtj6-jadual-waktu-ramadan-` prefix purged on activate
+- Precaches the app shell only: `./`, `index.html`, `info.html`, favicons,
+  manifest, and external logo/background assets
+- Prayer data from the API is **never** cached — always fetched fresh
+- **When changing any cached file, bump `CACHE_NAME`** and hard-refresh
+  (`Ctrl+Shift+R`) to verify
+
+## `vercel.json`
+
+```json
+{
+  "rewrites": [
     {
-      "day": 19,
-      "hijri": "1447-09-01",
-      "fajr": 1740009600,
-      "maghrib": 1740052800
+      "source": "/",
+      "has": [{ "type": "query", "key": "location" }],
+      "destination": "/api/og"
     }
   ]
 }
 ```
 
-## Key Functions
+Rewrites `/` → `/api/og` when `?location=` is present, in preparation for
+dynamic OG-image generation (backend not yet implemented).
 
-### Zone Management
+## CSS Class Reference
 
-```javascript
-// Get saved zone from URL, localStorage, or default
-getSavedZone() // Returns: "PHG03" (default)
+### `index.html`
 
-// Save zone to localStorage and update URL
-saveZone(zoneCode)
+- `.zone-selector`, `.zone-row` — zone selector layout
+- `#zone-select` — zone dropdown
+- `.gps-btn`, `.gps-btn.loading` — GPS button + pulse animation
+- `.share-btn` — share button (pill)
+- `.today-container` — "Info Hari Ini" container
+- `.prayer-widget-embed` — iframe wrapper for `widget.html` (aspect-ratio
+  `550/300`)
+- `.infaq-section`, `.infaq-qr`, `.infaq-button` — infaq/wakaf section
+- `#desktop-schedule-table`, `#mobile-schedule-table` — responsive table/cards
+- `tr.today`, `.mobile-day-today` — today-row highlight
+- `.simple-toast`, `.simple-toast.error`, `.simple-toast.fade-out` — toasts
+- `.update-toast`, `.update-toast.hidden` — PWA update notification
 
-// Load and populate zone dropdown
-async loadZones()
+### `widget.html`
 
-// Update header with zone info
-updateZoneHeader(zone)
-
-// Auto-detect zone via GPS (returns zone code or null)
-async detectZoneByGPS()
-// - Calls navigator.geolocation.getCurrentPosition()
-// - Fetches https://api.waktusolat.app/v2/solat/gps/{lat}/{long}
-// - Returns zone code string (e.g. "WLY01") or null on failure/denial
-
-// Triggered by GPS button click — re-detects and reloads data
-async triggerGPSDetection()
-// - Adds .loading (pulse) class to GPS button during detection
-// - Calls detectZoneByGPS(), saves zone, updates dropdown and reloads data
-// - Shows error toast via showSimpleToast() if detection fails
-
-// Show a self-dismissing toast (3s) for simple feedback
-showSimpleToast(message, type)
-// - type: 'error' (red). Appended to body, fades out and removes itself
-
-// Check if a given day/month is yesterday (mirrors isTomorrow)
-isYesterday(day, month)
-// - Used in fetchData() prayer loop to detect and save yesterday's Maghrib to lastMaghrib + localStorage
-```
-
-### Share Functionality
-
-```javascript
-// Share/copy current page URL with zone info
-shareLink()
-// - Gets selected zone from dropdown
-// - Looks up zone details (negeri, jakimCode, daerah) from cachedZones
-// - Builds share text: "Negeri {State} (Zon {Number}): {District}"
-// - Uses navigator.share on mobile (native share sheet with text)
-// - Falls back to clipboard copy on desktop
-// - Shows "Disalin!" feedback for 2 seconds
-```
-
-### Data Fetching
-
-```javascript
-// Fetch prayer data for Ramadan period
-async fetchData()
-// - Fetches Feb & Mar 2026 in parallel
-// - Filters to Ramadan dates (Feb 19 - Mar 20)
-// - Populates desktop table and mobile cards
-// - Sets up countdown timer
-// - Shows contextual messages before/after Ramadan
-```
-
-### Countdown Timer
-
-```javascript
-// Determine countdown target and highlight next time box
-setupCountdown()
-// - Before Fajr: countdown to imsak/subuh
-// - Fajr to Maghrib: countdown to berbuka
-// - After Maghrib: countdown to tomorrow's imsak
-// - Calls highlightNextPrayer() on each transition
-
-// Start countdown with progress bar and warning pulse
-startCountdown(targetTime, startTime, label, totalDuration)
-// - Adds .warning class at ≤5 min remaining (orange pulse)
-// - Calls highlightNextPrayer() every second
-
-// Highlight next upcoming time box (Imsak/Subuh/Berbuka)
-highlightNextPrayer()
-// - Before imsak: Imsak box active
-// - Imsak to fajr: Subuh box active
-// - Fajr to maghrib: Berbuka box active
-// - After maghrib: no box active
-
-// Auto-refresh data at midnight for next day
-scheduleMiddnightRefresh()
-```
-
-### Date/Time Helpers
-
-```javascript
-// Get test date/time from URL parameters or current date
-getTestDate()
-// - Supports: ?testDate=2026-02-20&testTime=18:30
-// - Sets timeOffset for getNow()
-
-// Get offset-adjusted current time in ms
-getNow() // Returns: Date.now() + timeOffset
-
-// Check if date matches today
-isToday(day, month)
-
-// Check if date matches tomorrow
-isTomorrow(day, month)
-
-// Format Hijri date for display
-formatHijriForRamadan(hijri) // "1 Ramadan", "2 Ramadan", etc.
-```
-
-## localStorage Keys
-
-| Key | Value | Description |
-|-----|-------|-------------|
-| `selectedZone` | Zone code (e.g., "PHG03") | User's selected zone |
-
-## Global Variables
-
-```javascript
-globalPrayerTimes = {
-  today: { fajr, maghrib },    // Unix timestamps
-  tomorrow: { fajr, maghrib }
-}
-
-countdownTimerId = null  // setInterval ID for cleanup
-initialDataLoaded = false  // Prevents repeated fetches
-timeOffset = 0  // ms offset for testTime simulation
-
-cachedZones = []  // Zone list from API
-```
+- `.widget` — main card container
+- `.top-bar`, `.location-bar`, `#zoneSelect`, `.footer-bar`/`#dateText` —
+  top row (zone selector + date)
+- `#arcContainer` — SVG arc, dots, labels, progress tip
+- `.info-bar`, `.info-side.left/.right`, `.countdown-block`,
+  `.countdown-display.warning` — countdown/info bar
+- `body.embed-mode` — transparent page, scale-to-fit (iframe embeds)
+- `body.hide-selector` / `body.hide-date` — chrome toggles
+- `body.dark-mode` / `body.large-viewport` — theming and scale-up
 
 ## Testing
 
-### URL Parameters
+`?testDate=`/`?testTime=` work across `index.html` and `widget.html`:
 
-| Parameter | Example | Description |
-|-----------|---------|-------------|
-| `location` | `?location=JHR01` | Auto-load specific zone |
-| `testDate` | `?testDate=2026-02-20` | Simulate specific date |
-| `testTime` | `?testTime=18:30` | Simulate specific time (ticks forward) |
-
-**Examples:**
 ```
-index.html?location=JHR01                              # Load Johor Zone 1
-index.html?testDate=2026-02-20                         # Test Feb 20, 2026
-index.html?testDate=2026-02-20&testTime=06:00          # Pre-fajr countdown
-index.html?testDate=2026-02-20&testTime=12:00          # Berbuka countdown
-index.html?testDate=2026-02-20&testTime=19:30          # Post-maghrib countdown
-index.html?testTime=18:30                               # Today + simulated time
+index.html?location=JHR01
+index.html?testDate=2026-02-20&testTime=06:00
+widget.html?zone=JHR01&testTime=18:30
+widget.html?testTime=05:00     → before Subuh (progress arc full, Isyak pulsing)
+widget.html?testTime=09:30     → Waktu Duha window
+widget.html?testTime=18:25     → 10-min warning before Maghrib
+widget.html?embed=1&testTime=18:30  → iframe-embed chrome
 ```
 
-### Test Scenarios
+Serve via `python -m http.server` — `file://` won't work (JSON fetches
+need CORS).
 
-1. **Zone Selection**: Change zones, verify header and URL updates
-2. **Zone Persistence**: Refresh page, verify zone is remembered
-3. **Share Button**: Click share, verify URL is copied/shared
-4. **Countdown**: Test during fasting hours vs after berbuka
-5. **Before Ramadan**: Test with date before Feb 19, verify message
-6. **After Ramadan**: Test with date after Mar 20, verify message
-7. **Responsive**: Test on mobile and desktop widths
-8. **Info Page Anchors**: Test `info.html#waktu`, `info.html#sumber`, etc.
+## Known Issues
 
-## CSS Classes
+- **Color theming** — `widget.html`'s arc accents are tuned per light/dark
+  theme but the overall visual language still assumes a dark card in embed
+  mode (see `gsites_embeded_guide.md` §1 — "transparent page, opaque card")
+- **GPS auto-detection** — implemented in `index.html` only, not in
+  `widget.html`
+- **Legacy "ramadan" naming** — `sw.js` `CACHE_NAME` and
+  `site.webmanifest` (`name`/`short_name`/`start_url: /jadual-waktu/`)
+  still carry pre-de-branding naming; cosmetic, not functional
+- **`test/test_file.html`** — unrelated "Mimbar Jumaat" sermon page,
+  flagged as out-of-place leftover, don't remove without asking
 
-### Layout
-- `.zone-selector` - Dropdown and share button container
-- `.share-btn` - Share button (pill-shaped)
-- `.today-container` - Today's info and countdown section
-- `.infaq-section` - Donation promotion section
-- `.schedule-title` - Table section heading
+## Other Docs in This Folder
 
-### Tables
-- `#desktop-schedule-table` - Desktop table view
-- `#mobile-schedule-table` - Mobile card view
-- `.today-row` - Highlighted current day row
+- **`CLAUDE.md`** — architecture map / Claude Code instructions
+- **`DEV_NOTES.md`** — session handoff log for `widget.html` (read first
+  for implementation history, design decisions, and animation internals)
+- **`gsites_embeded_guide.md`** — embed-mode reference (`?embed=1`
+  scale-to-fit algorithm, Google Sites pattern)
+- **`README.md`** — user-facing documentation (Malay)
 
-### Countdown
-- `#countdown-section` - Countdown container
-- `.countdown-item` - Hours/minutes/seconds boxes
-- `#countdown-progress-bar` - Progress bar fill
-- `.time-reminder-link` - Link to time accuracy info (underlined)
-- `.countdown-section.warning` - Orange pulse animation (≤5 min)
-- `.gps-btn` - GPS detection button (pill shape)
-- `.gps-btn.loading` - Pulsing opacity animation while detecting (background forced transparent)
-- `.simple-toast` - Auto-dismiss toast for simple feedback (e.g. GPS failure)
-- `.simple-toast.error` - Red background variant
-
-### Time Boxes (INFO HARI INI)
-- `.time-box` - Individual prayer time card
-- `.time-box.active` - Green-filled highlight on next upcoming time
-- `.time-box.active.warning` - Orange pulse on active box (≤5 min)
-
-### Info Page
-- `.info-section` - Content section with anchor
-- `.anchor-link` - Shareable section link (#)
-- `.highlight-box` - Highlighted info box
-- `.toc` - Table of contents
-- `.infaq-btn` - Infaq button
-
-## Ramadan 2026 Dates
-
-- **Start**: 19 February 2026 (1 Ramadan 1447H)
-- **End**: 20 March 2026 (30 Ramadan 1447H)
-- **Eid**: 21 March 2026 (1 Syawal 1447H)
-
-## Changelog
-
-### v1.5.4 (2026-02-21)
-- Fixed progress bar occasionally still calculating from midnight — added 24-hour validity check on `lastMaghrib` read from `localStorage`; stale values (>24h old) are discarded and `lastMaghrib` is re-populated fresh from the API via `isYesterday()` in the next `fetchData()` call
-- Bumped SW cache name to `v1.6.4`
-
-### v1.5.3 (2026-02-21)
-- Fixed progress bar still calculating from midnight even after v1.5.2 — root cause was `lastMaghrib` being a JS variable lost on page reload; now fetched directly from API using new `isYesterday()` helper and persisted to `localStorage` on every `fetchData()` call
-- Added `isYesterday(day, month)` helper (mirrors `isTomorrow()`) used in prayer loop to detect and save yesterday's Maghrib
-- Added "Atau gunakan GPS:" label next to GPS button in zone selector row
-- Bumped SW cache name to `v1.6.3`
-
-### v1.5.2 (2026-02-20)
-- Fixed progress bar jumping to 0% after midnight data refresh — added `lastMaghrib` variable to preserve today's Maghrib timestamp before `fetchData()` runs; pre-Fajr branch now uses `lastMaghrib` as `startTime` instead of midnight, keeping progress continuous
-- Bumped SW cache name to `v1.6.2`
-
-### v1.5.1 (2026-02-19)
-- Fixed GPS button turning fully green during loading — added `background-color: transparent` to `.gps-btn.loading` to override `:hover` state retained after click
-- Added `showSimpleToast()` helper — renders a self-dismissing red toast (3s) for error feedback
-- GPS detection failure now shows toast: "Lokasi tidak dapat dikesan. Sila pilih zon secara manual."
-- Bumped SW cache name to `v1.6.1`
-
-### v1.5.0 (2026-02-19)
-- Added `detectZoneByGPS()` — auto-detects zone on first visit via `navigator.geolocation` + GPS API endpoint
-- Added `triggerGPSDetection()` — GPS button click handler, re-detects and reloads prayer data
-- Added GPS button (📍 GPS pill) next to zone dropdown; pulsing opacity animation while detecting
-- Mobile layout: share button moved to row 2 using `.zone-row` wrapper + `flex-direction: column` on mobile
-- Fixed SW fetch handler: added `.catch()` returning `503 Offline` response to prevent uncaught promise rejections for failed cross-origin requests (e.g. Google Fonts)
-- Bumped SW cache name to `v1.6.0`
-
-### v1.4.1 (2026-02-19)
-- Fixed warning pulse animation not working on mobile — added `background-color: transparent` to `.countdown-section.warning` and `.time-box.active.warning` so the `@keyframes` animation is not overridden by static background-color
-- Fixed animation duration still showing 1.5s instead of 1s on both warning rules
-- Added `"version": "1.4.0"` to site.webmanifest (Android was displaying "version: 1" without it)
-- Bumped SW cache name to `v1.5.5`
-
-### v1.4.0 (2026-02-19)
-- Added `testTime` URL parameter for simulating specific times (ticks forward from specified moment)
-- Added `getNow()` helper and `timeOffset` global for time simulation across all countdown logic
-- Added green-filled highlight (`.time-box.active`) on next upcoming prayer time box (Imsak → Subuh → Berbuka)
-- Added 5-minute warning pulse animation (green ↔ orange) on countdown section and active time box
-- Fixed countdown phase transition bug: changed `>` to `>=` in `setupCountdown()` for seamless auto-transition
-- Added midnight auto-refresh (`scheduleMiddnightRefresh()`) to reload data for the next day without page refresh
-- Underlined time reminder link in countdown section
-- Updated info.html with new feature descriptions (highlight, warning pulse, auto-refresh, auto-transition)
-- Removed dead code (`today`/`currentDay` unused variables in `fetchData()`)
-- Bumped SW cache name to `v1.5.3`
-
-### v1.3.3 (2026-02-18)
-- Added PWA installation guide section to info.html (Android, iOS, Desktop)
-- Added offline usage note and update notification explanation
-- Added PWA feature bullets to Ciri-ciri utama list
-- Bumped SW cache name to `v1.5.2`
-
-### v1.3.2 (2026-02-18)
-- Updated share text format: removed "Bagi" prefix, added blank line before URL
-- Bumped SW cache name to `v1.5.0`
-
-### v1.3.1 (2026-02-18)
-- Fixed share link bug: URL now always includes `?location=` even on first page load
-- Updated share text format to 3 lines: title, zone info, and URL
-- Bumped SW cache name to `v1.4.9`
-
-### v1.3.0 (2026-02-18)
-- Registered service worker for full PWA support (cache-first, offline support)
-- Added update notification toast (green) when a new SW version is available
-- Fixed HTML `lang` attribute to `ms`
-- Aligned `theme_color` between HTML meta and web manifest to `#ffffff`
-- Fixed extra double-quote in OG meta title tag
-- Added `any` purpose icon entries in web manifest for 192×192 and 512×512 PNGs
-- Bumped SW cache name to `v1.4.8`
-
-### v1.2.2 (2026-02-03)
-- Updated share text format: "Negeri {State} (Zon {Number}): {District}"
-
-### v1.2.1 (2026-02-03)
-- Share button now includes zone info (state, code, district) in share text
-
-### v1.2.0 (2026-02-03)
-- New info page (`info.html`) with shareable anchor sections
-- URL auto-updates with `?location=` parameter for easy sharing
-- Share button next to zone dropdown (native share on mobile, clipboard on desktop)
-- Contextual messages for before/after Ramadan period
-- Pill-shaped dropdown matching share button style
-- "Jadual Keseluruhan Bulan Ramadan" title above schedule
-- Navigation links between main page and info page
-- MST SIRIM widget for time verification
-- Infaq & Wakaf section on both pages
-- Black text color for dropdown options
-
-### v1.1.0 (2026-02-02)
-- Green and white theme for countdown timer
-- Green accents for INFO HARI INI time boxes
-- Green highlight with white text for mobile today card
-- Updated date format in INFO HARI INI section
-
-### v1.0.0 (2026-02-02)
-- Initial release for Ramadan 1447H / 2026M
-- Zone selector with 61 zones across Malaysia (grouped by state)
-- Zone persistence via localStorage
-- Compact dropdown display (zone code only when closed, full details in options)
-- Dynamic header showing state name, zone number, and district
-- URL parameters support: `location` and `testDate`
-- Combined date format: "1 Ramadan / 19 Feb (Khamis)"
-- Countdown timer to berbuka/imsak with progress bar
-- Responsive design (desktop table & mobile cards)
-- Data from JAKIM via Waktu Solat API
+For development history (why things are the way they are), see
+`DEV_NOTES.md` and git history — this file intentionally has no version
+changelog.

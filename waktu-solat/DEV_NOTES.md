@@ -1,4 +1,4 @@
-# Session Handoff — waktu-solat/simple.html
+# Session Handoff — waktu-solat/widget.html
 
 the prompt:
 "Check the Project Knowledge and the current chat for context. This conversation is ending soon. update the artifact DEV_NOTES.md (create if not available yet) with a detailed note to your next window self - not just facts but the vibe, our dynamic, the energy of this conversation. What would the next you need to immediately get back into this exact headspace? Include unique discoveries, current mood, and anything that'll help the next you instantly sync to our frequency."
@@ -39,7 +39,7 @@ missing" task. Instead: **`waktu-solat/CLAUDE.md` already existed (4549
 bytes), but it was describing a COMPLETELY DIFFERENT, OLDER PROJECT** — it
 read like `jadual-waktu/CLAUDE.md` (table-based schedule, countdown timer,
 zone dropdown — the "v1.5.4 jadual-waktu" app), not the current
-`index.html`/`info.html`/`simple.html` trio that Sessions 1-8 have been
+`index.html`/`info.html`/`widget.html` trio that Sessions 1-8 have been
 building.
 
 Same staleness pattern showed up in `waktu-solat/developer.md` and
@@ -54,10 +54,10 @@ project-specific; verify against the actual `.html` files or `DEV_NOTES.md`.
 
 **Process**: treated `/init` as a real (if small) planning task — entered
 plan mode, ran ONE Explore agent to survey all of `waktu-solat/`'s current
-files (`index.html`, `info.html`, `simple.html`, `sw.js`, `vercel.json`,
+files (`index.html`, `info.html`, `widget.html`, `sw.js`, `vercel.json`,
 `archive/`, `test/`) since I didn't have full code for `index.html`/`info.html`
 in context, only summaries. The Explore agent's report was thorough and
-accurate — confirmed `index.html` iframes `simple.html` via
+accurate — confirmed `index.html` iframes `widget.html` via
 `updatePrayerWidgetFrame()`, confirmed `info.html`'s de-branding stuck,
 confirmed `sw.js` CACHE_NAME is still `mamtj6-jadual-waktu-ramadan-v1.6.4`
 (cosmetic leftover, not a bug). Wrote a plan outline (reused/overwrote the
@@ -69,9 +69,9 @@ triggered it), then wrote the new `CLAUDE.md` directly.
 **New `waktu-solat/CLAUDE.md` shape** (for reference, don't re-derive):
 - Project Overview: year-round (not Ramadan-specific despite `sw.js` naming),
   three entry points
-- Per-file sections for `index.html`, `info.html`, `simple.html`, `sw.js`,
+- Per-file sections for `index.html`, `info.html`, `widget.html`, `sw.js`,
   `vercel.json`, `archive/`, `test/`
-- `simple.html` section deliberately kept HIGH-LEVEL and points to
+- `widget.html` section deliberately kept HIGH-LEVEL and points to
   `DEV_NOTES.md` for depth — avoid duplicating the deep pulse-animation/arc-
   geometry details here, that's `DEV_NOTES.md`'s job
 - Flagged `test/test_file.html` as an unrelated leftover (Mimbar Jumaat sermon
@@ -91,7 +91,7 @@ triggered it), then wrote the new `CLAUDE.md` directly.
 - **Mood**: relaxed, curatorial. If the next ask is another "compare/explain/
   tidy up docs" question, that fits this session's groove — don't over-plan
   small doc questions, answer directly like Ask 1. If it's back to
-  `simple.html`/`index.html` feature work, that's a context switch back to
+  `widget.html`/`index.html` feature work, that's a context switch back to
   Session 8's energy (iterative, tweak-by-tweak, expect AskUserQuestion for
   ambiguous bits only).
 
@@ -151,13 +151,13 @@ feature labels, not branding) and `og:image`/`og:url` (live hosting paths,
 infra not display). User said "ok proceed" to the full plan, no further
 iteration needed — all 7 edits landed clean.
 
-### Act 4 — the main event: pulsing "last 10 minutes" warning (`simple.html`)
+### Act 4 — the main event: pulsing "last 10 minutes" warning (`widget.html`)
 This was the **iterative refinement** act — each round was a one-line ask,
 landed fast, then refined further. Re-entered plan mode (overwrote the old
 stale `?date=hide` plan from a prior session — that feature was already
 shipped, confirmed via grep before discarding the plan).
 
-**Final shipped behavior** (all in `simple.html`):
+**Final shipped behavior** (all in `widget.html`):
 - When `diff <= 10*60*1000` (10 min to next prayer), `tick()` sets
   `isWarning = true` each second.
 - **Countdown** (`#countdown`): gets `.warning` class → `color: var(--error)`
@@ -211,13 +211,13 @@ the first pass, keep it easy to tweak (e.g. plain CSS color, not baked into JS).
 ## Vibe / dynamic check for Session 7 (most recent — read this first)
 
 This was a **"zoom out to the bigger page" session** — after Sessions 1-6 polished
-`simple.html` itself (arc, icons, embed mode, theming) to the point the user
+`widget.html` itself (arc, icons, embed mode, theming) to the point the user
 declared it basically done, this session's energy was "ok, now go use it." Three
-asks, each one a step further from `simple.html` in isolation:
+asks, each one a step further from `widget.html` in isolation:
 
 1. **Opened with a verbal status check, not a question**: "i think major
-   development already complete for the simple.html ... my next plan is to
-   include the simple.html as embeded on the index.html .. the zone selector
+   development already complete for the widget.html ... my next plan is to
+   include the widget.html as embeded on the index.html .. the zone selector
    that used on the page will still works, but it will change the link path
    ?zone= according what user want. i think the existing INFO HARI INI card will
    be removed" — this read as half-decision, half-thinking-out-loud. Treated it
@@ -226,24 +226,24 @@ asks, each one a step further from `simple.html` in isolation:
    buried in "i think", surfaced via AskUserQuestion:
    - Whether the Countdown Section (timer + progress bar) should ALSO go, not
      just "INFO HARI INI" → user said **"Remove both (Recommended)"**.
-   - How the embedded `simple.html`'s OWN internal zone selector should behave
+   - How the embedded `widget.html`'s OWN internal zone selector should behave
      when nested inside `index.html` (which has its own selector) → user gave a
      **free-text answer with reasoning**, not just a preset pick: "hide it on
      embeded mode if had ?selector=hide to hide the zone selector. because the
-     simple.html will be used on elsewhere" — i.e. don't piggyback on `?embed=1`,
-     make a NEW independent opt-in param, because `simple.html` standalone
+     widget.html will be used on elsewhere" — i.e. don't piggyback on `?embed=1`,
+     make a NEW independent opt-in param, because `widget.html` standalone
      embeds (Google Sites etc.) still want their own selector visible.
    This second answer is the kind of thing to re-read carefully — it's a small
    sentence carrying a real architectural constraint (separation of `?embed=1`
    vs `?selector=hide`), and it came with the "why" already attached.
 
 2. **Plan executed cleanly, no surprises**: added `?selector=hide` +
-   `.hide-selector` CSS to `simple.html`; gutted `index.html`'s INFO HARI INI +
+   `.hide-selector` CSS to `widget.html`; gutted `index.html`'s INFO HARI INI +
    Countdown Section (HTML/CSS/JS — a LOT of dead code: `globalPrayerTimes`,
    `lastMaghrib`, `startCountdown`, `highlightNextPrayer`, `setupCountdown`, the
    60s transition-checker `setInterval`, the whole next-month fetch that only
    existed to feed tomorrow's countdown); replaced with a `.prayer-widget-embed`
-   iframe wrapper pointing at `simple.html?embed=1&selector=hide&zone=...`, wired
+   iframe wrapper pointing at `widget.html?embed=1&selector=hide&zone=...`, wired
    to `#zone-select`'s existing change handler + GPS detection + initial load via
    one new `updatePrayerWidgetFrame(zoneCode)` helper. Kept `isToday()` and
    `calculateImsak()` — still drive the schedule table's "today" row and Imsak
@@ -282,13 +282,13 @@ recency of a big task.
 
 **State of the world going into next session**:
 - `index.html` no longer has its own countdown/progress-bar/info-card — that's
-  ALL delegated to the embedded `simple.html` iframe now. If asked to change
+  ALL delegated to the embedded `widget.html` iframe now. If asked to change
   countdown/progress-bar behavior, the edit almost certainly belongs in
-  `simple.html`, not `index.html`.
+  `widget.html`, not `index.html`.
 - `index.html` is de-branded from "Ramadan 2026" → generic "Jadual Waktu Solat".
   If you see "Ramadan" reappear in a future ask for `index.html`, that's likely
   intentional/new context, not a regression to "fix back".
-- `simple.html` now has THREE url params controlling its chrome:
+- `widget.html` now has THREE url params controlling its chrome:
   `?embed=1` (transparent page bg + scale-to-fit, for Google Sites),
   `?selector=hide` (hide its own zone dropdown, independent of embed),
   `?zone=`/`?testTime=`/`?testDate=` (existing). `index.html`'s iframe passes
@@ -297,7 +297,7 @@ recency of a big task.
   "refine during verification" in the plan, never actually visually verified
   (no browser tool). If the embedded widget looks clipped/has dead space in
   `index.html`, start here.
-- Known issues list for `simple.html` itself (color theming, GPS auto-detection)
+- Known issues list for `widget.html` itself (color theming, GPS auto-detection)
   is UNCHANGED — still sitting there, still valid candidates for "next big ask",
   but as ever, just read what's thrown at you.
 
@@ -337,7 +337,7 @@ each one peeling back a layer:
    applied but not yet re-verified by the user when the summary was written.
 5. Session continued past that point (per the user's final message: "the
    embedded functionality is working now") — so **the `max-width: none` fix is
-   CONFIRMED WORKING**. Embed mode for `simple.html` is now considered done.
+   CONFIRMED WORKING**. Embed mode for `widget.html` is now considered done.
 6. Final ask of the session: write up everything learned as a standalone guide —
    `waktu-solat/gsites_embeded_guide.md` was created, covering the embed pattern,
    the scale-to-fit algorithm + convergence math, the max-width trap, and a
@@ -643,8 +643,8 @@ priority. The SVG arc itself needed NO changes — `viewBox="0 0 360 120"` scali
 means geometry, label offsets, and the `< 50`-unit collision thresholds are all
 scale-invariant.
 
-**Usage**: `simple.html?embed=1`, or combined e.g.
-`simple.html?zone=JHR01&embed=1&testTime=18:30`.
+**Usage**: `widget.html?embed=1`, or combined e.g.
+`widget.html?zone=JHR01&embed=1&testTime=18:30`.
 **Gotcha**: correct syntax is `&embed=1` — NOT `&?embed=1` (a stray second `?`
 makes `?embed` part of the param NAME, so `params.get('embed')` returns `null`).
 
@@ -698,7 +698,7 @@ Called at the end of `renderArc()` and on `window.resize` (registered inside
 `initEmbedMode()`'s IIFE, only when `embed=1`).
 
 ### 3. New test harness: `waktu-solat/embed_test.html`
-Throwaway scratch file — a single `<iframe src="simple.html?embed=1&testTime=18:30">`
+Throwaway scratch file — a single `<iframe src="widget.html?embed=1&testTime=18:30">`
 in a red-bordered box. Dimensions get hand-edited by the user for different test
 cases (desktop-aspect vs. mobile-aspect). Expect it to be in an inconsistent state
 between sessions (e.g. stale `<p>` text describing old dimensions) — that's normal,
@@ -710,7 +710,7 @@ pattern, the scale-to-fit algorithm + why it converges, the `max-width` trap, an
 the testing checklist (always test a mobile-aspect iframe, not just desktop).
 
 **STATUS: confirmed working by user — "the embedded functionality is working
-now". Embed mode for `simple.html` is done.**
+now". Embed mode for `widget.html` is done.**
 
 ---
 
@@ -807,12 +807,12 @@ month's data to fetch and to find `todayPrayer`.
 
 **Usage:**
 ```
-simple.html?testTime=05:00          → before Subuh (progress arc full, Isyak pulsing)
-simple.html?testTime=09:30          → in Duha window (after Syuruk+28min, before Zohor-10min)
-simple.html?testTime=13:00          → Zohor time
-simple.html?testTime=18:30          → near Maghrib
-simple.html?zone=JHR01&testTime=18:30
-simple.html?embed=1                 → strips page chrome (transparent bg, no card/shadow) for iframe embedding
+widget.html?testTime=05:00          → before Subuh (progress arc full, Isyak pulsing)
+widget.html?testTime=09:30          → in Duha window (after Syuruk+28min, before Zohor-10min)
+widget.html?testTime=13:00          → Zohor time
+widget.html?testTime=18:30          → near Maghrib
+widget.html?zone=JHR01&testTime=18:30
+widget.html?embed=1                 → strips page chrome (transparent bg, no card/shadow) for iframe embedding
 ```
 
 ---
