@@ -19,7 +19,7 @@ const COUNTDOWN_PLACEHOLDER = "{{countdown_number}}";
  */
 function setupAndCreateTrigger() {
   const events = [
-    { name: "1 RAMADAN 1447H / 2026", date: "2026-02-19T08:00:00+08:00" },
+    { name: "1 RAMADAN 1448H / 2027", date: "2027-02-08T08:00:00+08:00" },
   ];
   PropertiesService.getScriptProperties().setProperty("COUNTDOWN_EVENTS", JSON.stringify(events));
   console.log("Acara kiraan detik telah ditetapkan.");

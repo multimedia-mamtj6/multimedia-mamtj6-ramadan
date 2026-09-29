@@ -14,8 +14,8 @@
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="Maklumat Jadual Waktu Solat" />
   <meta property="og:description" content="Maklumat tentang sumber data, ketepatan dan panduan penggunaan jadual waktu solat" />
-  <meta property="og:image" content="https://ramadan.mamtj6.com/media/linkpreview-ramadan.jpg" />
-  <meta property="og:url" content="https://ramadan.mamtj6.com/info/jadual/info.html" />
+  <meta property="og:image" content="https://ramadan.mamtj6.com/waktu-solat/asset/image/link-preview.jpg" />
+  <meta property="og:url" content="https://ramadan.mamtj6.com/waktu-solat/info.html" />
   <meta property="og:type" content="website" />
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -480,47 +480,18 @@
     </div>
   </div>
 
-  <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
+  <!-- PWA dilumpuhkan buat sementara - nyahdaftar SW lama -->
   <script>
-    let newWorker;
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/jadual-waktu/sw.js').then(reg => {
-          if (reg.waiting) {
-            newWorker = reg.waiting;
-            showUpdateToast();
-          }
-          reg.addEventListener('updatefound', () => {
-            newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateToast();
-              }
-            });
-          });
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
         });
-
-        let refreshing;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (refreshing) return;
-          window.location.reload();
-          refreshing = true;
-        });
+        if ('caches' in window) {
+          caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+        }
       });
     }
-
-    function showUpdateToast() {
-      document.getElementById('update-toast').classList.remove('hidden');
-    }
-
-    document.getElementById('reload-btn').addEventListener('click', () => {
-      if (newWorker) newWorker.postMessage({ type: 'SKIP_WAITING' });
-    });
-
-    document.getElementById('dismiss-btn').addEventListener('click', () => {
-      document.getElementById('update-toast').classList.add('hidden');
-    });
   </script>
 </body>
 </html>

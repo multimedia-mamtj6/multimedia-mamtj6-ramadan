@@ -17,19 +17,19 @@
       });
     })();
   </script>
-  <title>Maklumat - Jadual Waktu Ramadan 2026</title>
+  <title>Maklumat - Jadual Waktu Ramadan 2027</title>
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg" sizes="any">
   <link rel="icon" type="image/png" href="/jadual-waktu/favicon/favicon-96x96.png" sizes="96x96">
   <link rel="apple-touch-icon" sizes="180x180" href="/jadual-waktu/favicon/apple-touch-icon.png" />
-  <meta name="apple-mobile-web-app-title" content="RAMADAN 2026" />
+  <meta name="apple-mobile-web-app-title" content="RAMADAN 2027" />
   <meta name="theme-color" content="#ffffff" />
   <link rel="manifest" href="/jadual-waktu/favicon/site.webmanifest" />
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="Maklumat Jadual Waktu Ramadan 2026" />
+  <meta property="og:title" content="Maklumat Jadual Waktu Ramadan 2027" />
   <meta property="og:description" content="Maklumat tentang sumber data, ketepatan dan panduan penggunaan jadual waktu Ramadan" />
-  <meta property="og:image" content="https://ramadan.mamtj6.com/media/linkpreview-ramadan.jpg" />
-  <meta property="og:url" content="https://ramadan.mamtj6.com/info/jadual/info.html" />
+  <meta property="og:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
+  <meta property="og:url" content="https://ramadan.mamtj6.com/jadual-waktu/info.html" />
   <meta property="og:type" content="website" />
   <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -325,7 +325,7 @@
     <section id="tentang" class="info-section">
       <h2>Tentang Projek <a href="#tentang" class="anchor-link">#</a></h2>
       <p>
-        Laman web ini memaparkan jadual waktu Imsak, Subuh dan Berbuka bagi bulan Ramadan 1447H / 2026M untuk semua zon waktu solat di Malaysia.
+        Laman web ini memaparkan jadual waktu Imsak, Subuh dan Berbuka bagi bulan Ramadan 1448H / 2027M untuk semua zon waktu solat di Malaysia.
       </p>
       <p>
         Projek ini adalah adalah projek <strong>CSR (Corporate Social Responsibility)</strong> dibangunkan oleh Masjid Al-Mukhlisin, Taman Jaya 6 (MAMTJ6) untuk memudahkan umat Islam di Malaysia merancang ibadah puasa dengan paparan yang ringkas, mesra pengguna dan boleh diakses melalui pelbagai peranti.
@@ -469,7 +469,7 @@
     <section id="berkaitan" class="info-section">
       <h2>Pautan Berkaitan <a href="#berkaitan" class="anchor-link">#</a></h2>
       <ul>
-        <li><a href="index.html">Jadual Waktu Ramadan 2026</a> - Laman utama jadual</li>
+        <li><a href="index.html">Jadual Waktu Ramadan 2027</a> - Laman utama jadual</li>
         <li><a href="https://www.e-solat.gov.my/" target="_blank">e-Solat JAKIM</a> - Portal rasmi waktu solat</li>
         <li><a href="https://api.waktusolat.app/" target="_blank">Waktu Solat API</a> - Dokumentasi API</li>
         <li><a href="https://www.jakim.gov.my/" target="_blank">JAKIM</a> - Jabatan Kemajuan Islam Malaysia</li>
@@ -494,47 +494,18 @@
     </div>
   </div>
 
-  <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
+  <!-- PWA dilumpuhkan buat sementara - nyahdaftar SW lama -->
   <script>
-    let newWorker;
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/jadual-waktu/sw.js').then(reg => {
-          if (reg.waiting) {
-            newWorker = reg.waiting;
-            showUpdateToast();
-          }
-          reg.addEventListener('updatefound', () => {
-            newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateToast();
-              }
-            });
-          });
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
         });
-
-        let refreshing;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (refreshing) return;
-          window.location.reload();
-          refreshing = true;
-        });
+        if ('caches' in window) {
+          caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+        }
       });
     }
-
-    function showUpdateToast() {
-      document.getElementById('update-toast').classList.remove('hidden');
-    }
-
-    document.getElementById('reload-btn').addEventListener('click', () => {
-      if (newWorker) newWorker.postMessage({ type: 'SKIP_WAITING' });
-    });
-
-    document.getElementById('dismiss-btn').addEventListener('click', () => {
-      document.getElementById('update-toast').classList.add('hidden');
-    });
   </script>
 </body>
 </html>

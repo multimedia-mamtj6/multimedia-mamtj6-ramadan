@@ -49,7 +49,7 @@ waktu-solat/
 - **Schedule tables** — desktop table (`#desktop-schedule-table`) + mobile
   cards (`#mobile-schedule-table`), today-row highlight, midnight
   auto-refresh via `scheduleMiddnightRefresh()`
-- **PWA** — registers `/jadual-waktu/sw.js`, shows an update toast on new
+- **PWA** — registers `/waktu-solat/sw.js`, shows an update toast on new
   service-worker versions
 
 ~1240 lines.

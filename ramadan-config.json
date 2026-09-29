@@ -1,0 +1,37 @@
+{
+  "year": 2027,
+  "hijriYear": 1448,
+  "ramadanStart": "2027-02-08T00:00:00",
+  "ramadanEnd": "2027-03-09T00:00:00",
+  "syawal": "2027-03-10T00:00:00",
+  "hijriTarget": "2027-02-07T19:29:00",
+  "hijriTargetZone": "WLY01",
+  "hijriTargetNote": "TODO(2027-recheck): waktu Maghrib KL 7 Feb 2027 belum disahkan — API 2027 belum live (404). Sahkan dengan api.waktusolat.app sebaik sahaja data 2027 keluar.",
+  "fetchYear": 2027,
+  "fetchMonths": [2, 3],
+  "febStartDay": 8,
+  "marEndDay": 9,
+  "hijriMonths": {
+    "rejab1": "2026-12-10",
+    "syaaban1": "2027-01-09",
+    "ramadan1": "2027-02-08",
+    "note": "TODO(2027-recheck): tarikh 1 Rejab / 1 Syaaban provisional (anggaran). Sahkan dengan Takwim e-solat JAKIM 2027 + pengumuman rasmi."
+  },
+  "templateFolders": {
+    "before-rejab": "1-before-rejab",
+    "rejab": "2-in-rejab",
+    "syaaban": "3-in-syaaban",
+    "ramadan": ""
+  },
+  "testDates": {
+    "before-rejab": "2026-12-01",
+    "rejab": "2026-12-15",
+    "syaaban": "2027-01-15",
+    "ramadan": "2027-02-15"
+  },
+  "labels": {
+    "headerYear": "2027 / 1448H",
+    "masihiInfo": "Kiraan baki hari menuju 8 Februari 2027.",
+    "hijriInfoDate": "7 Februari 2027"
+  }
+}

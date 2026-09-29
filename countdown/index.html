@@ -17,12 +17,12 @@
       });
     })();
   </script>
-  <title>Countdown Ramadan 2026</title>
+  <title>Countdown Ramadan 2027</title>
 
 
   <!-- === SEO Asas (Paling Penting untuk Google) === -->
-  <meta name="description" content="Ketahui countdown menuju Ramadan 2026 / 1447H. Dapatkan tarikh jangkaan permulaan puasa di Malaysia dan kongsi imej countdown yang menarik dengan kepada sahabat dan kenalan.">
-  <meta name="keywords" content="Ramadan 2026, Kiraan Detik Ramadan, Countdown Ramadan, Tarikh Puasa 2026, 1447H, Waktu Berbuka, Imsak, Malaysia, MAMTJ6">
+  <meta name="description" content="Ketahui countdown menuju Ramadan 2027 / 1448H. Dapatkan tarikh jangkaan permulaan puasa di Malaysia dan kongsi imej countdown yang menarik dengan kepada sahabat dan kenalan.">
+  <meta name="keywords" content="Ramadan 2027, Kiraan Detik Ramadan, Countdown Ramadan, Tarikh Puasa 2027, 1448H, Waktu Berbuka, Imsak, Malaysia, MAMTJ6">
   <!-- PENTING: Gantikan dengan URL laman web anda yang sebenar -->
   <link rel="canonical" href="https://ramadan.mamtj6.com/countdown">
 
@@ -37,8 +37,8 @@
   <link rel="manifest" href="media/favicon/site.webmanifest" />
 
   <!-- === Open Graph (untuk Facebook, WhatsApp, Telegram, dll.) === -->
-  <meta property="og:title" content="Countdown 1 Ramadan 2026 / 1447H">
-  <meta property="og:description" content="Ketahui countdown menuju Ramadan 2026 & dan kongsi imej countdown yang menarik sementara menantikan Ramadan Al-Mubarak.">
+  <meta property="og:title" content="Countdown 1 Ramadan 2027 / 1448H">
+  <meta property="og:description" content="Ketahui countdown menuju Ramadan 2027 & dan kongsi imej countdown yang menarik sementara menantikan Ramadan Al-Mubarak.">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ms_MY">
   <!-- PENTING: Gantikan dengan URL laman web anda yang sebenar -->
@@ -50,18 +50,12 @@
 
   <!-- === Twitter Card (Khas untuk Twitter/X) === -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Countdown Ramadan 2026 / 1447H">
-  <meta name="twitter:description" content="Ketahui countdown menuju Ramadan 2026 & dan kongsi imej countdown yang menarik sementara menantikan Ramadan Al-Mubarak.">
+  <meta name="twitter:title" content="Countdown Ramadan 2027 / 1448H">
+  <meta name="twitter:description" content="Ketahui countdown menuju Ramadan 2027 & dan kongsi imej countdown yang menarik sementara menantikan Ramadan Al-Mubarak.">
   <!-- PENTING: Gantikan dengan URL penuh ke imej pratonton anda -->
-  <meta name="twitter:image" content="https://ramadan.mamtj6.com/countdown">
+  <meta name="twitter:image" content="https://ramadan.mamtj6.com/countdown/media/preview/link-preview.jpg">
 
   <!-- === Fon & Gaya === -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -73,7 +67,7 @@
     <img src="media/image/ramadan-kareem.svg" alt="Ramadan Kareem Calligraphy" class="header-svg">
     <p class="header-subtitle">COUNTDOWN UNTIL</p>
     <h1 class="header-title">1 RAMADAN</h1>
-    <p class="header-year">2026 / 1447H</p>
+    <p class="header-year">2027 / 1448H</p>
   </header>
 
   <div class="main-container">
@@ -92,7 +86,7 @@
           <div id="masihi-days" class="days-display">0</div>
           <div class="days-label">hari lagi</div>
         </div>
-        <div id="masihi-info-display">Kiraan baki hari menuju 19 Februari 2026.</div>
+        <div id="masihi-info-display">Kiraan baki hari menuju 8 Februari 2027.</div>
          <p class="disclaimer-text">* Tertakluk Kepada Pengisytiharan oleh Penyimpan Mohor Besar Raja-Raja Malaysia.</p>
         <div id="masihi-message" class="message">🎉 SELAMAT MENYAMBUT RAMADAN 🎉</div>
       </div>
@@ -172,63 +166,18 @@
 
   <script src="script.js" defer></script>
 
- <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
+ <!-- PWA dilumpuhkan buat sementara - nyahdaftar SW lama -->
   <script>
-    let newWorker;
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(reg => {
-          console.log('Service Worker registered:', reg.scope);
-
-          // 1. Check if there is already a worker waiting (from previous ignored update)
-          if (reg.waiting) {
-            newWorker = reg.waiting;
-            showUpdateToast(); 
-          }
-
-          // 2. Listen for new updates being found
-          reg.addEventListener('updatefound', () => {
-            newWorker = reg.installing;
-
-            newWorker.addEventListener('statechange', () => {
-              // Has the new worker finished installing?
-              if (newWorker.state === 'installed') {
-                // Is there an existing controller? (Means this is an update, not first load)
-                if (navigator.serviceWorker.controller) {
-                  showUpdateToast();
-                }
-              }
-            });
-          });
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
         });
-
-        // 3. Handle the "Reload/SkipWaiting" action
-        let refreshing;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (refreshing) return;
-          window.location.reload();
-          refreshing = true;
-        });
+        if ('caches' in window) {
+          caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+        }
       });
     }
-
-    // UI Functions
-    function showUpdateToast() {
-      const toast = document.getElementById('update-toast');
-      toast.classList.remove('hidden');
-    }
-
-    document.getElementById('reload-btn').addEventListener('click', () => {
-      if (newWorker) {
-        // Send message to SW to skip waiting and activate immediately
-        newWorker.postMessage({ type: 'SKIP_WAITING' });
-      }
-    });
-
-    document.getElementById('dismiss-btn').addEventListener('click', () => {
-      document.getElementById('update-toast').classList.add('hidden');
-    });
   </script>
 
   

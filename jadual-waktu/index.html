@@ -17,7 +17,7 @@
       });
     })();
   </script>
-  <title>Jadual Waktu Ramadan 2026-1447h</title>
+  <title>Jadual Waktu Ramadan 2027-1448h</title>
  <!-- Favicon -->
     <!-- 1. Modern Browsers: Try the SVG first -->
     <link rel="icon" type="image/svg+xml" href="https://dev.mamtj6.com/media/logo-mamtj6/SVG/mamtj6_single.svg" sizes="any">
@@ -27,7 +27,7 @@
 
     <!-- 3. Apple: Specific requirements for iOS -->
     <link rel="apple-touch-icon" sizes="180x180" href="/jadual-waktu/favicon/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="RAMADAN 2026" />
+    <meta name="apple-mobile-web-app-title" content="RAMADAN 2027" />
     <meta name="theme-color" content="#ffffff" />
 
     <!-- 4. PWA: The manifest handles the installed app icon -->
@@ -41,7 +41,7 @@
   <meta property="og:type" content="website" />
 
     <!-- Twitter Card (for Twitter link preview) -->
-    <meta name="twitter:card" content="Jadual Waktu Ramadan 2026-1447h" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Waktu Imsak, Subuh dan Berbuka" />
     <meta name="twitter:description" content="Bagi semua zon waktu solat di Malaysia" />
     <meta name="twitter:image" content="https://ramadan.mamtj6.com/jadual-waktu/asset/image/link-preview.jpg" />
@@ -987,11 +987,11 @@ h3 {
       return `${day} ${months[month] || "Mac"}`;
     }
 
-    // Check if a given date is today
+    // Check if a given date is today (day+month match; data tahun semasa dari config)
     function isToday(day, month) {
       const today = getTestDate();
       // month parameter is 1-indexed (2=Feb, 3=Mar), getMonth() is 0-indexed
-      return today.getDate() === day && today.getMonth() === (month - 1) && today.getFullYear() === 2026;
+      return today.getDate() === day && today.getMonth() === (month - 1);
     }
 
     // Check if a given date is tomorrow
@@ -1000,7 +1000,7 @@ h3 {
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
       // month parameter is 1-indexed (2=Feb, 3=Mar), getMonth() is 0-indexed
-      return tomorrow.getDate() === day && tomorrow.getMonth() === (month - 1) && tomorrow.getFullYear() === 2026;
+      return tomorrow.getDate() === day && tomorrow.getMonth() === (month - 1);
     }
 
     // Check if a given date is yesterday
@@ -1008,7 +1008,7 @@ h3 {
       const today = getTestDate();
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
-      return yesterday.getDate() === day && yesterday.getMonth() === (month - 1) && yesterday.getFullYear() === 2026;
+      return yesterday.getDate() === day && yesterday.getMonth() === (month - 1);
     }
 
     // Function to process Hijri dates for Ramadan
@@ -1200,8 +1200,24 @@ h3 {
       }
 
       const zone = getSavedZone();
-      const febUrl = `https://api.waktusolat.app/v2/solat/${zone}?year=2026&month=2`;
-      const marUrl = `https://api.waktusolat.app/v2/solat/${zone}?year=2026&month=3`;
+      // TODO(2027-recheck): nilai fallback di bawah provisional — sahkan dengan pengumuman
+      // rasmi + api.waktusolat.app?year=2027 (404 ketika ditulis). Penyelenggaraan tahunan:
+      // edit /ramadan-config.json sahaja; kod ini membaca config dahulu, fallback jika gagal.
+      let cfgYear = 2027, cfgMonths = [2, 3], cfgFebStart = 8, cfgMarEnd = 9;
+      try {
+        const cfgRes = await fetch('/ramadan-config.json', { cache: 'no-store' });
+        if (cfgRes.ok) {
+          const cfg = await cfgRes.json();
+          if (cfg.fetchYear) cfgYear = cfg.fetchYear;
+          if (Array.isArray(cfg.fetchMonths) && cfg.fetchMonths.length >= 2) cfgMonths = cfg.fetchMonths;
+          if (cfg.febStartDay) cfgFebStart = cfg.febStartDay;
+          if (cfg.marEndDay) cfgMarEnd = cfg.marEndDay;
+        }
+      } catch (e) {
+        console.warn('ramadan-config.json tidak dapat dibaca, guna fallback:', e);
+      }
+      const febUrl = `https://api.waktusolat.app/v2/solat/${zone}?year=${cfgYear}&month=${cfgMonths[0]}`;
+      const marUrl = `https://api.waktusolat.app/v2/solat/${zone}?year=${cfgYear}&month=${cfgMonths[1]}`;
       const loadingIndicator = document.getElementById("loading-indicator");
 
       try {
@@ -1220,17 +1236,17 @@ h3 {
         const febData = await febResponse.json();
         const marData = await marResponse.json();
 
-        // Filter February: days >= 19, add month identifier
+        // Filter February: days >= cfgFebStart, add month identifier
         const febPrayers = febData.prayers
-          .filter(p => p.day >= 19)
-          .map(p => ({...p, month: 2}));
+          .filter(p => p.day >= cfgFebStart)
+          .map(p => ({...p, month: cfgMonths[0]}));
 
-        // Filter March: days <= 20, add month identifier
+        // Filter March: days <= cfgMarEnd, add month identifier
         const marPrayers = marData.prayers
-          .filter(p => p.day <= 20)
-          .map(p => ({...p, month: 3}));
+          .filter(p => p.day <= cfgMarEnd)
+          .map(p => ({...p, month: cfgMonths[1]}));
 
-        // Combine both months (Ramadan period: 19 Feb - 20 Mar 2026)
+        // Combine both months (Ramadan period from /ramadan-config.json)
         const ramadanPrayers = [...febPrayers, ...marPrayers];
 
         if (ramadanPrayers.length === 0) {
@@ -1387,7 +1403,7 @@ mobileContainer.appendChild(mobileDay);
         } else {
           // No data for today - check if before or after Ramadan
           const today = getTestDate();
-          const ramadanStart = new Date('2026-02-19T00:00:00');
+          const ramadanStart = new Date(cfgYear, cfgMonths[0] - 1, cfgFebStart, 0, 0, 0);
 
           if (today < ramadanStart) {
             // Before Ramadan - show countdown
@@ -1628,58 +1644,18 @@ mobileContainer.appendChild(mobileDay);
     </div>
   </div>
 
-  <!-- === PENDAFTARAN SERVICE WORKER & UPDATE LOGIC === -->
+  <!-- PWA dilumpuhkan buat sementara - nyahdaftar SW lama -->
   <script>
-    let newWorker;
-
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/jadual-waktu/sw.js').then(reg => {
-          console.log('Service Worker registered:', reg.scope);
-
-          // 1. Check if there is already a worker waiting (from previous ignored update)
-          if (reg.waiting) {
-            newWorker = reg.waiting;
-            showUpdateToast();
-          }
-
-          // 2. Listen for new updates being found
-          reg.addEventListener('updatefound', () => {
-            newWorker = reg.installing;
-
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed') {
-                if (navigator.serviceWorker.controller) {
-                  showUpdateToast();
-                }
-              }
-            });
-          });
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(r => r.unregister());
         });
-
-        // 3. Handle the reload after SW activates
-        let refreshing;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (refreshing) return;
-          window.location.reload();
-          refreshing = true;
-        });
+        if ('caches' in window) {
+          caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+        }
       });
     }
-
-    function showUpdateToast() {
-      document.getElementById('update-toast').classList.remove('hidden');
-    }
-
-    document.getElementById('reload-btn').addEventListener('click', () => {
-      if (newWorker) {
-        newWorker.postMessage({ type: 'SKIP_WAITING' });
-      }
-    });
-
-    document.getElementById('dismiss-btn').addEventListener('click', () => {
-      document.getElementById('update-toast').classList.add('hidden');
-    });
   </script>
 </body>
 

@@ -1,7 +1,68 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- Global Variables ---
-    const masihiTargetDate = new Date('2026-02-19T00:00:00');
-    const hijriTargetDate = new Date('2026-02-18T19:29:00');
+    // --- Global Variables (fallback 2027 provisional; ramadan-config.json overrides when reachable) ---
+    // TODO(2027-recheck): sahkan tarikh rasmi 1 Ramadan 1448H + waktu Maghrib KL 7 Feb 2027
+    // sebaik sahaja pengumuman Penyimpan Mohor + api.waktusolat.app?year=2027 live (404 ketika ditulis).
+    let masihiTargetDate = new Date('2027-02-08T00:00:00');
+    let hijriTargetDate = new Date('2027-02-07T19:29:00');
+    let hijriInfoDateLabel = '7 Februari 2027';
+    // Fasa templat: before-rejab | rejab | syaaban | ramadan (fallback sama jika config gagal dibaca)
+    let hijriMonths = { rejab1: '2026-12-10', syaaban1: '2027-01-09', ramadan1: '2027-02-08' };
+    let templateFolders = { 'before-rejab': '1-before-rejab', 'rejab': '2-in-rejab', 'syaaban': '3-in-syaaban', 'ramadan': '' };
+    let testDates = { 'before-rejab': '2026-12-01', 'rejab': '2026-12-15', 'syaaban': '2027-01-15', 'ramadan': '2027-02-15' };
+    try {
+        const cfgRes = await fetch('/ramadan-config.json', { cache: 'no-store' });
+        if (cfgRes.ok) {
+            const cfg = await cfgRes.json();
+            if (cfg.ramadanStart) masihiTargetDate = new Date(cfg.ramadanStart);
+            if (cfg.hijriTarget) hijriTargetDate = new Date(cfg.hijriTarget);
+            if (cfg.labels && cfg.labels.hijriInfoDate) hijriInfoDateLabel = cfg.labels.hijriInfoDate;
+            if (cfg.hijriMonths) hijriMonths = { ...hijriMonths, ...cfg.hijriMonths };
+            if (cfg.templateFolders) templateFolders = { ...templateFolders, ...cfg.templateFolders };
+            if (cfg.testDates) testDates = { ...testDates, ...cfg.testDates };
+        }
+    } catch (e) {
+        console.warn('ramadan-config.json tidak dapat dibaca, guna fallback:', e);
+    }
+
+    // --- Fasa + parameter ujian (?testDate / ?test / ?debug) ---
+    // Keutamaan: ?testDate=YYYY-MM-DD > ?test=<fasa> > tarikh sebenar. ?debug=1 papar panel rujukan.
+    const urlParams = new URLSearchParams(window.location.search);
+    const testAliases = {
+        'before-rejab': 'before-rejab', '1-before-rejab': 'before-rejab', '1': 'before-rejab',
+        'rejab': 'rejab', '2-in-rejab': 'rejab', '2': 'rejab',
+        'syaaban': 'syaaban', '3-in-syaaban': 'syaaban', '3': 'syaaban',
+        'ramadan': 'ramadan', '4-in-ramadan': 'ramadan', '4': 'ramadan'
+    };
+    function resolvePhase(d) {
+        const t = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+        const r1 = new Date(hijriMonths.ramadan1 + 'T00:00:00').getTime();
+        const s1 = new Date(hijriMonths.syaaban1 + 'T00:00:00').getTime();
+        const j1 = new Date(hijriMonths.rejab1 + 'T00:00:00').getTime();
+        if (t >= r1) return 'ramadan';
+        if (t >= s1) return 'syaaban';
+        if (t >= j1) return 'rejab';
+        return 'before-rejab';
+    }
+    let dateSource = 'live';
+    let effectiveDate = new Date(Date.now() + timeOffset);
+    const testDateParam = urlParams.get('testDate');
+    const testParam = (urlParams.get('test') || '').toLowerCase().trim();
+    if (testDateParam && !isNaN(new Date(testDateParam + 'T00:00:00').getTime())) {
+        effectiveDate = new Date(testDateParam + 'T00:00:00');
+        dateSource = 'testDate';
+    } else if (testParam && testAliases[testParam] && testDates[testAliases[testParam]]) {
+        effectiveDate = new Date(testDates[testAliases[testParam]] + 'T00:00:00');
+        dateSource = 'test';
+    }
+    let activePhase = resolvePhase(effectiveDate);
+    function templateBase() {
+        const folder = templateFolders[activePhase];
+        return folder ? `media/template/${folder}` : 'media/template';
+    }
+    const debugMode = urlParams.get('debug') === '1' || urlParams.has('debug') && urlParams.get('debug') === '';
+    if (dateSource !== 'live' || debugMode) {
+        console.log(`[countdown] fasa=${activePhase} sumber=${dateSource} tarikh=${effectiveDate.toDateString()} templat=${templateBase()}`);
+    }
     let hijriInterval;
     let timeOffset = 0;
     let activeExportButton = null;
@@ -132,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function initializeHijriCountdown() {
-        hijriInfoDisplay.innerHTML = `Kiraan detik ke waktu Maghrib bagi wilayah Kuala Lumpur <strong>(${formatTimeForDisplay(hijriTargetDate)})</strong> pada 18 Februari 2026.`;
+        hijriInfoDisplay.innerHTML = `Kiraan detik ke waktu Maghrib bagi wilayah Kuala Lumpur <strong>(${formatTimeForDisplay(hijriTargetDate)})</strong> pada ${hijriInfoDateLabel}.`;
         startHijriCountdown();
     }
     
@@ -282,16 +343,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = masihiDaysDisplay.textContent;
         const options = {
-            templateSrc: `media/template/template-masihi.png${getCacheBustParam()}`,
-            texts: [{ 
-                text: days, 
-                font: '700 300px Merriweather', 
-                color: '#FFFFFF', 
+            templateSrc: `${templateBase()}/template-masihi.png${getCacheBustParam()}`,
+            texts: [{
+                text: days,
+                font: '700 300px Merriweather',
+                color: '#FFFFFF',
                 spacing: 15,
                 yOffset: -5,
-                shadowColor: 'rgba(0,0,0,0.3)', 
-                shadowBlur: 15, 
-                shadowOffsetY: 10 
+                shadowColor: 'rgba(0,0,0,0.3)',
+                shadowBlur: 15,
+                shadowOffsetY: 10
             }],
             filename: `KiraanDetikRamadan-Masihi-${days}hari.png`,
             button: unifiedExportBtn
@@ -304,7 +365,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = hijriElements.days.textContent;
         const options = {
-            templateSrc: `media/template/template-hijri.png${getCacheBustParam()}`,
+            templateSrc: `${templateBase()}/template-hijri.png${getCacheBustParam()}`,
             texts: [{ 
                 text: days, 
                 font: '700 300px Merriweather', 
@@ -326,5 +387,31 @@ document.addEventListener('DOMContentLoaded', async () => {
         await synchronizeWithMalaysiaTime();
         calculateAndDisplayMasihiDays();
         initializeHijriCountdown();
+        // Lencana fasa ketika mod ujian aktif (?test / ?testDate)
+        if (dateSource !== 'live') {
+            const badge = document.createElement('div');
+            badge.id = 'phase-badge';
+            badge.textContent = `MOD UJIAN — fasa: ${activePhase} (${dateSource})`;
+            badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;background:#f59e0b;color:#000;font:700 12px sans-serif;padding:8px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
+            document.body.appendChild(badge);
+        }
+        // Panel rujukan ?debug=1 — senarai semua parameter ujian
+        if (debugMode) {
+            const phases = ['before-rejab', 'rejab', 'syaaban', 'ramadan'];
+            const links = phases.map(p => `<li><a href="?test=${p}">${p}</a> → ${testDates[p]} → <code>${templateFolders[p] ? 'media/template/' + templateFolders[p] : 'media/template (root)'}</code></li>`).join('');
+            const panel = document.createElement('div');
+            panel.id = 'debug-panel';
+            panel.innerHTML = `<strong>DEBUG — parameter ujian</strong><br>`
+                + `sumber tarikh: <code>${dateSource}</code> | tarikh berkesan: <code>${effectiveDate.toDateString()}</code><br>`
+                + `fasa: <code>${activePhase}</code> | templat: <code>${templateBase()}</code><br>`
+                + `config: ramadanStart=<code>${masihiTargetDate.toISOString()}</code> hijriTarget=<code>${hijriTargetDate.toISOString()}</code><br>`
+                + `hijriMonths: rejab1=<code>${hijriMonths.rejab1}</code> syaaban1=<code>${hijriMonths.syaaban1}</code> ramadan1=<code>${hijriMonths.ramadan1}</code>`
+                + `<ul>${links}</ul>`
+                + `<div>?testDate=YYYY-MM-DD mengatasi ?test. <a href="?">mod live</a> | cth: <a href="?testDate=2026-12-15">?testDate=2026-12-15</a></div>`;
+            panel.style.cssText = 'position:fixed;top:12px;right:12px;z-index:9999;background:#111;color:#eee;font:12px/1.6 sans-serif;padding:12px 14px;border-radius:10px;max-width:340px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
+            panel.querySelectorAll('a').forEach(a => { a.style.color = '#fbbf24'; });
+            document.body.appendChild(panel);
+            console.log('[countdown][debug]', { dateSource, effectiveDate: effectiveDate.toString(), activePhase, template: templateBase(), hijriMonths, testDates });
+        }
     })();
 });
