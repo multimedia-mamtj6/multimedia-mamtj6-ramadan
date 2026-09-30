@@ -61,6 +61,8 @@ Countdown Hijri/Masihi + export PNG ikut fasa (PWA off).
   countdown/?test=syaaban        countdown/?test=ramadan
   countdown/?debug=1             (panel rujukan semua parameter + pautan pantas)
   countdown/?testDate=2026-12-15 (mengatasi ?test)
+  countdown/?testDate=2026-12-17 (nombor simulasi — detik berdetik dari 00:00 tarikh itu)
+  countdown/?testDate=2027-02-07&testTime=18:00 (simulasi malam Maghrib — uji detik akhir Hijri)
   ```
   Lencana `MOD UJIAN` muncul bila override aktif. Serve: `python -m http.server 8000`.
 

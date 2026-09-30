@@ -23,6 +23,12 @@
     "syaaban": "3-in-syaaban",
     "ramadan": ""
   },
+  "templateFiles": {
+    "before-rejab": { "hijri": "hijri-before-rejab.png", "masihi": "masihi-before-rejab.png" },
+    "rejab": { "hijri": "hijri-in-rejab.png", "masihi": "masihi-in-rejab.png" },
+    "syaaban": { "hijri": "hijri-in-syaaban.png", "masihi": "masihi-in-syaaban.png" },
+    "ramadan": { "hijri": "hijri-in-ramadan.png", "masihi": "masihi-in-ramadan.png" }
+  },
   "testDates": {
     "before-rejab": "2026-12-01",
     "rejab": "2026-12-15",

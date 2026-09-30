@@ -8,6 +8,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Fasa templat: before-rejab | rejab | syaaban | ramadan (fallback sama jika config gagal dibaca)
     let hijriMonths = { rejab1: '2026-12-10', syaaban1: '2027-01-09', ramadan1: '2027-02-08' };
     let templateFolders = { 'before-rejab': '1-before-rejab', 'rejab': '2-in-rejab', 'syaaban': '3-in-syaaban', 'ramadan': '' };
+    let templateFiles = {
+        'before-rejab': { hijri: 'hijri-before-rejab.png', masihi: 'masihi-before-rejab.png' },
+        'rejab': { hijri: 'hijri-in-rejab.png', masihi: 'masihi-in-rejab.png' },
+        'syaaban': { hijri: 'hijri-in-syaaban.png', masihi: 'masihi-in-syaaban.png' },
+        'ramadan': { hijri: 'hijri-in-ramadan.png', masihi: 'masihi-in-ramadan.png' }
+    };
     let testDates = { 'before-rejab': '2026-12-01', 'rejab': '2026-12-15', 'syaaban': '2027-01-15', 'ramadan': '2027-02-15' };
     try {
         const cfgRes = await fetch('/ramadan-config.json', { cache: 'no-store' });
@@ -18,6 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (cfg.labels && cfg.labels.hijriInfoDate) hijriInfoDateLabel = cfg.labels.hijriInfoDate;
             if (cfg.hijriMonths) hijriMonths = { ...hijriMonths, ...cfg.hijriMonths };
             if (cfg.templateFolders) templateFolders = { ...templateFolders, ...cfg.templateFolders };
+            if (cfg.templateFiles) templateFiles = { ...templateFiles, ...cfg.templateFiles };
             if (cfg.testDates) testDates = { ...testDates, ...cfg.testDates };
         }
     } catch (e) {
@@ -44,6 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 'before-rejab';
     }
     let dateSource = 'live';
+    let timeOffset = 0;
     let effectiveDate = new Date(Date.now() + timeOffset);
     const testDateParam = urlParams.get('testDate');
     const testParam = (urlParams.get('test') || '').toLowerCase().trim();
@@ -54,17 +62,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         effectiveDate = new Date(testDates[testAliases[testParam]] + 'T00:00:00');
         dateSource = 'test';
     }
+    // ?testTime=HH:MM (24j) — hanya bermakna bersama ?testDate / ?test; lalai 00:00 (tengah malam).
+    // Format tidak sah atau tanpa mod ujian → diabaikan (jam live digunakan).
+    const testTimeMatch = /^(\d{1,2}):(\d{2})$/.exec((urlParams.get('testTime') || '').trim());
+    if ((dateSource === 'testDate' || dateSource === 'test') && testTimeMatch) {
+        const hh = parseInt(testTimeMatch[1], 10);
+        const mm = parseInt(testTimeMatch[2], 10);
+        if (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59) {
+            effectiveDate = new Date(effectiveDate.getFullYear(), effectiveDate.getMonth(), effectiveDate.getDate(), hh, mm, 0);
+        }
+    }
+    // Jam simulasi: tarikh efektif + masa nyata yang berlalu sejak load (detik terus berdetik).
+    // Mod live: jam peranti + offset penyegerakan Malaysia.
+    const simAnchor = effectiveDate.getTime();
+    const realAnchor = Date.now();
+    function getNow() {
+        if (dateSource === 'testDate' || dateSource === 'test') {
+            return new Date(simAnchor + (Date.now() - realAnchor));
+        }
+        return new Date(Date.now() + timeOffset);
+    }
     let activePhase = resolvePhase(effectiveDate);
     function templateBase() {
         const folder = templateFolders[activePhase];
         return folder ? `media/template/${folder}` : 'media/template';
     }
+    function templatePath(kind) {
+        return `${templateBase()}/${templateFiles[activePhase][kind]}`;
+    }
     const debugMode = urlParams.get('debug') === '1' || urlParams.has('debug') && urlParams.get('debug') === '';
     if (dateSource !== 'live' || debugMode) {
-        console.log(`[countdown] fasa=${activePhase} sumber=${dateSource} tarikh=${effectiveDate.toDateString()} templat=${templateBase()}`);
+        console.log(`[countdown] fasa=${activePhase} sumber=${dateSource} tarikh=${effectiveDate.toString()} templat=${templatePath('masihi')} / ${templatePath('hijri')}`);
     }
     let hijriInterval;
-    let timeOffset = 0;
+    let masihiInterval;
     let activeExportButton = null;
     const CIRCUMFERENCE = 220;
 
@@ -117,18 +148,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // --- Fungsi Kiraan Hari Masihi (dengan logik Fade In) ---
-    function calculateAndDisplayMasihiDays() {
-        const now = new Date(Date.now() + timeOffset);
-        const timeRemaining = masihiTargetDate - now;
+    // --- Kiraan Masihi langsung (hari + jam/minit/saat, cermin logik Hijri) ---
+    // Nota: objek masihiElements diisytihar selepas seksyen DOM Elements (memerlukan masihiPanel).
+
+    function updateMasihiCountdown(targetDate, elements) {
+        if (!targetDate) return;
+        const now = getNow();
+        const timeRemaining = targetDate - now;
         if (timeRemaining < 0) {
-            masihiDaysDisplay.parentElement.style.display = 'none';
+            elements.countdownContainer.style.display = 'none';
             document.getElementById('masihi-message').style.display = 'block';
+            clearInterval(masihiInterval);
             return;
         }
-        const days = Math.ceil(timeRemaining / (1000 * 60 * 60 * 24));
-        masihiDaysDisplay.textContent = days;
-        
+        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        elements.days.textContent = days;
+        elements.hoursText.textContent = formatTime(hours);
+        elements.minutesText.textContent = formatTime(minutes);
+        elements.secondsText.textContent = formatTime(seconds);
+        if (days === 0) {
+            elements.days.style.display = 'none';
+            elements.daysLabel.style.display = 'none';
+            elements.countdownContainer.classList.add('final-day');
+        } else {
+            elements.days.style.display = 'block';
+            elements.daysLabel.style.display = 'block';
+            elements.countdownContainer.classList.remove('final-day');
+        }
+        updateProgress(elements.hoursCircle, hours, 24);
+        updateProgress(elements.minutesCircle, minutes, 60);
+        updateProgress(elements.secondsCircle, seconds, 60);
+        pulseOnChange(elements, 'days', days);
+        pulseOnChange(elements, 'hours', hours);
+        pulseOnChange(elements, 'minutes', minutes);
+    }
+
+    function startMasihiCountdown() {
+        if (masihiInterval) clearInterval(masihiInterval);
+        updateMasihiCountdown(masihiTargetDate, masihiElements);
+        masihiInterval = setInterval(() => updateMasihiCountdown(masihiTargetDate, masihiElements), 1000);
     }
 
      // --- Helper Functions ---
@@ -139,6 +200,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     function formatTimeForDisplay(dateObject) {
         return dateObject.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    // Pop + glow pada ring jam/minit dan nombor hari ketika nilainya bertukar
+    // (saat dikecualikan — terlalu kerap). Tiada pop pada lukisan pertama.
+    function pulseOnChange(elements, slot, value) {
+        const key = '_prev_' + slot;
+        if (elements[key] === undefined) {
+            elements[key] = value;
+            return;
+        }
+        if (value === elements[key]) return;
+        elements[key] = value;
+        // Slot 'days' tiada ring — animasikan nombor hari itu sendiri (bukan container).
+        const target = slot === 'days' ? elements.days : elements[slot + 'Circle'];
+        const box = slot === 'days' ? target : (target ? target.closest('.time-box') : null);
+        if (!box) return;
+        box.classList.remove('tick-pop');
+        void box.offsetWidth; // paksa reflow supaya animasi boleh dicetus semula
+        box.classList.add('tick-pop');
+        setTimeout(() => box.classList.remove('tick-pop'), 500);
     }
 
     // --- Countdown Elements (Hijri) ---
@@ -155,10 +235,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         message: document.getElementById('hijri-message'),
     };
 
+    // --- Elemen Masihi (diisi selepas DOM; memerlukan masihiPanel) ---
+    const masihiElements = {
+        days: document.getElementById('masihi-days'),
+        daysLabel: masihiPanel.querySelector('.days-label'),
+        hoursText: document.getElementById('masihi-hours-text'),
+        minutesText: document.getElementById('masihi-minutes-text'),
+        secondsText: document.getElementById('masihi-seconds-text'),
+        hoursCircle: document.getElementById('masihi-hours-circle'),
+        minutesCircle: document.getElementById('masihi-minutes-circle'),
+        secondsCircle: document.getElementById('masihi-seconds-circle'),
+        countdownContainer: masihiPanel.querySelector('.countdown-container'),
+        message: document.getElementById('masihi-message'),
+    };
+
      // --- Core Countdown Logic (Hijri) ---
     function updateHijriCountdown(targetDate, elements) {
         if (!targetDate) return;
-        const now = new Date(Date.now() + timeOffset);
+        const now = getNow();
         const timeRemaining = targetDate - now;
         if (timeRemaining < 0) {
             elements.countdownContainer.style.display = 'none';
@@ -177,13 +271,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (days === 0) {
             elements.days.style.display = 'none';
             elements.daysLabel.style.display = 'none';
+            elements.countdownContainer.classList.add('final-day');
         } else {
             elements.days.style.display = 'block';
             elements.daysLabel.style.display = 'block';
+            elements.countdownContainer.classList.remove('final-day');
         }
         updateProgress(elements.hoursCircle, hours, 24);
         updateProgress(elements.minutesCircle, minutes, 60);
         updateProgress(elements.secondsCircle, seconds, 60);
+        pulseOnChange(elements, 'days', days);
+        pulseOnChange(elements, 'hours', hours);
+        pulseOnChange(elements, 'minutes', minutes);
     }
 
     function startHijriCountdown() {
@@ -209,12 +308,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             tabContainer.dataset.activeTab = targetTab;
             
             if (targetTab === 'masihi') {
-                // Hentikan kiraan Hijri & tukar panel
+                // Hentikan kiraan Hijri, mulakan kiraan Masihi & tukar panel
                 clearInterval(hijriInterval);
                 hijriPanel.classList.remove('active-panel');
                 masihiPanel.classList.add('active-panel');
+                startMasihiCountdown();
             } else {
-                // Tukar panel & mulakan kiraan Hijri
+                // Hentikan kiraan Masihi, mulakan kiraan Hijri & tukar panel
+                clearInterval(masihiInterval);
                 masihiPanel.classList.remove('active-panel');
                 hijriPanel.classList.add('active-panel');
                 startHijriCountdown();
@@ -343,7 +444,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = masihiDaysDisplay.textContent;
         const options = {
-            templateSrc: `${templateBase()}/template-masihi.png${getCacheBustParam()}`,
+            templateSrc: `${templatePath('masihi')}${getCacheBustParam()}`,
             texts: [{
                 text: days,
                 font: '700 300px Merriweather',
@@ -365,7 +466,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Nota: closeChoicePopup() telah dibuang untuk membenarkan logik 'kembali'
         const days = hijriElements.days.textContent;
         const options = {
-            templateSrc: `${templateBase()}/template-hijri.png${getCacheBustParam()}`,
+            templateSrc: `${templatePath('hijri')}${getCacheBustParam()}`,
             texts: [{ 
                 text: days, 
                 font: '700 300px Merriweather', 
@@ -384,34 +485,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- Initial Load ---
     (async () => {
-        await synchronizeWithMalaysiaTime();
-        calculateAndDisplayMasihiDays();
+        // Mod ujian: abaikan penyegerakan masa (jam simulasi deterministik dari ?testDate/?test).
+        if (dateSource === 'live') {
+            await synchronizeWithMalaysiaTime();
+        }
         initializeHijriCountdown();
+        startMasihiCountdown();
         // Lencana fasa ketika mod ujian aktif (?test / ?testDate)
         if (dateSource !== 'live') {
             const badge = document.createElement('div');
             badge.id = 'phase-badge';
-            badge.textContent = `MOD UJIAN — fasa: ${activePhase} (${dateSource})`;
+            badge.textContent = `MOD UJIAN — fasa: ${activePhase} (${dateSource} ${effectiveDate.toLocaleString('ms-MY', { hour12: false })})`;
             badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:9999;background:#f59e0b;color:#000;font:700 12px sans-serif;padding:8px 12px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.3);';
             document.body.appendChild(badge);
         }
         // Panel rujukan ?debug=1 — senarai semua parameter ujian
         if (debugMode) {
             const phases = ['before-rejab', 'rejab', 'syaaban', 'ramadan'];
-            const links = phases.map(p => `<li><a href="?test=${p}">${p}</a> → ${testDates[p]} → <code>${templateFolders[p] ? 'media/template/' + templateFolders[p] : 'media/template (root)'}</code></li>`).join('');
+            const links = phases.map(p => `<li><a href="?test=${p}">${p}</a> → ${testDates[p]} → <code>${templateFolders[p] ? 'media/template/' + templateFolders[p] + '/' : 'media/template/'}${templateFiles[p].masihi} / ${templateFiles[p].hijri}</code></li>`).join('');
             const panel = document.createElement('div');
             panel.id = 'debug-panel';
             panel.innerHTML = `<strong>DEBUG — parameter ujian</strong><br>`
                 + `sumber tarikh: <code>${dateSource}</code> | tarikh berkesan: <code>${effectiveDate.toDateString()}</code><br>`
-                + `fasa: <code>${activePhase}</code> | templat: <code>${templateBase()}</code><br>`
+                + `jam simulasi: <code>${getNow().toLocaleString('ms-MY', { hour12: false })}</code> (tambah <code>&testTime=HH:MM</code> untuk ubah)<br>`
+                + `fasa: <code>${activePhase}</code> | templat: <code>${templatePath('masihi')} / ${templatePath('hijri')}</code><br>`
                 + `config: ramadanStart=<code>${masihiTargetDate.toISOString()}</code> hijriTarget=<code>${hijriTargetDate.toISOString()}</code><br>`
                 + `hijriMonths: rejab1=<code>${hijriMonths.rejab1}</code> syaaban1=<code>${hijriMonths.syaaban1}</code> ramadan1=<code>${hijriMonths.ramadan1}</code>`
                 + `<ul>${links}</ul>`
-                + `<div>?testDate=YYYY-MM-DD mengatasi ?test. <a href="?">mod live</a> | cth: <a href="?testDate=2026-12-15">?testDate=2026-12-15</a></div>`;
+                + `<div>?testDate=YYYY-MM-DD mengatasi ?test; <code>&testTime=HH:MM</code> pilihan (lalai 00:00). <a href="?">mod live</a> | cth: <a href="?testDate=2026-12-15">?testDate=2026-12-15</a> <a href="?testDate=2027-02-07&testTime=18:00">maghrib eve 18:00</a></div>`;
             panel.style.cssText = 'position:fixed;top:12px;right:12px;z-index:9999;background:#111;color:#eee;font:12px/1.6 sans-serif;padding:12px 14px;border-radius:10px;max-width:340px;box-shadow:0 2px 12px rgba(0,0,0,.4);';
             panel.querySelectorAll('a').forEach(a => { a.style.color = '#fbbf24'; });
             document.body.appendChild(panel);
-            console.log('[countdown][debug]', { dateSource, effectiveDate: effectiveDate.toString(), activePhase, template: templateBase(), hijriMonths, testDates });
+            console.log('[countdown][debug]', { dateSource, effectiveDate: effectiveDate.toString(), activePhase, template: [templatePath('masihi'), templatePath('hijri')], hijriMonths, testDates });
         }
     })();
 });

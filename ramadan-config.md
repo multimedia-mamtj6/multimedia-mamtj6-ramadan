@@ -37,6 +37,7 @@ Lokasi: `/ramadan-config.json` (root repo).
 | `hijriMonths.ramadan1` | `YYYY-MM-DD` | Tarikh Gregorian 1 Ramadan (= `ramadanStart` tarikhnya). Menandakan mula fasa `ramadan`. Sebelum `rejab1` = fasa `before-rejab`. |
 | `hijriMonths.note` | string | Nota TODO-recheck manusia sahaja. |
 | `templateFolders` | object | Peta fasa → subfolder dalam `countdown/media/template/`. String kosong (`""` untuk `ramadan`) = guna root. |
+| `templateFiles` | object | Peta fasa → `{ hijri, masihi }` nama fail PNG. Cth. `rejab` → `hijri-in-rejab.png` / `masihi-in-rejab.png`. Laluan penuh = `templateFolders[fasa]/templateFiles[fasa][jenis]`. |
 | `testDates` | object | Tarikh wakil setiap fasa untuk `?test=`. Cth. `rejab` → `2026-12-15`. |
 | `labels.headerYear` | string | Paparan tahun di header (jika disambungkan ke UI pada masa depan). |
 | `labels.masihiInfo` | string | Teks info panel Masihi (rujukan masa depan). |
@@ -45,6 +46,7 @@ Lokasi: `/ramadan-config.json` (root repo).
 ## Logik berkaitan (jangan ubah tanpa sebab)
 
 - Keutamaan tarikh berkesan: `?testDate=YYYY-MM-DD` > `?test=<fasa>` > tarikh sebenar.
+- `&testTime=HH:MM` (24j, pilihan) menetapkan masa simulasi bersama `?testDate`/`?test`; lalai `00:00`. Tanpa mod ujian ia diabaikan.
 - Sempadan fasa: `t >= ramadan1` → ramadan; `>= syaaban1` → syaaban; `>= rejab1` → rejab; selainnya before-rejab.
 - `?debug=1` memaparkan kesemua nilai di atas + pautan ujian — buka itu dahulu jika terlupa.
 - Tarikh 2027 semasa provisional — sahkan semula selepas pengumuman rasmi + API live.

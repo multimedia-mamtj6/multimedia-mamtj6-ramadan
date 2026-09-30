@@ -206,11 +206,20 @@ body::before {
 .days-label { font-size: clamp(1.5rem, 6vw, 2.5rem); margin-top: -15px; font-weight: 700; color: var(--text-color); }
 .time-container { display: flex; justify-content: center; margin-top: 30px; gap: 15px; }
 .time-box { text-align: center; }
-.progress-ring { width: 80px; height: 80px; }
+.progress-ring { width: 80px; height: 80px; transition: width .5s ease; }
+/* Saiz finale 2x — hanya bila hari = 0 (nombor hari disorok, kelas ditogol dari script.js) */
+.countdown-container.final-day .progress-ring { width: clamp(96px, 28vw, 160px); height: auto; }
 .circle-bg { fill: none; stroke: var(--container-bg); stroke-width: 8; }
 .circle-progress { fill: none; stroke: var(--primary-color); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 220; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.5s linear; }
 .time-text { font-size: 1.5rem; font-weight: 700; fill: var(--text-color); text-anchor: middle; dominant-baseline: middle; }
 .label { font-size: 1rem; color: var(--text-color); opacity: 0.8; margin-top: 10px; }
+/* Pop + glow ringkas ketika angka minit bertukar (dicetus dari script.js) */
+.time-box.tick-pop { animation: tick-pop .45s ease-out; }
+@keyframes tick-pop {
+  0% { transform: scale(1); filter: none; }
+  30% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(52, 152, 219, .8)); }
+  100% { transform: scale(1); filter: none; }
+}
 .message { font-size: 2.5rem; font-weight: 700; color: #28a745; margin-top: 40px; padding: 20px; background-color: rgba(248, 249, 250, 0.9); border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); display: none; }
 
 /* FOOTER BAHARU */

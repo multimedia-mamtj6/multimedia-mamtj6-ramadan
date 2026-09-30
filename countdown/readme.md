@@ -38,7 +38,7 @@ Projek ini diuruskan melalui beberapa fail dan folder utama:
     *   `/image/ramadan-kareem.svg`: Kaligrafi untuk header laman.
     *   `/favicon/`: Mengandungi set penuh ikon laman web (`.ico`, `.svg`, `.png`, `manifest`).
     *   `/preview/link-preview.jpg`: Imej pratonton (1200x630) untuk perkongsian di media sosial.
-    *   `/template/template-masihi.png` & `template-hijri.png`: Templat latar belakang (1080x1080) untuk eksport PNG.
+    *   `/template/`: Templat latar belakang 1080x1080 ikut fasa untuk eksport PNG — `1-before-rejab/hijri-before-rejab.png` + `masihi-before-rejab.png`, `2-in-rejab/hijri-in-rejab.png` + `masihi-in-rejab.png`, `3-in-syaaban/hijri-in-syaaban.png` + `masihi-in-syaaban.png`, root `hijri-in-ramadan.png` + `masihi-in-ramadan.png` (dipetakan oleh `templateFolders` + `templateFiles` dalam `/ramadan-config.json`).
 
 ### 4. Pemasangan dan Penggunaan
 
