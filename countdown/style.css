@@ -213,8 +213,8 @@ body::before {
 .circle-progress { fill: none; stroke: var(--primary-color); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 220; stroke-dashoffset: 220; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke-dashoffset 0.5s linear; }
 .time-text { font-size: 1.5rem; font-weight: 700; fill: var(--text-color); text-anchor: middle; dominant-baseline: middle; }
 .label { font-size: 1rem; color: var(--text-color); opacity: 0.8; margin-top: 10px; }
-/* Pop + glow ringkas ketika angka minit bertukar (dicetus dari script.js) */
-.time-box.tick-pop { animation: tick-pop .45s ease-out; }
+/* Pop + glow ringkas ketika angka bertukar (dicetus dari script.js) */
+.time-box.tick-pop, .days-display.tick-pop { animation: tick-pop .45s ease-out; }
 @keyframes tick-pop {
   0% { transform: scale(1); filter: none; }
   30% { transform: scale(1.1); filter: drop-shadow(0 0 12px rgba(52, 152, 219, .8)); }
